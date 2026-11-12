@@ -136,7 +136,7 @@ struct FixedDepositsView: View {
                 rates: [7.25, 7.55, 7.25, 7.20], rating: .insured),
         Deposit(name: "Utkarsh SF Bank", logo: "FDLICHousing", kind: .smallFinance,
                 rates: [6.00, 7.50, 7.50, 7.00], rating: .insured),
-        Deposit(name: "AU SF Bank", logo: "FDManipal", kind: .smallFinance,
+        Deposit(name: "AU SF Bank", logo: "FDAU", kind: .smallFinance,
                 rates: [6.35, 7.00, 7.40, 6.75], rating: .insured),
     ]
 

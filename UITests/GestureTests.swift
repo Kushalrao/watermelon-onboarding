@@ -57,7 +57,7 @@ final class GestureTests: XCTestCase {
     /// Fixed deposits: hold a card to lift it out with its questions, then swipe one right to ask about it
     func testFDHoldAndSwipe() {
         let app = XCUIApplication()
-        app.launchArguments = ["-fd"]
+        app.launchArguments = ["-fd", "-fdListV1"]
         app.launch()
         sleep(2)
         func point(_ x: CGFloat, _ y: CGFloat) -> XCUICoordinate {
@@ -80,7 +80,7 @@ final class GestureTests: XCTestCase {
     /// Fixed deposits: the small finance banks, then returns calculated on an amount
     func testFDBanksAndReturns() {
         let app = XCUIApplication()
-        app.launchArguments = ["-fd"]
+        app.launchArguments = ["-fd", "-fdListV1"]
         app.launch()
         sleep(2)
         func shot(_ name: String) {
@@ -104,7 +104,7 @@ final class GestureTests: XCTestCase {
     /// Fixed deposits: a tap on a bank's card pushes its page; back pops to the list
     func testFDBankPage() {
         let app = XCUIApplication()
-        app.launchArguments = ["-fd", "-fdBankV1"]
+        app.launchArguments = ["-fd", "-fdListV1", "-fdBankV1"]
         app.launch()
         sleep(2)
         func shot(_ name: String) {
@@ -138,7 +138,7 @@ final class GestureTests: XCTestCase {
     /// Fixed deposits: the second version of the bank's page, the default
     func testFDBankPageV2() {
         let app = XCUIApplication()
-        app.launchArguments = ["-fd"]
+        app.launchArguments = ["-fd", "-fdListV1"]
         app.launch()
         sleep(2)
         func shot(_ name: String) {
@@ -192,6 +192,14 @@ final class GestureTests: XCTestCase {
         sleep(2)
         XCTAssertTrue(app.staticTexts["Your FD at maturity will be Rs75,213"].exists)
         shot("plan-2")
+        // Continue turns the card into the review; its chevron turns it back
+        app.buttons["Continue"].tap()
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["Start your fixed deposit"].exists)
+        XCTAssertTrue(app.staticTexts["Rs75,213"].exists)
+        shot("plan-review")
+        app.buttons["Back to amount"].tap()
+        sleep(2)
         app.buttons["Close plan"].tap()
         sleep(2)
         XCTAssertFalse(app.buttons["Continue"].exists)
@@ -465,7 +473,7 @@ final class GestureTests: XCTestCase {
 
     func testFixedDeposits() {
         let app = XCUIApplication()
-        app.launchArguments = ["-fd"]
+        app.launchArguments = ["-fd", "-fdListV1"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Bajaj Finance"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["Compare returns"].exists)
@@ -482,7 +490,7 @@ final class GestureTests: XCTestCase {
 
     func testCompareReturns() {
         let app = XCUIApplication()
-        app.launchArguments = ["-fd"]
+        app.launchArguments = ["-fd", "-fdListV1"]
         app.launch()
         let compare = app.buttons["Compare returns"]
         XCTAssertTrue(compare.waitForExistence(timeout: 3))
@@ -739,5 +747,92 @@ final class GestureTests: XCTestCase {
         field.tap()
         field.typeText("Ok, show me past dips\n")
         sleep(4)
+    }
+
+    /// The fixed deposits page: hold a card, swipe it to the composer, the advisor pill, then a tap pushes the bank's page
+    func testFDHome() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-fd"]
+        app.launch()
+        sleep(2)
+        func shot(_ name: String) {
+            let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/" + name + ".png"))
+        }
+        func at(_ x: CGFloat, _ y: CGFloat) -> XCUICoordinate {
+            app.coordinate(withNormalizedOffset: CGVector(dx: x / 402, dy: y / 874))
+        }
+        XCTAssertTrue(app.staticTexts["Browse all fixed deposits"].exists)
+        shot("home-1")
+        app.swipeUp(velocity: .slow)
+        sleep(1)
+        app.swipeUp(velocity: .slow)
+        sleep(1)
+        shot("home-2")
+        at(200, 300).press(forDuration: 0.9)
+        sleep(2)
+        shot("home-held")
+        at(200, 840).tap()
+        sleep(2)
+        at(60, 300).press(forDuration: 0.05, thenDragTo: at(280, 300), withVelocity: .slow, thenHoldForDuration: 0.6)
+        sleep(2)
+        shot("home-swiped")
+        at(200, 100).tap()
+        sleep(2)
+        app.swipeUp(velocity: .slow)
+        sleep(1)
+        shot("home-3")
+        app.swipeUp(velocity: .slow)
+        sleep(1)
+        shot("home-4")
+        // The first card of the second run, under the advisor's tiles
+        at(200, 640).tap()
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["FIXED DEPOSIT"].exists)
+        shot("home-bank")
+        at(32, 95).tap()
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["Ask your advisor"].exists)
+    }
+
+    /// Search on the fixed deposits page: an intent narrows the deposits, a bank opens its page, and a pull down opens it too
+    func testFDSearch() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-fd"]
+        app.launch()
+        sleep(2)
+        func shot(_ name: String) {
+            let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/" + name + ".png"))
+        }
+        func at(_ x: CGFloat, _ y: CGFloat) -> XCUICoordinate {
+            app.coordinate(withNormalizedOffset: CGVector(dx: x / 402, dy: y / 874))
+        }
+        app.buttons["Search"].tap()
+        sleep(1)
+        shot("search-open")
+        app.typeText("short")
+        sleep(1)
+        shot("search-typed")
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Short term'")).firstMatch.tap()
+        sleep(2)
+        XCTAssertTrue(app.buttons["Clear search"].exists)
+        app.swipeUp(velocity: .slow)
+        sleep(1)
+        shot("search-intent")
+        app.buttons["Clear search"].tap()
+        sleep(1)
+        app.swipeDown(velocity: .fast)
+        sleep(1)
+        // Pull the page down past the threshold and let go
+        at(200, 300).press(forDuration: 0.05, thenDragTo: at(200, 520), withVelocity: .slow, thenHoldForDuration: 0.1)
+        sleep(2)
+        shot("search-pulled")
+        app.typeText("jana")
+        sleep(1)
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Jana SF Bank'")).firstMatch.tap()
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["FIXED DEPOSIT"].exists)
+        shot("search-bank")
     }
 }

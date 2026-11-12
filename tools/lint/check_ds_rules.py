@@ -15,7 +15,7 @@ import sys
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 COMPONENTS = os.path.join(ROOT, "Sources", "DesignSystem", "Components")
 # Screens built only from the design system. Add a file here when it has been moved over.
-ADOPTED = ["Sources/FixedDeposits.swift", "Sources/FixedDepositBank.swift", "Sources/FixedDepositBankV2.swift", "Sources/FixedDepositPlan.swift"]
+ADOPTED = ["Sources/FixedDeposits.swift", "Sources/FixedDepositBank.swift", "Sources/FixedDepositBankV2.swift", "Sources/FixedDepositPlan.swift", "Sources/FixedDepositsHome.swift"]
 
 RULES = [
     ("no_tier1", r"\b(FoundationTokens|SpacingPrimitives|ColorPrimitives|ShadowPrimitives)\.",

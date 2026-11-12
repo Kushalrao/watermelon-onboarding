@@ -96,6 +96,8 @@ enum FundContext: Equatable {
     case deposit(String)
     /// A card on a bank's page: the issuer, which card, and which version of the page it is on
     case bank(String, BankSection, v2: Bool)
+    /// A deposit's card on the fixed deposits page, by issuer and which of the page's two runs it is in
+    case fdCard(String, Int)
 
     /// The cards on a bank's page (`offers` is one of the second version's tenure groups)
     enum BankSection: Equatable {
@@ -124,7 +126,7 @@ enum FundContext: Equatable {
     /// The fixed deposit it is, for a deposit card or a card on its bank's page
     var deposit: FixedDepositsView.Deposit? {
         switch self {
-        case .deposit(let name), .bank(let name, _, _): FixedDepositsView.deposits.first { $0.name == name }
+        case .deposit(let name), .bank(let name, _, _), .fdCard(let name, _): FixedDepositsView.deposits.first { $0.name == name }
         default: nil
         }
     }
@@ -141,7 +143,7 @@ enum FundContext: Equatable {
         case .summary: "Fund summary for you"
         case .fundPerformance: "Fund performance"
         case .msftChart: "MSFT price chart"
-        case .deposit(let name): "\(name) FD"
+        case .deposit(let name), .fdCard(let name, _): "\(name) FD"
         case .bank(_, let section, _): section.title
         }
     }
@@ -155,7 +157,7 @@ enum FundContext: Equatable {
         case .summary: "Risk, goals, performance"
         case .fundPerformance: "Steady growth over years"
         case .msftChart: "NSE · 3Y"
-        case .deposit: deposit.map { "Up to \($0.rate) PA · \($0.ratingShort)" } ?? ""
+        case .deposit, .fdCard: deposit.map { "Up to \($0.rate) PA · \($0.ratingShort)" } ?? ""
         case .bank(let name, _, _): name
         }
     }
@@ -178,6 +180,7 @@ enum FundContext: Equatable {
         case .fundPerformance: FundPerformanceCard()
         case .msftChart: MSFTChartCard()
         case .deposit: if let deposit { DepositCard(deposit: deposit) }
+        case .fdCard: if let deposit { FDHomeCard(deposit: deposit) }
         case .bank(_, let section, let v2):
             if let deposit {
                 if v2 {

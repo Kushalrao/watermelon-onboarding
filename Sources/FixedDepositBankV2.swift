@@ -52,7 +52,7 @@ struct FixedDepositBankV2View: View {
                 FixedDepositPlanLayer(
                     deposit: deposit,
                     offer: Self.groups[plan.group].offers[plan.offer],
-                    swatch: Self.groups[plan.group].swatch,
+                    icon: Self.groups[plan.group].icon,
                     origin: plan.frame,
                     open: planOpen,
                     onClose: closePlan
@@ -265,19 +265,19 @@ struct FixedDepositBankV2View: View {
 
     private struct Group {
         let title: String
-        let swatch: Color
+        let icon: String
         let offers: [FDOffer]
     }
 
-    // Gap: the swatches use accent primitives (accent-pink/600, accent-lavender/600, accent-yellow/300); no semantic colour
+    // Figma 571:11994: each group's rows carry the bars on the group's colour
     private static let groups = [
-        Group(title: "More than 1 year", swatch: ColorPrimitives.accentPink600, // ds-lint-ignore: no_tier1
+        Group(title: "More than 1 year", icon: "FDTermLong",
               offers: [FDOffer(term: "5 years", rate: "8.25", years: 5), FDOffer(term: "3 years", rate: "4.00", years: 3),
                        FDOffer(term: "1 year", rate: "4.00", years: 1)]),
-        Group(title: "Up to 1 year", swatch: ColorPrimitives.accentLavender600, // ds-lint-ignore: no_tier1
+        Group(title: "Up to 1 year", icon: "FDTermMid",
               offers: [FDOffer(term: "6 months", rate: "4.00", years: 0.5), FDOffer(term: "9 months", rate: "4.00", years: 0.75),
                        FDOffer(term: "1 year", rate: "4.00", years: 1)]),
-        Group(title: "Up to 3 months", swatch: ColorPrimitives.accentYellow300, // ds-lint-ignore: no_tier1
+        Group(title: "Up to 3 months", icon: "FDTermShort",
               offers: [FDOffer(term: "14 days", rate: "4.00", years: 14.0 / 365), FDOffer(term: "45 days", rate: "4.25", years: 45.0 / 365),
                        FDOffer(term: "90 days", rate: "4.50", years: 90.0 / 365)]),
     ]
@@ -305,7 +305,7 @@ struct FixedDepositBankV2View: View {
     /// A plan; a tap grows it into its card
     private func offerRow(group: Int, offer: Int) -> some View {
         Surface(surface: .surfaceWidget, radius: .radius23, border: .borderSubtle, shadow: .none) {
-            FDOfferRowContent(offer: Self.groups[group].offers[offer], swatch: Self.groups[group].swatch)
+            FDOfferRowContent(offer: Self.groups[group].offers[offer], icon: Self.groups[group].icon)
         }
         // Gone from the page while it is the card
         .opacity(plan?.group == group && plan?.offer == offer ? 0 : 1)

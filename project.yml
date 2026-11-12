@@ -24,6 +24,7 @@ targets:
           - RecklessStandardS-TRIAL-Regular.otf
           - GT-Super-Text-Medium-Trial.otf
           - RecklessStandardS-TRIAL-SemiBold.otf
+          - RecklessCondensedS-TRIAL-SemiBold.otf
     settings:
       base:
         SWIFT_VERSION: "5.0"

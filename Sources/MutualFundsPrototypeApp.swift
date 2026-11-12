@@ -16,7 +16,12 @@ struct MutualFundsPrototypeApp: App {
             if ProcessInfo.processInfo.arguments.contains("chat") {
                 ChatExperienceView()
             } else if Self.opensOnFixedDeposits {
-                FixedDepositsView()
+                // The page by default; `-fdListV1` keeps the earlier list
+                if ProcessInfo.processInfo.arguments.contains("-fdListV1") {
+                    FixedDepositsView()
+                } else {
+                    FixedDepositsHomeView()
+                }
             } else {
                 RootView()
             }

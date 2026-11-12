@@ -14,17 +14,18 @@ struct FDOffer: Equatable {
     }
 }
 
-/// A plan's row on the bank's page: its group's swatch, the term, the rate and a chevron. Also what the plan's
+/// A plan's row on the bank's page: its group's icon, the term, the rate and a chevron. Also what the plan's
 /// card starts out as when the row grows into it.
 struct FDOfferRowContent: View {
     let offer: FDOffer
-    let swatch: Color
+    /// Its group's icon: the bars on the group's colour
+    let icon: String
 
     var body: some View {
         HStack(spacing: 0) {
-            RoundedRectangle(cornerRadius: RadiusToken.radius15.value, style: .continuous)
-                .fill(swatch)
+            Image(icon)
                 .frame(width: 39, height: 39)
+                .accessibilityHidden(true)
             // Gap: P3's size at 17/23 in black, unbound in the frame
             GapText(offer.term, family: .walsheim, medium: false, size: 17, lineHeight: 23, color: Color.black) // Gap: unbound black
                 .padding(.leading, SpacingScale.spaceLg)
@@ -34,7 +35,7 @@ struct FDOfferRowContent: View {
                 .padding(.leading, SpacingScale.spaceMd)
                 .accessibilityHidden(true)
         }
-        .padding(.leading, 16) // Gap: 16 beside the swatch, no spacing token
+        .padding(.leading, 16) // Gap: 16 beside the icon, no spacing token
         .padding(.trailing, 17) // Gap: 17 beside the chevron, no spacing token
         .frame(height: 75)
     }
@@ -58,7 +59,8 @@ struct FDRateText: View {
 struct FixedDepositPlanLayer: View {
     let deposit: FixedDepositsView.Deposit
     let offer: FDOffer
-    let swatch: Color
+    /// Its group's icon: the bars on the group's colour
+    let icon: String
     /// The row's frame on screen, where the card grows from and folds back to
     let origin: CGRect
     /// false = still the row, true = the card
@@ -73,6 +75,13 @@ struct FixedDepositPlanLayer: View {
     @State private var showsMaturity = false
     /// How long after the last key the foot waits before opening
     private static let typingPause: Duration = .milliseconds(650)
+
+    /// "Continue" has turned the card into the review of the deposit (Figma 659:19336); its chevron turns it back
+    @State private var reviewing = false
+    /// Whether the deposit is re-invested when it matures (the review's switch)
+    @State private var reinvests = true
+    private static let reviewHeight: CGFloat = 542
+    private static let reviewTransition = Animation.spring(response: 0.5, dampingFraction: 0.86)
 
     private var entered: Int? { Int(digits).flatMap { $0 > 0 ? $0 : nil } }
 
@@ -93,14 +102,16 @@ struct FixedDepositPlanLayer: View {
         GeometryReader { geo in
             let cardWidth = geo.size.width - Self.margin * 2
             let target = CGRect(x: Self.margin, y: geo.safeAreaInsets.top + 17, width: cardWidth,
-                                height: restyled ? Self.restyledHeight : showsMaturity ? Self.openHeight : Self.closedHeight)
+                                height: reviewing ? Self.reviewHeight : restyled ? Self.restyledHeight : showsMaturity ? Self.openHeight : Self.closedHeight)
+            // "Continue" sits 21 above the home indicator restyled and on the review, 27 on the first styling
+            let continueTop = geo.safeAreaInsets.top + geo.size.height - (restyled || reviewing ? 21 : 27) - 51
             let rect = open ? target : origin
             // The row's 23 corners; the restyled card's are 27
-            let shape = RoundedRectangle(cornerRadius: open && restyled ? 27 : 23, style: .continuous) // Gap: trial styling, as drawn
+            let shape = RoundedRectangle(cornerRadius: open && (restyled || reviewing) ? 27 : 23, style: .continuous) // Gap: trial styling, as drawn
 
             ZStack(alignment: .topLeading) {
                 // The page gives way to the plan's own ground
-                (restyled ? Color(hex: 0xF8FAF5) : ColorScale.surfaceBase) // Gap: trial styling, as drawn
+                (restyled && !reviewing ? Color(hex: 0xF8FAF5) : ColorScale.surfaceBase) // Gap: trial styling, as drawn
                     // The page starts to show through as the card is pulled down
                     .opacity(open ? 1 - min(0.6, pull / 300) : 0)
                     .contentShape(Rectangle())
@@ -111,20 +122,35 @@ struct FixedDepositPlanLayer: View {
                     keypad
                         .frame(width: geo.size.width)
                         .offset(y: target.minY + Self.openHeight + 26 + (open ? 0 : 40))
-                        .opacity(open ? 1 : 0)
+                        .opacity(open && !reviewing ? 1 : 0)
+                        .allowsHitTesting(!reviewing)
                 }
+
+                // The review's reassurances, 27 above "Continue"
+                security
+                    .frame(width: geo.size.width)
+                    .offset(y: continueTop - 27 - 87 + (open && reviewing ? 0 : 12))
+                    .opacity(open && reviewing ? 1 : 0)
+                    .accessibilityHidden(!reviewing)
 
                 // Pinned to the foot of the screen: 27 above the home indicator's 34, as in the frame (21 restyled)
                 continueButton
                     .frame(width: geo.size.width)
-                    .offset(y: geo.safeAreaInsets.top + geo.size.height - (restyled ? 21 : 27) - 51 + (open ? 0 : 40))
+                    .offset(y: continueTop + (open ? 0 : 40))
                     .opacity(open ? 1 : 0)
 
                 ZStack(alignment: .top) {
                     card(width: cardWidth)
                         .frame(width: cardWidth, height: restyled ? Self.restyledHeight : Self.openHeight, alignment: .top)
-                        .opacity(open ? 1 : 0)
-                    FDOfferRowContent(offer: offer, swatch: swatch)
+                        .opacity(open && !reviewing ? 1 : 0)
+                        .allowsHitTesting(!reviewing)
+                        .accessibilityHidden(reviewing)
+                    review
+                        .frame(width: cardWidth, height: Self.reviewHeight, alignment: .top)
+                        .opacity(open && reviewing ? 1 : 0)
+                        .allowsHitTesting(reviewing)
+                        .accessibilityHidden(!reviewing)
+                    FDOfferRowContent(offer: offer, icon: icon)
                         .frame(width: origin.width, height: origin.height)
                         .opacity(open ? 0 : 1)
                         .accessibilityHidden(true)
@@ -319,6 +345,154 @@ struct FixedDepositPlanLayer: View {
         .shadow(color: Color.black.opacity(restyled ? 0.05 : 0), radius: 42, x: 0, y: 2) // Gap: trial styling, 0 2 84 at 5% as drawn. ds-lint-ignore: no_raw_shadow
     }
 
+    // MARK: Review
+
+    /// Figma "iPhone 14 Plus - 459" (659:19336): the deposit to be started, in the same card. The bank over
+    /// "Start your fixed deposit", the amount and what it grows to, then the plan's terms.
+    private var review: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ZStack {
+                HStack(spacing: SpacingScale.spaceMd) {
+                    Image(deposit.logo)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 24, height: 24)
+                        .clipped()
+                        .frame(width: 33, height: 33)
+                        .background(ColorScale.surfaceWidget)
+                        .clipShape(RoundedRectangle(cornerRadius: 9.706, style: .continuous)) // Gap: 9.706 is not a Radius variable
+                        .overlay(RoundedRectangle(cornerRadius: 9.706, style: .continuous).strokeBorder(ColorScale.borderSubtle, lineWidth: BorderTokens.hairline)) // Gap: 9.706 is not a Radius variable
+                        .accessibilityHidden(true)
+                    // Gap: Md 17/23 at 5% tracking in black 50% has no text style or content token
+                    GapText(deposit.name.uppercased(), family: .walsheim, medium: true, size: 17, lineHeight: 23, trackingPercent: 5,
+                            color: Color.black.opacity(0.5)) // Gap: unbound black 50%
+                        .fixedSize()
+                }
+                Button {
+                    Haptics.tap()
+                    withAnimation(Self.reviewTransition) { reviewing = false }
+                } label: {
+                    Image("FDBack")
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Back to amount")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 3) // Gap: the chevron's leading edge 20 into the card
+            }
+            .frame(height: 63)
+
+            // Gap: Md 27/35 has no text style (H3 is 27/39)
+            GapText("Start your fixed deposit", family: .walsheim, medium: true, size: 27, lineHeight: 35, color: ColorScale.contentPrimary)
+                .padding(.top, 12) // Gap: 12 under the bar, no spacing token
+                .padding(.leading, 17) // Gap: 17 beside the title, no spacing token
+
+            reviewAmounts
+                .padding(.top, SpacingScale.space2xl)
+                .padding(.horizontal, 11) // Gap: 11 beside the box, no spacing token
+            Surface(radius: .radius23, border: .borderSubtle, shadow: .none) {
+                VStack(spacing: 0) {
+                    reviewTerm("Tenure", offer.term.capitalized)
+                    Hairline(.borderSubtle)
+                    reviewTerm("Interest rate", offer.rate + "%")
+                    Hairline(.borderSubtle)
+                    reviewTerm("Interest payout", "At maturity")
+                }
+            }
+            .padding(.top, SpacingScale.spaceMdLg)
+            .padding(.horizontal, 11) // Gap: 11 beside the box, no spacing token
+            reinvestBox
+                .padding(.top, SpacingScale.spaceMdLg)
+                .padding(.horizontal, 11) // Gap: 11 beside the box, no spacing token
+        }
+    }
+
+    /// Figma 699:24364: what happens at maturity, with a switch beside it to turn re-investing on and off
+    private var reinvestBox: some View {
+        Surface(radius: .radius23, border: .borderSubtle, shadow: .none) {
+            HStack(spacing: 0) {
+                Image("FDReviewRow").accessibilityHidden(true)
+                DsText("At maturity", variant: .p4, color: .contentTertiary)
+                    .padding(.leading, SpacingScale.spaceLg)
+                Spacer(minLength: 0)
+                DsText("Re invest", variant: .h6, color: reinvests ? .contentPrimary : .contentTertiary)
+                Toggle("Re invest at maturity", isOn: $reinvests)
+                    .labelsHidden()
+                    .padding(.leading, 10) // Gap: 10 between the value and the switch; the frame draws no switch
+            }
+            .padding(.leading, 17) // Gap: 17 beside the icon, no spacing token
+            .padding(.trailing, 23) // Gap: 23 beside the switch, no spacing token
+            .frame(height: 65)
+        }
+        .onChange(of: reinvests) { Haptics.tap() }
+    }
+
+    /// The amount going in, and what comes back
+    private var reviewAmounts: some View {
+        let shape = RoundedRectangle(cornerRadius: 17, style: .continuous) // Gap: 17 is not a Radius variable
+        return VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                DsText("Deposit amount", variant: .p4, color: .contentTertiary)
+                Spacer(minLength: 0)
+                // Gap: Md 23/29 at 3% tracking has no text style, and accent-lavender/600 is a primitive with no content token
+                GapText(FixedDepositsView.rupees(entered ?? 0), family: .walsheim, medium: true, size: 23, lineHeight: 29, trackingPercent: 3,
+                        color: ColorPrimitives.accentLavender600) // ds-lint-ignore: no_tier1
+                    .fixedSize()
+            }
+            .padding(.leading, 18) // Gap: 18 beside the label, no spacing token
+            .padding(.trailing, 24) // Gap: 24 beside the amount, no spacing token
+            .frame(height: 54)
+            Hairline(.borderSubtle)
+            HStack(spacing: SpacingScale.spaceXs) {
+                DsText("At maturity", variant: .p4, color: .contentTertiary)
+                Spacer(minLength: 0)
+                Image("FDReviewSpark").accessibilityHidden(true)
+                // Gap: accent-lime/400 is a primitive with no content token
+                GapText(FixedDepositsView.rupees(offer.maturity(of: entered ?? 0)), family: .walsheim, medium: true, size: 19, lineHeight: 27,
+                        color: ColorPrimitives.accentLime400) // ds-lint-ignore: no_tier1
+                    .fixedSize()
+            }
+            .padding(.leading, 19) // Gap: 19 beside the label, no spacing token
+            .padding(.trailing, 23) // Gap: 23 beside the value, no spacing token
+            .frame(height: 54)
+        }
+        .overlay(shape.strokeBorder(Color(hex: 0xC2C2C2).opacity(0.33), lineWidth: 1)) // Gap: 1pt #C2C2C2 33%, unbound
+    }
+
+    private func reviewTerm(_ label: String, _ value: String) -> some View {
+        HStack(spacing: 0) {
+            Image("FDReviewRow").accessibilityHidden(true)
+            DsText(label, variant: .p4, color: .contentTertiary)
+                .padding(.leading, SpacingScale.spaceLg)
+            Spacer(minLength: 0)
+            DsText(value, variant: .h6)
+        }
+        .padding(.leading, 17) // Gap: 17 beside the icon, no spacing token
+        .padding(.trailing, 23) // Gap: 23 beside the value, no spacing token
+        .frame(height: 65)
+    }
+
+    /// "Your deposit security" and its two ticks, between the card and "Continue"
+    private var security: some View {
+        VStack(spacing: 0) {
+            // Gap: P5's type at 7% tracking, which the style doesn't carry
+            GapText("YOUR DEPOSIT SECURITY", family: .walsheim, medium: false, size: 13, lineHeight: 21, trackingPercent: 7, color: ColorScale.contentTertiary)
+            securityLine("Withdraw anytime")
+                .padding(.top, SpacingScale.spaceMdLg)
+            securityLine("Deposit insured up to 5L")
+                .padding(.top, 11) // Gap: 11 between the lines, no spacing token
+        }
+        .frame(height: 87, alignment: .top)
+    }
+
+    private func securityLine(_ text: String) -> some View {
+        HStack(spacing: SpacingScale.spaceMd) {
+            Image("FDReviewCheck").accessibilityHidden(true)
+            DsText(text, variant: .p5)
+        }
+    }
+
     // MARK: Pad
 
     /// 1–9 in three columns 129.5 apart, then 0 in the middle. The frame draws no way to take a digit back, so one
@@ -367,7 +541,12 @@ struct FixedDepositPlanLayer: View {
     }
 
     private var continueButton: some View {
-        Button { Haptics.tap() } label: {
+        Button {
+            // With an amount in, the card turns into the review; on the review it goes nowhere yet
+            guard entered != nil else { return }
+            Haptics.tap()
+            if !reviewing { withAnimation(Self.reviewTransition) { reviewing = true } }
+        } label: {
             DsText("Continue", variant: .h6, color: .contentOnColor)
                 .frame(width: 344, height: 51)
                 .background(Capsule().fill(Color(hex: 0x1F1513))) // Gap: #1F1513 is unbound
