@@ -1,0 +1,19 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="296" height="242" viewBox="0 0 296 242" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 30" clip-path="url(#clip0_717_11160)">
+<path id="Line 16" d="M0 1.5H338" stroke="black" stroke-opacity="0.05"/>
+<path id="Line 4" d="M0 121.5H338" stroke="black" stroke-opacity="0.05"/>
+<path id="Line 10" d="M0 241.5H338" stroke="black" stroke-opacity="0.05"/>
+<path id="Line 11" d="M0 321.5H338" stroke="black" stroke-opacity="0.05"/>
+<path id="Line 6" d="M0 281.5H338" stroke="black" stroke-opacity="0.05"/>
+<path id="Line 7" d="M-3 361.5H335" stroke="black" stroke-opacity="0.05"/>
+<rect id="Rectangle 1763" x="20" y="160" width="43" height="82" fill="#3FD519"/>
+<rect id="Rectangle 1764" x="99" y="142" width="43" height="100" fill="#3FD519"/>
+<rect id="Rectangle 1765" x="178" y="111" width="43" height="131" fill="#3FD519"/>
+<rect id="Rectangle 1766" x="257" y="48" width="43" height="194" fill="#3FD519"/>
+</g>
+<defs>
+<clipPath id="clip0_717_11160">
+<rect width="296" height="242" fill="white"/>
+</clipPath>
+</defs>
+</svg>

@@ -1,0 +1,3412 @@
+{
+  "fileKey": "TWgGkus0FyMoym2H7LNnwD",
+  "fileName": "Horse Design System",
+  "exportedAt": "2026-11-11T09:37:14.853Z",
+  "collections": [
+    {
+      "id": "VariableCollectionId:26:2",
+      "name": "Typography",
+      "modes": [
+        "Mode 1"
+      ],
+      "variables": [
+        {
+          "id": "VariableID:26:3",
+          "name": "font/family/Reckless",
+          "type": "STRING",
+          "scopes": [
+            "FONT_FAMILY"
+          ],
+          "value": "Reckless Standard S-TRIAL",
+          "description": "Serif. Display (D1–D2) and large headings (H1–H2)."
+        },
+        {
+          "id": "VariableID:26:4",
+          "name": "font/family/GT Walsheim",
+          "type": "STRING",
+          "scopes": [
+            "FONT_FAMILY"
+          ],
+          "value": "GT Walsheim Trial",
+          "description": "Sans. Headings H3–H6, paragraph, labels, numericals."
+        },
+        {
+          "id": "VariableID:26:5",
+          "name": "font/weight/reckless/regular",
+          "type": "STRING",
+          "scopes": [
+            "FONT_STYLE"
+          ],
+          "value": "Regular",
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:6",
+          "name": "font/weight/reckless/medium",
+          "type": "STRING",
+          "scopes": [
+            "FONT_STYLE"
+          ],
+          "value": "Medium",
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:7",
+          "name": "font/weight/gtwalsheim/regular",
+          "type": "STRING",
+          "scopes": [
+            "FONT_STYLE"
+          ],
+          "value": "Rg",
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:8",
+          "name": "font/weight/gtwalsheim/medium",
+          "type": "STRING",
+          "scopes": [
+            "FONT_STYLE"
+          ],
+          "value": "Md",
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:9",
+          "name": "font/size/12",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 12,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:10",
+          "name": "font/size/13",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 13,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:11",
+          "name": "font/size/15",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 15,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:12",
+          "name": "font/size/17",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 17,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:13",
+          "name": "font/size/19",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 19,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:14",
+          "name": "font/size/23",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 23,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:15",
+          "name": "font/size/27",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 27,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:16",
+          "name": "font/size/35",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 35,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:17",
+          "name": "font/size/45",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 45,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:18",
+          "name": "font/size/53",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 53,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:19",
+          "name": "font/size/67",
+          "type": "FLOAT",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "value": 67,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:20",
+          "name": "font/lineheight/17",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 17,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:21",
+          "name": "font/lineheight/19",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 19,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:22",
+          "name": "font/lineheight/21",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 21,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:23",
+          "name": "font/lineheight/23",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 23,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:24",
+          "name": "font/lineheight/25",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 25,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:25",
+          "name": "font/lineheight/27",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 27,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:26",
+          "name": "font/lineheight/29",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 29,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:27",
+          "name": "font/lineheight/35",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 35,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:28",
+          "name": "font/lineheight/39",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 39,
+          "description": ""
+        },
+        {
+          "id": "VariableID:26:29",
+          "name": "font/lineheight/43",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 43,
+          "description": ""
+        },
+        {
+          "id": "VariableID:45:2",
+          "name": "font/lineheight/49",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 49,
+          "description": ""
+        },
+        {
+          "id": "VariableID:27:2",
+          "name": "font/lineheight/51",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 51,
+          "description": ""
+        },
+        {
+          "id": "VariableID:27:3",
+          "name": "font/lineheight/66",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 66,
+          "description": ""
+        },
+        {
+          "id": "VariableID:27:4",
+          "name": "font/lineheight/79",
+          "type": "FLOAT",
+          "scopes": [
+            "LINE_HEIGHT"
+          ],
+          "value": 79,
+          "description": ""
+        },
+        {
+          "id": "VariableID:24:2858",
+          "name": "font/kerning/none",
+          "type": "FLOAT",
+          "scopes": [
+            "LETTER_SPACING"
+          ],
+          "value": 0,
+          "description": "Default letter spacing (0%) for all non-numerical styles."
+        },
+        {
+          "id": "VariableID:26:34",
+          "name": "font/kerning/num",
+          "type": "FLOAT",
+          "scopes": [
+            "LETTER_SPACING"
+          ],
+          "value": 9,
+          "description": "Letter spacing (%) for numerical styles N1–N6."
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:28:2",
+      "name": "Container styles",
+      "modes": [
+        "Mode 1"
+      ],
+      "variables": [
+        {
+          "id": "VariableID:28:3",
+          "name": "Spacing/2",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 2,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:4",
+          "name": "Spacing/5",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 5,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:5",
+          "name": "Spacing/7",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 7,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:6",
+          "name": "Spacing/9",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 9,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:7",
+          "name": "Spacing/13",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 13,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:8",
+          "name": "Spacing/15",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 15,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:9",
+          "name": "Spacing/21",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 21,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:10",
+          "name": "Spacing/25",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 25,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:11",
+          "name": "Spacing/29",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 29,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:12",
+          "name": "Spacing/35",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 35,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:13",
+          "name": "Spacing/39",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 39,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:14",
+          "name": "Spacing/47",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 47,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:15",
+          "name": "Spacing/65",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 65,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:16",
+          "name": "Spacing/75",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 75,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:17",
+          "name": "Spacing/95",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 95,
+          "description": ""
+        },
+        {
+          "id": "VariableID:28:18",
+          "name": "Spacing/115",
+          "type": "FLOAT",
+          "scopes": [
+            "GAP"
+          ],
+          "value": 115,
+          "description": ""
+        },
+        {
+          "id": "VariableID:29:2",
+          "name": "Radius/15",
+          "type": "FLOAT",
+          "scopes": [
+            "CORNER_RADIUS"
+          ],
+          "value": 15,
+          "description": ""
+        },
+        {
+          "id": "VariableID:29:3",
+          "name": "Radius/23",
+          "type": "FLOAT",
+          "scopes": [
+            "CORNER_RADIUS"
+          ],
+          "value": 23,
+          "description": ""
+        },
+        {
+          "id": "VariableID:29:4",
+          "name": "Radius/27",
+          "type": "FLOAT",
+          "scopes": [
+            "CORNER_RADIUS"
+          ],
+          "value": 27,
+          "description": ""
+        },
+        {
+          "id": "VariableID:29:5",
+          "name": "Radius/35",
+          "type": "FLOAT",
+          "scopes": [
+            "CORNER_RADIUS"
+          ],
+          "value": 35,
+          "description": ""
+        },
+        {
+          "id": "VariableID:29:6",
+          "name": "Border/hairline",
+          "type": "FLOAT",
+          "scopes": [
+            "STROKE_FLOAT"
+          ],
+          "value": 0.7,
+          "description": "0.7px hairline stroke used by borders and separators."
+        }
+      ]
+    },
+    {
+      "id": "VariableCollectionId:41:2",
+      "name": "Colors primitives",
+      "modes": [
+        "Light"
+      ],
+      "variables": [
+        {
+          "name": "brand/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.302,
+            "g": 0.1098,
+            "b": 0.0784,
+            "a": 1
+          },
+          "hex": "#4D1C14",
+          "description": ""
+        },
+        {
+          "name": "brand/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4941,
+            "g": 0.1922,
+            "b": 0.1451,
+            "a": 1
+          },
+          "hex": "#7E3125",
+          "description": ""
+        },
+        {
+          "name": "brand/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.6314,
+            "g": 0.2235,
+            "b": 0.1608,
+            "a": 1
+          },
+          "hex": "#A13929",
+          "description": ""
+        },
+        {
+          "name": "brand/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.7765,
+            "g": 0.2471,
+            "b": 0.1686,
+            "a": 1
+          },
+          "hex": "#C63F2B",
+          "description": ""
+        },
+        {
+          "name": "brand/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9255,
+            "g": 0.2706,
+            "b": 0.1765,
+            "a": 1
+          },
+          "hex": "#EC452D",
+          "description": ""
+        },
+        {
+          "name": "brand/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.4353,
+            "b": 0.3373,
+            "a": 1
+          },
+          "hex": "#FF6F56",
+          "description": ""
+        },
+        {
+          "name": "brand/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.6667,
+            "b": 0.5922,
+            "a": 1
+          },
+          "hex": "#FFAA97",
+          "description": ""
+        },
+        {
+          "name": "brand/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.8,
+            "b": 0.7529,
+            "a": 1
+          },
+          "hex": "#FFCCC0",
+          "description": ""
+        },
+        {
+          "name": "brand/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.8549,
+            "b": 0.8157,
+            "a": 1
+          },
+          "hex": "#FFDAD0",
+          "description": ""
+        },
+        {
+          "name": "brand/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.9176,
+            "b": 0.8902,
+            "a": 1
+          },
+          "hex": "#FFEAE3",
+          "description": ""
+        },
+        {
+          "name": "secondary/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.2627,
+            "g": 0.1059,
+            "b": 0.0706,
+            "a": 1
+          },
+          "hex": "#431B12",
+          "description": ""
+        },
+        {
+          "name": "secondary/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4667,
+            "g": 0.2196,
+            "b": 0.1608,
+            "a": 1
+          },
+          "hex": "#773829",
+          "description": ""
+        },
+        {
+          "name": "secondary/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.5961,
+            "g": 0.2627,
+            "b": 0.1843,
+            "a": 1
+          },
+          "hex": "#98432F",
+          "description": ""
+        },
+        {
+          "name": "secondary/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.7294,
+            "g": 0.302,
+            "b": 0.2039,
+            "a": 1
+          },
+          "hex": "#BA4D34",
+          "description": ""
+        },
+        {
+          "name": "secondary/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8314,
+            "g": 0.3098,
+            "b": 0.1882,
+            "a": 1
+          },
+          "hex": "#D44F30",
+          "description": ""
+        },
+        {
+          "name": "secondary/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9922,
+            "g": 0.4863,
+            "b": 0.3647,
+            "a": 1
+          },
+          "hex": "#FD7C5D",
+          "description": ""
+        },
+        {
+          "name": "secondary/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.6667,
+            "b": 0.5765,
+            "a": 1
+          },
+          "hex": "#FFAA93",
+          "description": ""
+        },
+        {
+          "name": "secondary/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.8039,
+            "b": 0.7412,
+            "a": 1
+          },
+          "hex": "#FFCDBD",
+          "description": ""
+        },
+        {
+          "name": "secondary/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.8588,
+            "b": 0.8078,
+            "a": 1
+          },
+          "hex": "#FFDBCE",
+          "description": ""
+        },
+        {
+          "name": "secondary/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.9216,
+            "b": 0.8863,
+            "a": 1
+          },
+          "hex": "#FFEBE2",
+          "description": ""
+        },
+        {
+          "name": "accent-lavender/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.1961,
+            "g": 0.1333,
+            "b": 0.2078,
+            "a": 1
+          },
+          "hex": "#322235",
+          "description": ""
+        },
+        {
+          "name": "accent-lavender/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.3608,
+            "g": 0.2588,
+            "b": 0.3804,
+            "a": 1
+          },
+          "hex": "#5C4261",
+          "description": ""
+        },
+        {
+          "name": "accent-lavender/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4549,
+            "g": 0.3216,
+            "b": 0.4824,
+            "a": 1
+          },
+          "hex": "#74527B",
+          "description": ""
+        },
+        {
+          "name": "accent-lavender/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.5529,
+            "g": 0.3804,
+            "b": 0.5922,
+            "a": 1
+          },
+          "hex": "#8D6197",
+          "description": ""
+        },
+        {
+          "name": "accent-lavender/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.6588,
+            "g": 0.4471,
+            "b": 0.702,
+            "a": 1
+          },
+          "hex": "#A872B3",
+          "description": ""
+        },
+        {
+          "name": "accent-lavender/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8,
+            "g": 0.5922,
+            "b": 0.8431,
+            "a": 1
+          },
+          "hex": "#CC97D7",
+          "description": ""
+        },
+        {
+          "name": "accent-lavender/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8784,
+            "g": 0.7137,
+            "b": 0.9137,
+            "a": 1
+          },
+          "hex": "#E0B6E9",
+          "description": ""
+        },
+        {
+          "name": "accent-lavender/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9412,
+            "g": 0.8235,
+            "b": 0.9686,
+            "a": 1
+          },
+          "hex": "#F0D2F7",
+          "description": ""
+        },
+        {
+          "name": "accent-lavender/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9608,
+            "g": 0.8745,
+            "b": 0.9765,
+            "a": 1
+          },
+          "hex": "#F5DFF9",
+          "description": ""
+        },
+        {
+          "name": "accent-lavender/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9882,
+            "g": 0.9333,
+            "b": 1,
+            "a": 1
+          },
+          "hex": "#FCEEFF",
+          "description": ""
+        },
+        {
+          "name": "accent-pink/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.2784,
+            "g": 0.0824,
+            "b": 0.1294,
+            "a": 1
+          },
+          "hex": "#471521",
+          "description": ""
+        },
+        {
+          "name": "accent-pink/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4902,
+            "g": 0.1804,
+            "b": 0.2549,
+            "a": 1
+          },
+          "hex": "#7D2E41",
+          "description": ""
+        },
+        {
+          "name": "accent-pink/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.6275,
+            "g": 0.2039,
+            "b": 0.3137,
+            "a": 1
+          },
+          "hex": "#A03450",
+          "description": ""
+        },
+        {
+          "name": "accent-pink/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.7686,
+            "g": 0.2235,
+            "b": 0.3765,
+            "a": 1
+          },
+          "hex": "#C43960",
+          "description": ""
+        },
+        {
+          "name": "accent-pink/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9608,
+            "g": 0.2863,
+            "b": 0.4745,
+            "a": 1
+          },
+          "hex": "#F54979",
+          "description": ""
+        },
+        {
+          "name": "accent-pink/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.4039,
+            "b": 0.5608,
+            "a": 1
+          },
+          "hex": "#FF678F",
+          "description": ""
+        },
+        {
+          "name": "accent-pink/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.6471,
+            "b": 0.7216,
+            "a": 1
+          },
+          "hex": "#FFA5B8",
+          "description": ""
+        },
+        {
+          "name": "accent-pink/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.7882,
+            "b": 0.8314,
+            "a": 1
+          },
+          "hex": "#FFC9D4",
+          "description": ""
+        },
+        {
+          "name": "accent-pink/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.8471,
+            "b": 0.8784,
+            "a": 1
+          },
+          "hex": "#FFD8E0",
+          "description": ""
+        },
+        {
+          "name": "accent-pink/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.9137,
+            "b": 0.9333,
+            "a": 1
+          },
+          "hex": "#FFE9EE",
+          "description": ""
+        },
+        {
+          "name": "accent-lime/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.1333,
+            "g": 0.1843,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#222F00",
+          "description": ""
+        },
+        {
+          "name": "accent-lime/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.2627,
+            "g": 0.3373,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#435600",
+          "description": ""
+        },
+        {
+          "name": "accent-lime/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.3294,
+            "g": 0.4196,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#546B00",
+          "description": ""
+        },
+        {
+          "name": "accent-lime/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4,
+            "g": 0.5059,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#668100",
+          "description": ""
+        },
+        {
+          "name": "accent-lime/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4745,
+            "g": 0.5961,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#799800",
+          "description": ""
+        },
+        {
+          "name": "accent-lime/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.5804,
+            "g": 0.7255,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#94B900",
+          "description": ""
+        },
+        {
+          "name": "accent-lime/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.7373,
+            "g": 0.898,
+            "b": 0.0588,
+            "a": 1
+          },
+          "hex": "#BCE50F",
+          "description": ""
+        },
+        {
+          "name": "accent-lime/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8078,
+            "g": 0.9294,
+            "b": 0.4745,
+            "a": 1
+          },
+          "hex": "#CEED79",
+          "description": ""
+        },
+        {
+          "name": "accent-lime/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8627,
+            "g": 0.9529,
+            "b": 0.6471,
+            "a": 1
+          },
+          "hex": "#DCF3A5",
+          "description": ""
+        },
+        {
+          "name": "accent-lime/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9255,
+            "g": 0.9843,
+            "b": 0.7961,
+            "a": 1
+          },
+          "hex": "#ECFBCB",
+          "description": ""
+        },
+        {
+          "name": "accent-yellow/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.2314,
+            "g": 0.1412,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#3B2400",
+          "description": ""
+        },
+        {
+          "name": "accent-yellow/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4078,
+            "g": 0.2745,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#684600",
+          "description": ""
+        },
+        {
+          "name": "accent-yellow/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.5059,
+            "g": 0.3451,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#815800",
+          "description": ""
+        },
+        {
+          "name": "accent-yellow/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.6039,
+            "g": 0.4196,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#9A6B00",
+          "description": ""
+        },
+        {
+          "name": "accent-yellow/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.7059,
+            "g": 0.4941,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#B47E00",
+          "description": ""
+        },
+        {
+          "name": "accent-yellow/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8549,
+            "g": 0.6078,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#DA9B00",
+          "description": ""
+        },
+        {
+          "name": "accent-yellow/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9961,
+            "g": 0.7412,
+            "b": 0.0706,
+            "a": 1
+          },
+          "hex": "#FEBD12",
+          "description": ""
+        },
+        {
+          "name": "accent-yellow/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.8431,
+            "b": 0.4863,
+            "a": 1
+          },
+          "hex": "#FFD77C",
+          "description": ""
+        },
+        {
+          "name": "accent-yellow/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.8941,
+            "b": 0.6549,
+            "a": 1
+          },
+          "hex": "#FFE4A7",
+          "description": ""
+        },
+        {
+          "name": "accent-yellow/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.9451,
+            "b": 0.8,
+            "a": 1
+          },
+          "hex": "#FFF1CC",
+          "description": ""
+        },
+        {
+          "name": "blue/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.1333,
+            "g": 0.2235,
+            "b": 0.349,
+            "a": 1
+          },
+          "hex": "#223959",
+          "description": ""
+        },
+        {
+          "name": "blue/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.2235,
+            "g": 0.3059,
+            "b": 0.4235,
+            "a": 1
+          },
+          "hex": "#394E6C",
+          "description": ""
+        },
+        {
+          "name": "blue/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.3059,
+            "g": 0.3843,
+            "b": 0.4902,
+            "a": 1
+          },
+          "hex": "#4E627D",
+          "description": ""
+        },
+        {
+          "name": "blue/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.3922,
+            "g": 0.4627,
+            "b": 0.5569,
+            "a": 1
+          },
+          "hex": "#64768E",
+          "description": ""
+        },
+        {
+          "name": "blue/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4824,
+            "g": 0.5412,
+            "b": 0.6275,
+            "a": 1
+          },
+          "hex": "#7B8AA0",
+          "description": ""
+        },
+        {
+          "name": "blue/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.6157,
+            "g": 0.6627,
+            "b": 0.7294,
+            "a": 1
+          },
+          "hex": "#9DA9BA",
+          "description": ""
+        },
+        {
+          "name": "blue/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.7529,
+            "g": 0.7843,
+            "b": 0.8314,
+            "a": 1
+          },
+          "hex": "#C0C8D4",
+          "description": ""
+        },
+        {
+          "name": "blue/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.851,
+            "g": 0.8706,
+            "b": 0.902,
+            "a": 1
+          },
+          "hex": "#D9DEE6",
+          "description": ""
+        },
+        {
+          "name": "blue/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8941,
+            "g": 0.9098,
+            "b": 0.9333,
+            "a": 1
+          },
+          "hex": "#E4E8EE",
+          "description": ""
+        },
+        {
+          "name": "blue/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.9961,
+            "b": 0.9882,
+            "a": 1
+          },
+          "hex": "#FFFEFC",
+          "description": ""
+        },
+        {
+          "name": "stone/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.1569,
+            "g": 0.1412,
+            "b": 0.1412,
+            "a": 1
+          },
+          "hex": "#282424",
+          "description": ""
+        },
+        {
+          "name": "stone/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.3137,
+            "g": 0.298,
+            "b": 0.298,
+            "a": 1
+          },
+          "hex": "#504C4C",
+          "description": ""
+        },
+        {
+          "name": "stone/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.3922,
+            "g": 0.3725,
+            "b": 0.3725,
+            "a": 1
+          },
+          "hex": "#645F5F",
+          "description": ""
+        },
+        {
+          "name": "stone/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4706,
+            "g": 0.451,
+            "b": 0.451,
+            "a": 1
+          },
+          "hex": "#787373",
+          "description": ""
+        },
+        {
+          "name": "stone/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.5529,
+            "g": 0.5333,
+            "b": 0.5333,
+            "a": 1
+          },
+          "hex": "#8D8888",
+          "description": ""
+        },
+        {
+          "name": "stone/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.6706,
+            "g": 0.651,
+            "b": 0.651,
+            "a": 1
+          },
+          "hex": "#ABA6A6",
+          "description": ""
+        },
+        {
+          "name": "stone/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.7961,
+            "g": 0.7765,
+            "b": 0.7765,
+            "a": 1
+          },
+          "hex": "#CBC6C6",
+          "description": ""
+        },
+        {
+          "name": "stone/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8863,
+            "g": 0.8627,
+            "b": 0.8627,
+            "a": 1
+          },
+          "hex": "#E2DCDC",
+          "description": ""
+        },
+        {
+          "name": "stone/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9255,
+            "g": 0.902,
+            "b": 0.902,
+            "a": 1
+          },
+          "hex": "#ECE6E6",
+          "description": ""
+        },
+        {
+          "name": "stone/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9686,
+            "g": 0.949,
+            "b": 0.949,
+            "a": 1
+          },
+          "hex": "#F7F2F2",
+          "description": ""
+        },
+        {
+          "name": "utility-green/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.0157,
+            "g": 0.2,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#043300",
+          "description": ""
+        },
+        {
+          "name": "utility-green/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.0824,
+            "g": 0.3686,
+            "b": 0.0118,
+            "a": 1
+          },
+          "hex": "#155E03",
+          "description": ""
+        },
+        {
+          "name": "utility-green/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.0118,
+            "g": 0.4627,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#037600",
+          "description": ""
+        },
+        {
+          "name": "utility-green/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0,
+            "g": 0.5608,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#008F00",
+          "description": ""
+        },
+        {
+          "name": "utility-green/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0,
+            "g": 0.6588,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#00A800",
+          "description": ""
+        },
+        {
+          "name": "utility-green/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.2471,
+            "g": 0.8353,
+            "b": 0.098,
+            "a": 1
+          },
+          "hex": "#3FD519",
+          "description": ""
+        },
+        {
+          "name": "utility-green/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4863,
+            "g": 0.8941,
+            "b": 0.4118,
+            "a": 1
+          },
+          "hex": "#7CE469",
+          "description": ""
+        },
+        {
+          "name": "utility-green/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.6745,
+            "g": 0.9569,
+            "b": 0.6235,
+            "a": 1
+          },
+          "hex": "#ACF49F",
+          "description": ""
+        },
+        {
+          "name": "utility-green/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.7765,
+            "g": 0.9725,
+            "b": 0.7412,
+            "a": 1
+          },
+          "hex": "#C6F8BD",
+          "description": ""
+        },
+        {
+          "name": "utility-green/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8745,
+            "g": 0.9961,
+            "b": 0.851,
+            "a": 1
+          },
+          "hex": "#DFFED9",
+          "description": ""
+        },
+        {
+          "name": "utility-red/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.2824,
+            "g": 0.0863,
+            "b": 0.0706,
+            "a": 1
+          },
+          "hex": "#481612",
+          "description": ""
+        },
+        {
+          "name": "utility-red/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4941,
+            "g": 0.1882,
+            "b": 0.1608,
+            "a": 1
+          },
+          "hex": "#7E3029",
+          "description": ""
+        },
+        {
+          "name": "utility-red/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.6353,
+            "g": 0.2157,
+            "b": 0.1804,
+            "a": 1
+          },
+          "hex": "#A2372E",
+          "description": ""
+        },
+        {
+          "name": "utility-red/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.7804,
+            "g": 0.2392,
+            "b": 0.2,
+            "a": 1
+          },
+          "hex": "#C73D33",
+          "description": ""
+        },
+        {
+          "name": "utility-red/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9412,
+            "g": 0.2706,
+            "b": 0.2275,
+            "a": 1
+          },
+          "hex": "#F0453A",
+          "description": ""
+        },
+        {
+          "name": "utility-red/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.4314,
+            "b": 0.3725,
+            "a": 1
+          },
+          "hex": "#FF6E5F",
+          "description": ""
+        },
+        {
+          "name": "utility-red/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.6627,
+            "b": 0.6118,
+            "a": 1
+          },
+          "hex": "#FFA99C",
+          "description": ""
+        },
+        {
+          "name": "utility-red/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.8,
+            "b": 0.7608,
+            "a": 1
+          },
+          "hex": "#FFCCC2",
+          "description": ""
+        },
+        {
+          "name": "utility-red/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.8549,
+            "b": 0.8235,
+            "a": 1
+          },
+          "hex": "#FFDAD2",
+          "description": ""
+        },
+        {
+          "name": "utility-red/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 0.9176,
+            "b": 0.898,
+            "a": 1
+          },
+          "hex": "#FFEAE5",
+          "description": ""
+        },
+        {
+          "name": "utility-yellow/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.1804,
+            "g": 0.1647,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#2E2A00",
+          "description": ""
+        },
+        {
+          "name": "utility-yellow/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.3333,
+            "g": 0.3137,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#555000",
+          "description": ""
+        },
+        {
+          "name": "utility-yellow/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4157,
+            "g": 0.3922,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#6A6400",
+          "description": ""
+        },
+        {
+          "name": "utility-yellow/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.502,
+            "g": 0.4706,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#807800",
+          "description": ""
+        },
+        {
+          "name": "utility-yellow/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.5882,
+            "g": 0.5529,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#968D00",
+          "description": ""
+        },
+        {
+          "name": "utility-yellow/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.7176,
+            "g": 0.6784,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#B7AD00",
+          "description": ""
+        },
+        {
+          "name": "utility-yellow/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8588,
+            "g": 0.8235,
+            "b": 0.0745,
+            "a": 1
+          },
+          "hex": "#DBD213",
+          "description": ""
+        },
+        {
+          "name": "utility-yellow/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9098,
+            "g": 0.8941,
+            "b": 0.4824,
+            "a": 1
+          },
+          "hex": "#E8E47B",
+          "description": ""
+        },
+        {
+          "name": "utility-yellow/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9373,
+            "g": 0.9255,
+            "b": 0.6549,
+            "a": 1
+          },
+          "hex": "#EFECA7",
+          "description": ""
+        },
+        {
+          "name": "utility-yellow/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9725,
+            "g": 0.9686,
+            "b": 0.8,
+            "a": 1
+          },
+          "hex": "#F8F7CC",
+          "description": ""
+        },
+        {
+          "name": "ivory/900",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.1725,
+            "g": 0.1569,
+            "b": 0.1451,
+            "a": 1
+          },
+          "hex": "#2C2825",
+          "description": ""
+        },
+        {
+          "name": "ivory/800",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.3137,
+            "g": 0.298,
+            "b": 0.2863,
+            "a": 1
+          },
+          "hex": "#504C49",
+          "description": ""
+        },
+        {
+          "name": "ivory/700",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.3882,
+            "g": 0.3765,
+            "b": 0.3608,
+            "a": 1
+          },
+          "hex": "#63605C",
+          "description": ""
+        },
+        {
+          "name": "ivory/600",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.4667,
+            "g": 0.4549,
+            "b": 0.4431,
+            "a": 1
+          },
+          "hex": "#777471",
+          "description": ""
+        },
+        {
+          "name": "ivory/500",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.549,
+            "g": 0.5333,
+            "b": 0.5255,
+            "a": 1
+          },
+          "hex": "#8C8886",
+          "description": ""
+        },
+        {
+          "name": "ivory/400",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.8706,
+            "g": 0.8588,
+            "b": 0.851,
+            "a": 1
+          },
+          "hex": "#DEDBD9",
+          "description": ""
+        },
+        {
+          "name": "ivory/300",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9216,
+            "g": 0.9137,
+            "b": 0.9098,
+            "a": 1
+          },
+          "hex": "#EBE9E8",
+          "description": ""
+        },
+        {
+          "name": "ivory/200",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9294,
+            "g": 0.9216,
+            "b": 0.9176,
+            "a": 1
+          },
+          "hex": "#EDEBEA",
+          "description": ""
+        },
+        {
+          "name": "ivory/100",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9608,
+            "g": 0.9529,
+            "b": 0.949,
+            "a": 1
+          },
+          "hex": "#F5F3F2",
+          "description": ""
+        },
+        {
+          "name": "ivory/50",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0.9922,
+            "g": 0.9882,
+            "b": 0.9882,
+            "a": 1
+          },
+          "hex": "#FDFCFC",
+          "description": ""
+        },
+        {
+          "name": "static/white",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 1
+          },
+          "hex": "#FFFFFF",
+          "description": ""
+        },
+        {
+          "name": "static/black",
+          "type": "COLOR",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "value": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 1
+          },
+          "hex": "#000000",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "Color Semantics",
+      "modes": [
+        "Light"
+      ],
+      "variables": [
+        {
+          "name": "surface/base",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "ivory/50"
+          },
+          "description": "Page background — everything sits on this."
+        },
+        {
+          "name": "surface/widget",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "static/white"
+          },
+          "description": "Widget / card surface on the base, carries Shadow/1."
+        },
+        {
+          "name": "surface/sunken-1",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "ivory/100"
+          },
+          "description": "One level sunk into its parent surface."
+        },
+        {
+          "name": "surface/sunken-2",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "ivory/200"
+          },
+          "description": "Two levels sunk into its parent surface."
+        },
+        {
+          "name": "surface/raised",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "static/white"
+          },
+          "description": "Raised element on a surface, carries Shadow/1."
+        },
+        {
+          "name": "surface/focus",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "static/white"
+          },
+          "description": "Focused / highlighted raised element, carries Shadow/2."
+        },
+        {
+          "name": "surface/inverse",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "static/black"
+          },
+          "description": "Inverse surface; pair with content/inverse."
+        },
+        {
+          "name": "content/primary",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "stone/900"
+          },
+          "description": "Default text and icons. 14.99:1 on surface/base."
+        },
+        {
+          "name": "content/secondary",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "stone/700"
+          },
+          "description": "Supporting text. 6.13:1 on base."
+        },
+        {
+          "name": "content/tertiary",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "stone/600"
+          },
+          "description": "De-emphasised text. 4.56:1 on base."
+        },
+        {
+          "name": "content/quaternary",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "stone/500"
+          },
+          "description": "Decorative / metadata only. 3.41:1 — never body text."
+        },
+        {
+          "name": "content/disabled",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "stone/400"
+          },
+          "description": "Disabled state."
+        },
+        {
+          "name": "content/inverse",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "stone/50"
+          },
+          "description": "Text on surface/inverse."
+        },
+        {
+          "name": "content/on-color",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "static/white"
+          },
+          "description": "Text on solid brand/status fills. Audit per fill — fails on status/success/solid for small text."
+        },
+        {
+          "name": "border/subtle",
+          "type": "COLOR",
+          "scopes": [
+            "STROKE_COLOR"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "ivory/300"
+          },
+          "description": "Hairline on widgets and dividers."
+        },
+        {
+          "name": "border/default",
+          "type": "COLOR",
+          "scopes": [
+            "STROKE_COLOR"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "ivory/400"
+          },
+          "description": "Default control border."
+        },
+        {
+          "name": "border/strong",
+          "type": "COLOR",
+          "scopes": [
+            "STROKE_COLOR"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "stone/500"
+          },
+          "description": "Emphasised border. 3.41:1 vs base."
+        },
+        {
+          "name": "border/disabled",
+          "type": "COLOR",
+          "scopes": [
+            "STROKE_COLOR"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "ivory/300"
+          },
+          "description": "Disabled state."
+        },
+        {
+          "name": "brand/solid",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "brand/600"
+          },
+          "description": "Primary brand fill. White ink 5.06:1."
+        },
+        {
+          "name": "brand/solid-hover",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "brand/700"
+          },
+          "description": "Hover / pressed state of brand/solid."
+        },
+        {
+          "name": "brand/subtle",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "brand/50"
+          },
+          "description": "Tinted brand surface."
+        },
+        {
+          "name": "brand/text",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "brand/700"
+          },
+          "description": "Brand-coloured text. 5.79:1 on brand/subtle."
+        },
+        {
+          "name": "brand/border",
+          "type": "COLOR",
+          "scopes": [
+            "STROKE_COLOR"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "brand/300"
+          },
+          "description": "Brand border."
+        },
+        {
+          "name": "secondary/solid",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "secondary/600"
+          },
+          "description": "Secondary brand fill."
+        },
+        {
+          "name": "secondary/subtle",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "secondary/50"
+          },
+          "description": "Tinted secondary surface."
+        },
+        {
+          "name": "status/success/solid",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-green/600"
+          },
+          "description": "White ink 4.26:1 — large text / UI only."
+        },
+        {
+          "name": "status/success/subtle",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-green/50"
+          },
+          "description": "Success tint."
+        },
+        {
+          "name": "status/success/text",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-green/700"
+          },
+          "description": "5.37:1 on status/success/subtle."
+        },
+        {
+          "name": "status/success/border",
+          "type": "COLOR",
+          "scopes": [
+            "STROKE_COLOR"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-green/300"
+          },
+          "description": ""
+        },
+        {
+          "name": "status/error/solid",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-red/600"
+          },
+          "description": "White ink 5.07:1."
+        },
+        {
+          "name": "status/error/subtle",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-red/50"
+          },
+          "description": "Error tint."
+        },
+        {
+          "name": "status/error/text",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-red/700"
+          },
+          "description": "5.81:1 on status/error/subtle."
+        },
+        {
+          "name": "status/error/border",
+          "type": "COLOR",
+          "scopes": [
+            "STROKE_COLOR"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-red/300"
+          },
+          "description": ""
+        },
+        {
+          "name": "status/warning/solid",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-yellow/600"
+          },
+          "description": "White ink 4.56:1."
+        },
+        {
+          "name": "status/warning/subtle",
+          "type": "COLOR",
+          "scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-yellow/50"
+          },
+          "description": "Warning tint."
+        },
+        {
+          "name": "status/warning/text",
+          "type": "COLOR",
+          "scopes": [
+            "TEXT_FILL",
+            "SHAPE_FILL"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-yellow/700"
+          },
+          "description": "5.58:1 on status/warning/subtle."
+        },
+        {
+          "name": "status/warning/border",
+          "type": "COLOR",
+          "scopes": [
+            "STROKE_COLOR"
+          ],
+          "value": {
+            "type": "VARIABLE_ALIAS",
+            "collection": "Colors primitives",
+            "name": "utility-yellow/300"
+          },
+          "description": ""
+        }
+      ]
+    }
+  ],
+  "effectStyles": [
+    {
+      "name": "Shadow/1",
+      "description": "Resting surface lift. Blur 100, y 4, spread 12, 5%.",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "color": "#000000",
+          "opacity": 0.05,
+          "offset": {
+            "x": 0,
+            "y": 4
+          },
+          "blur": 100,
+          "spread": 12
+        }
+      ]
+    },
+    {
+      "name": "Shadow/2",
+      "description": "Raised surface. Blur 97, y 4, spread 7, 7%.",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "color": "#000000",
+          "opacity": 0.07,
+          "offset": {
+            "x": 0,
+            "y": 4
+          },
+          "blur": 97,
+          "spread": 7
+        }
+      ]
+    },
+    {
+      "name": "Shadow/3",
+      "description": "Strongest lift (floating / dark card). Blur 85, y 2, spread 7, 11%.",
+      "effects": [
+        {
+          "type": "DROP_SHADOW",
+          "color": "#000000",
+          "opacity": 0.11,
+          "offset": {
+            "x": 0,
+            "y": 2
+          },
+          "blur": 85,
+          "spread": 7
+        }
+      ]
+    }
+  ],
+  "textStyles": [
+    {
+      "name": "D1",
+      "fontFamily": "Reckless Standard S-TRIAL",
+      "fontStyle": "Medium",
+      "fontSize": 67,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 79
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/Reckless",
+        "fontStyle": "font/weight/reckless/medium",
+        "fontSize": "font/size/67",
+        "lineHeight": "font/lineheight/79",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "D2",
+      "fontFamily": "Reckless Standard S-TRIAL",
+      "fontStyle": "Medium",
+      "fontSize": 53,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 66
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/Reckless",
+        "fontStyle": "font/weight/reckless/medium",
+        "fontSize": "font/size/53",
+        "lineHeight": "font/lineheight/66",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "H1",
+      "fontFamily": "Reckless Standard S-TRIAL",
+      "fontStyle": "Regular",
+      "fontSize": 45,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 49
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/Reckless",
+        "fontStyle": "font/weight/reckless/regular",
+        "fontSize": "font/size/45",
+        "lineHeight": "font/lineheight/49",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "H2",
+      "fontFamily": "Reckless Standard S-TRIAL",
+      "fontStyle": "Regular",
+      "fontSize": 35,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 51
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/Reckless",
+        "fontStyle": "font/weight/reckless/regular",
+        "fontSize": "font/size/35",
+        "lineHeight": "font/lineheight/51",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "H3",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Md",
+      "fontSize": 27,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 39
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/medium",
+        "fontSize": "font/size/27",
+        "lineHeight": "font/lineheight/39",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "H4",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Md",
+      "fontSize": 23,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 35
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/medium",
+        "fontSize": "font/size/23",
+        "lineHeight": "font/lineheight/35",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "H5",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Md",
+      "fontSize": 19,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 27
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/medium",
+        "fontSize": "font/size/19",
+        "lineHeight": "font/lineheight/27",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "H6",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Md",
+      "fontSize": 17,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 23
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/medium",
+        "fontSize": "font/size/17",
+        "lineHeight": "font/lineheight/23",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "P1",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 23,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 35
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/23",
+        "lineHeight": "font/lineheight/35",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "P2",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 19,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 29
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/19",
+        "lineHeight": "font/lineheight/29",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "P3",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 17,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 25
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/17",
+        "lineHeight": "font/lineheight/25",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "P4",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 15,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 23
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/15",
+        "lineHeight": "font/lineheight/23",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "P5",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 13,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 21
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/13",
+        "lineHeight": "font/lineheight/21",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "Lb1",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 13,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 21
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/13",
+        "lineHeight": "font/lineheight/21",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "Lb2",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 12,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 19
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/12",
+        "lineHeight": "font/lineheight/19",
+        "letterSpacing": "font/kerning/none"
+      }
+    },
+    {
+      "name": "N1",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Md",
+      "fontSize": 35,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 43
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 9
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/medium",
+        "fontSize": "font/size/35",
+        "lineHeight": "font/lineheight/43",
+        "letterSpacing": null
+      }
+    },
+    {
+      "name": "N2",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Md",
+      "fontSize": 27,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 29
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 9
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/medium",
+        "fontSize": "font/size/27",
+        "lineHeight": "font/lineheight/29",
+        "letterSpacing": null
+      }
+    },
+    {
+      "name": "N3",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 19,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 25
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 9
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/19",
+        "lineHeight": "font/lineheight/25",
+        "letterSpacing": null
+      }
+    },
+    {
+      "name": "N4",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 17,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 23
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 9
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/17",
+        "lineHeight": "font/lineheight/23",
+        "letterSpacing": null
+      }
+    },
+    {
+      "name": "N5",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 15,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 23
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 9
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/15",
+        "lineHeight": "font/lineheight/23",
+        "letterSpacing": null
+      }
+    },
+    {
+      "name": "N6",
+      "fontFamily": "GT Walsheim Trial",
+      "fontStyle": "Rg",
+      "fontSize": 12,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 17
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 9
+      },
+      "bound": {
+        "fontFamily": "font/family/GT Walsheim",
+        "fontStyle": "font/weight/gtwalsheim/regular",
+        "fontSize": "font/size/12",
+        "lineHeight": "font/lineheight/17",
+        "letterSpacing": null
+      }
+    }
+  ]
+}

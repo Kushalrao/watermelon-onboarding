@@ -1,0 +1,82 @@
+name: MutualFundsPrototype
+options:
+  bundleIdPrefix: com.kushal.prototype
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+targets:
+  MutualFundsPrototype:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+      - Resources
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: Mutual Funds
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIAppFonts:
+          - GT-Walsheim-Regular-Trial.otf
+          - GT-Walsheim-Medium-Trial.otf
+          - RecklessStandardS-TRIAL-Medium.otf
+          - RecklessStandardS-TRIAL-Regular.otf
+          - GT-Super-Text-Medium-Trial.otf
+          - RecklessStandardS-TRIAL-SemiBold.otf
+    settings:
+      base:
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+    preBuildScripts:
+      # Drift-guard: the generated token files must match the Figma snapshot, or the build fails
+      - name: Check design tokens
+        script: python3 "$SRCROOT/tools/tokens/generate.py" --check
+        basedOnDependencyAnalysis: false
+  MutualFundsPrototypeTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests
+    dependencies:
+      - target: MutualFundsPrototype
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: "YES"
+        SWIFT_VERSION: "5.0"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/MutualFundsPrototype.app/MutualFundsPrototype"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+  MutualFundsPrototypeUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - UITests
+    dependencies:
+      - target: MutualFundsPrototype
+    settings:
+      base:
+        TEST_TARGET_NAME: MutualFundsPrototype
+        GENERATE_INFOPLIST_FILE: "YES"
+schemes:
+  MutualFundsPrototype:
+    build:
+      targets:
+        MutualFundsPrototype: all
+        MutualFundsPrototypeUITests: [test]
+        MutualFundsPrototypeTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - MutualFundsPrototypeTests
+        - MutualFundsPrototypeUITests
+  ChatPrototype:
+    build:
+      targets:
+        MutualFundsPrototype: all
+    run:
+      config: Debug
+      commandLineArguments:
+        "-experience chat": true
