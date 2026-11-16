@@ -735,7 +735,7 @@ final class GestureTests: XCTestCase {
         app.buttons["Continue"].firstMatch.tap()
         sleep(1)
         XCTAssertTrue(heading("Tap & hold the widget").exists)
-        point(200, 520).press(forDuration: 0.9)
+        point(200, 520).press(forDuration: 1.5)
         sleep(2)
         shot("guide-hold-2")
         point(200, 780).tap()

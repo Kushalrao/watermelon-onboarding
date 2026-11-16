@@ -99,6 +99,19 @@ struct OnboardingHoldGuideView: View {
     /// Where the confetti starts: the lifted widget's lower left, fixed when it's lifted. The widget's frame is
     /// only read when the hold lands, never while the screen's being drawn
     @State private var confettiOrigin: CGPoint = .zero
+    /// The demonstration, shown when the widget's been left alone for three seconds: a ripple from its middle, the
+    /// widget pressing in and waiting there, then springing back out. Counted up at each touch, which starts the wait again
+    @State private var hintRun = 0
+    @State private var hintScale: CGFloat = 1
+    @State private var rippleScale: CGFloat = 0.2
+    @State private var rippleOpacity: Double = 0
+    @State private var hintDim: Double = 0
+    @State private var beats: Task<Void, Never>?
+    /// The wait after each tick while the widget's held, each shorter than the last; together they fill the hold
+    private static let beatWaits: [TimeInterval] = [0.2, 0.17, 0.145, 0.12, 0.1, 0.085, 0.07, 0.06, 0.05]
+
+    /// How long the widget has to be held
+    private static let holdTime: TimeInterval = 1
 
     /// The earlier panel is 378 × 392 with a 364 × 330 widget; the frame has it at 329 × 341.185
     private static let scale: CGFloat = 329 / 378
@@ -136,9 +149,36 @@ struct OnboardingHoldGuideView: View {
                             if heldFrame == nil {
                                 ResearchCard()
                                     // 973:17484: the widget's rounded 23 now
+                                    .overlay(
+                                        // White light spreading from the touch, soft at its edge. The widget's white,
+                                        // so it goes a shade darker as it's pressed, and the light is where that shade
+                                        // is lifted off again; nothing's laid over the widget's words
+                                        Color.black.opacity(0.07 * hintDim)
+                                            .mask {
+                                                ZStack {
+                                                    Color.black
+                                                    Circle()
+                                                        .fill(RadialGradient(
+                                                            stops: [
+                                                                .init(color: Color.black, location: 0),
+                                                                .init(color: Color.black.opacity(0.8), location: 0.6),
+                                                                .init(color: Color.black.opacity(0), location: 1),
+                                                            ],
+                                                            center: .center, startRadius: 0, endRadius: 70
+                                                        ))
+                                                        .frame(width: 140, height: 140)
+                                                        .scaleEffect(rippleScale)
+                                                        .opacity(rippleOpacity)
+                                                        .blendMode(.destinationOut)
+                                                }
+                                                .compositingGroup()
+                                            }
+                                        .allowsHitTesting(false)
+                                    )
                                     .clipShape(RoundedRectangle(cornerRadius: 23 / Self.scale, style: .continuous))
-                                    .scaleEffect(pressing ? 1.015 : 1)
-                                    .animation(.easeOut(duration: 0.25), value: pressing)
+                                    // Pressed in further the longer it's held; let go early, it springs back out
+                                    .scaleEffect((pressing ? 0.95 : 1) * hintScale)
+                                    .animation(pressing ? .linear(duration: Self.holdTime) : .spring(response: 0.4, dampingFraction: 0.6), value: pressing)
                             }
                         }
                         .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { cardFrame = $0 }
@@ -149,11 +189,31 @@ struct OnboardingHoldGuideView: View {
                 .frame(width: 329, height: 341.185, alignment: .topLeading)
                 // The whole panel listens for the hold; only the widget reacts
                 .contentShape(Rectangle())
-                .onLongPressGesture(minimumDuration: 0.45, maximumDistance: 12) {
+                .onLongPressGesture(minimumDuration: Self.holdTime, maximumDistance: 12) {
                     hold(cardFrame)
                 } onPressingChanged: { down in
                     pressing = down
-                    if down { Haptics.prepare() }
+                    if down {
+                        Haptics.prepare()
+                        // Ticks, with a shorter wait before each, until the hold lands
+                        beats = Task {
+                            for (i, wait) in Self.beatWaits.enumerated() {
+                                Haptics.beat(strength: Double(i) / Double(Self.beatWaits.count - 1))
+                                try? await Task.sleep(for: .seconds(wait))
+                                if Task.isCancelled { return }
+                            }
+                        }
+                    } else {
+                        // Let go, or landed: the ticks stop
+                        beats?.cancel()
+                    }
+                    // A touch ends the demonstration and starts its wait again
+                    hintRun += 1
+                    rippleOpacity = 0
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        hintScale = 1
+                        hintDim = 0
+                    }
                 }
                 .inGuideCard(17.5, 102, top: top)
             }
@@ -177,6 +237,31 @@ struct OnboardingHoldGuideView: View {
                 .allowsHitTesting(false)
         }
         .ignoresSafeArea()
+        .task(id: hintRun) { await demonstrate() }
+    }
+
+    /// Shows how it's done, over and over, for as long as the widget is left alone
+    private func demonstrate() async {
+        do {
+            try await Task.sleep(for: .seconds(3))
+            while !done, !pressing, heldFrame == nil {
+                // The touch: a ripple out from the middle
+                rippleScale = 0.2
+                rippleOpacity = 1
+                try await Task.sleep(for: .seconds(0.03))
+                withAnimation(.easeOut(duration: 0.25)) { hintDim = 1 }
+                withAnimation(.easeOut(duration: 1)) { rippleScale = 4 }
+                withAnimation(.easeIn(duration: 1)) { rippleOpacity = 0 }
+                try await Task.sleep(for: .seconds(0.12))
+                // pressing in, and held there
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.9)) { hintScale = 0.93 }
+                try await Task.sleep(for: .seconds(1.3))
+                // then let go: back out past its size and settling
+                withAnimation(.spring(response: 0.55, dampingFraction: 0.42)) { hintScale = 1 }
+                withAnimation(.easeOut(duration: 0.3)) { hintDim = 0 }
+                try await Task.sleep(for: .seconds(3))
+            }
+        } catch {}
     }
 
     /// A tap outside the lifted widget puts it back (Confirm stays awake once the hold's been done)
@@ -193,7 +278,8 @@ struct OnboardingHoldGuideView: View {
 
     private func hold(_ frame: CGRect) {
         guard heldFrame == nil else { return }
-        Haptics.lift()
+        beats?.cancel()
+        Haptics.landed()
         heldFrame = frame
         confettiOrigin = CGPoint(x: frame.minX + 40, y: frame.maxY + 20)
         holdProgress = 0
@@ -224,9 +310,29 @@ struct OnboardingSwipeGuideView: View {
     @FocusState private var focused: Bool
     @State private var dragX: CGFloat = 0
     @State private var pastThreshold = false
+    @State private var dragging = false
+    /// How many of the ticks' marks the finger is past
+    @State private var beatsPassed = 0
+    /// The demonstration, shown when the widget's been left alone for three seconds: it slides right as if
+    /// swiped, waits, and springs back. Counted up at each touch, which starts the wait again
+    @State private var hintRun = 0
+    @State private var hintX: CGFloat = 0
 
     private static let scale: CGFloat = 328 / 378
     private static let swipeThreshold: CGFloat = 70
+    /// Where along the swipe (in the panel's measure) a tick is given: each gap shorter than the last, down to 6,
+    /// so they come quicker the further the widget's taken
+    private static let beatMarks: [CGFloat] = {
+        var marks: [CGFloat] = []
+        var x: CGFloat = 8
+        var gap: CGFloat = 26
+        while x < 320 {
+            marks.append(x)
+            x += gap
+            gap = max(6, gap * 0.82)
+        }
+        return marks
+    }()
 
     var body: some View {
         GeometryReader { geo in
@@ -249,9 +355,9 @@ struct OnboardingSwipeGuideView: View {
                             .foregroundStyle(Color(hex: 0x3A545B))
                             .at(119, 17)
 
-                        let lift = min(1, dragX / Self.swipeThreshold)
+                        let lift = min(1, (dragX + hintX) / Self.swipeThreshold)
                         MSFTChartCard()
-                            .offset(x: dragX)
+                            .offset(x: dragX + hintX)
                             .scaleEffect(1 + 0.02 * lift, anchor: .leading)
                             .shadow(color: Color.black.opacity(0.12 * lift), radius: 18, x: 0, y: 8)
                             .at(7, 55)
@@ -292,15 +398,44 @@ struct OnboardingSwipeGuideView: View {
             .modifier(AnimatedComposeProgress(progress: composeProgress))
         }
         .ignoresSafeArea()
+        .task(id: hintRun) { await demonstrate() }
+    }
+
+    /// Shows how it's done, over and over, for as long as the widget is left alone
+    private func demonstrate() async {
+        do {
+            try await Task.sleep(for: .seconds(3))
+            while !done, !dragging, !isComposing {
+                // Out to the right, as a finger would take it
+                withAnimation(.spring(response: 0.55, dampingFraction: 0.8)) { hintX = 56 }
+                try await Task.sleep(for: .seconds(1.1))
+                // and let go: back past its place and settling
+                withAnimation(.spring(response: 0.55, dampingFraction: 0.42)) { hintX = 0 }
+                try await Task.sleep(for: .seconds(3))
+            }
+        } catch {}
     }
 
     private func dragChanged(_ dx: CGFloat) {
-        if dragX == 0 { Haptics.prepare() }
+        if !dragging {
+            dragging = true
+            Haptics.prepare()
+            beatsPassed = 0
+            // A touch ends the demonstration
+            hintRun += 1
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { hintX = 0 }
+        }
         // Follows the finger up to the threshold, then eases off; the panel's drawn smaller, so the finger's
         // travel is put back into the panel's own measure
         let x = max(0, dx) / Self.scale
         let over = x - Self.swipeThreshold
         dragX = x <= Self.swipeThreshold ? x : Self.swipeThreshold + (1 - 1 / (over * 0.55 / 90 + 1)) * 90
+        // A tick at each mark the finger passes going out; coming back gives none, and re-arms them
+        let passed = Self.beatMarks.prefix { $0 <= x }.count
+        if passed > beatsPassed {
+            Haptics.beat(strength: Double(passed) / Double(Self.beatMarks.count))
+        }
+        beatsPassed = passed
         let past = x > Self.swipeThreshold
         if past != pastThreshold {
             pastThreshold = past
@@ -311,13 +446,16 @@ struct OnboardingSwipeGuideView: View {
     private func dragEnded() {
         let send = pastThreshold
         pastThreshold = false
+        dragging = false
+        // and its wait starts again from here
+        hintRun += 1
         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { dragX = 0 }
         if send { swiped() }
     }
 
     private func swiped() {
         guard !isComposing else { return }
-        Haptics.tap()
+        Haptics.landed()
         isComposing = true
         withAnimation(.spring(response: 0.5, dampingFraction: 0.86)) { composeProgress = 1 }
         withAnimation { done = true }
