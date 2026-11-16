@@ -630,3 +630,69 @@ struct MorningstarMark: View {
     ResearchLive(started: .now)
         .frame(width: 374, height: 400, alignment: .top)
 }
+
+/// A report on its way (1027:11737), 295 × 301: the looker-out over its title and the line it opens with, and at
+/// the foot "Preparing" and what it's on, a band of light crossing the word while the work goes on
+struct ReportPreparingCard: View {
+    let title: String
+    let subject: String
+
+    static let size = CGSize(width: 295, height: 301)
+
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: 29, style: .continuous)
+        ZStack(alignment: .topLeading) {
+            Color.white
+
+            // 1027:11740: the picture, 186 × 149 in a 285 × 145 box, a little up and left of its middle
+            Image("ReportPreparingArt")
+                .resizable()
+                .frame(width: 186, height: 149)
+                .offset(x: -4.5, y: -7.5)
+                // The picture's own ground is a shade lighter than the box; darkened onto it, so no edge shows
+                .blendMode(.darken)
+                .frame(width: 285, height: 145)
+                .background(Color(hex: 0xF2F2F2))
+                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .at(5, 5)
+                .accessibilityHidden(true)
+
+            Text(title)
+                .font(FigmaFont.reckless(23))
+                .foregroundStyle(ColorScale.contentPrimary)
+                .lineLimit(1)
+                // A longer topic than the frame's is set a little smaller to stay on its line
+                .minimumScaleFactor(0.8)
+                .frame(width: 265, height: 31, alignment: .leading)
+                .at(15, 167)
+
+            Text("Arindam, For the next few weeks the number")
+                .font(FigmaFont.walsheim(15))
+                .lineSpacing(21 - UIFont(name: "GTWalsheimTrial-Rg", size: 15)!.lineHeight)
+                .foregroundStyle(Color.black.opacity(0.7))
+                .frame(width: 265, alignment: .leading)
+                .at(15, 201)
+
+            Color(hex: 0xDFDCDA)
+                .frame(width: 265, height: 1)
+                .at(15, 256)
+
+            HStack(spacing: 7) {
+                Text("Preparing")
+                    .foregroundStyle(ColorScale.contentSecondary)
+                    .fixedSize()
+                    .shimmering(true)
+                Text(subject)
+                    .foregroundStyle(ColorScale.contentDisabled)
+                    .lineLimit(1)
+            }
+            .font(FigmaFont.walsheim(13))
+            .frame(width: 265, height: 19, alignment: .leading)
+            .at(15, 266)
+        }
+        .frame(width: Self.size.width, height: Self.size.height, alignment: .topLeading)
+        .clipShape(shape)
+        .overlay(shape.strokeBorder(Color.black.opacity(0.03), lineWidth: 2))
+        .accessibilityElement(children: .combine)
+    }
+}

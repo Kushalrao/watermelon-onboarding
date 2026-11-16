@@ -126,7 +126,7 @@ struct OnboardingSwipeView: View {
 }
 
 /// Frame 2330: six chevrons that keep marching right, new ones entering from the left
-private struct MarchingChevrons: View {
+struct MarchingChevrons: View {
     private static let spacing: CGFloat = 16   // chevrons sit 16pt apart in the Figma SVG
     private static let speed: CGFloat = 22     // pt per second
 

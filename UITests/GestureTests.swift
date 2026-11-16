@@ -136,9 +136,72 @@ final class GestureTests: XCTestCase {
     }
 
     /// Fixed deposits: the second version of the bank's page, the default
-    func testFDBankPageV2() {
+    /// The bank page that ends on "How your money could grow?" in place of the plans
+    func testFDBankGrowth() {
         let app = XCUIApplication()
         app.launchArguments = ["-fd", "-fdListV1"]
+        app.launch()
+        sleep(2)
+        func shot(_ name: String) {
+            let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/" + name + ".png"))
+        }
+        app.buttons["Small Finance Banks"].tap()
+        sleep(1)
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4)).tap()
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["FIXED DEPOSIT"].exists)
+        app.swipeUp(velocity: .fast)
+        app.swipeUp(velocity: .fast)
+        app.swipeUp(velocity: .fast)
+        sleep(1)
+        XCTAssertTrue(app.staticTexts["How your money could grow?"].exists)
+        XCTAssertFalse(app.staticTexts["Available FD’s"].exists)
+        shot("growth-1")
+        app.buttons["5 years"].tap()
+        sleep(1)
+        XCTAssertTrue(app.staticTexts["5 years"].exists)
+        shot("growth-5y")
+        let slider = app.otherElements["One time deposit"]
+        XCTAssertTrue(slider.exists)
+        slider.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5))
+            .press(forDuration: 0.1, thenDragTo: slider.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5)))
+        sleep(1)
+        shot("growth-slid")
+        // Pushed past the track's end and held, the slider opens into the meter and the amount keeps climbing
+        slider.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5))
+            .press(forDuration: 0.1, thenDragTo: slider.coordinate(withNormalizedOffset: CGVector(dx: 1.04, dy: 0.5)), withVelocity: .slow, thenHoldForDuration: 2.5)
+        sleep(1)
+        let reached = Int((slider.value as? String ?? "").filter(\.isNumber)) ?? 0
+        XCTAssertGreaterThan(reached, 100_000)
+        shot("growth-metered")
+        // The bar's "View plans" opens every plan in one card; a row grows into its plan as before
+        app.buttons["View plans"].tap()
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["Select your plan"].exists)
+        XCTAssertTrue(app.staticTexts["More than 1 year"].exists)
+        XCTAssertTrue(app.buttons["One time deposit"].isSelected)
+        app.buttons["Recurring deposit"].tap()
+        sleep(1)
+        XCTAssertTrue(app.buttons["Recurring deposit"].isSelected)
+        app.buttons["One time deposit"].tap()
+        sleep(1)
+        shot("growth-plans")
+        app.staticTexts["5 years"].firstMatch.tap()
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["Interest payout"].exists)
+        shot("growth-plan")
+        app.buttons["Close plan"].tap()
+        sleep(2)
+        app.buttons["Back to bank"].tap()
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["How your money could grow?"].exists)
+        shot("growth-back")
+    }
+
+    func testFDBankPageV2() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-fd", "-fdListV1", "-fdBankV2"]
         app.launch()
         sleep(2)
         func shot(_ name: String) {
@@ -466,9 +529,10 @@ final class GestureTests: XCTestCase {
         app.launchArguments = ["-onboardingPAN"]
         app.launch()
         sleep(2)
-        app.buttons["Verify"].tap()
+        app.buttons["Confirm"].tap()
         sleep(4)
-        XCTAssertTrue(app.staticTexts["Welcome to Decade Advisory"].exists)
+        XCTAssertTrue(app.staticTexts["Welcome to Decade Wealth Advisory"].exists)
+        XCTAssertTrue(app.staticTexts["Hello Arindam"].exists)
     }
 
     func testFixedDeposits() {
@@ -526,26 +590,168 @@ final class GestureTests: XCTestCase {
         XCTAssertTrue(understood.waitForExistence(timeout: 12))
         sleep(1)
         understood.tap()
-        // then it's kept in the chat, and the agent turns to personal advice, with prompts to ask it
+        // then it's kept in the chat, and the agent turns to personal advice: its own card asking for the funds
         XCTAssertTrue(app.buttons["View analysis"].waitForExistence(timeout: 4))
         XCTAssertTrue(app.staticTexts["useful when its"].waitForExistence(timeout: 5))
-        let prompt = app.buttons["How can I improve my portfolio for better profits?"]
-        XCTAssertTrue(prompt.waitForExistence(timeout: 5))
+        let connect = app.buttons["Connect securely"]
+        XCTAssertTrue(connect.waitForExistence(timeout: 6))
+        XCTAssertTrue(app.staticTexts["Action required"].exists)
         sleep(2)
-        prompt.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        // Advice that personal needs the funds
-        XCTAssertTrue(app.staticTexts["Connect your mutual funds portfolio for personal advise"].waitForExistence(timeout: 3))
-        sleep(1)
-        app.buttons["Continue"].tap()
+        let dirC = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirC + "/connect-1.png"))
+        connect.tap()
+        // which opens how they'll be brought in
         XCTAssertTrue(app.staticTexts["We will import mutual funds via MFCentral"].waitForExistence(timeout: 3))
-        XCTAssertTrue(app.buttons["Upload your portfolio yourself"].exists)
-        // Tapping the strip of chat above it puts it away, and the stored analysis opens again
+        XCTAssertTrue(app.buttons["Lets connect"].exists)
+        XCTAssertTrue(app.buttons["I will upload myself"].exists)
         sleep(1)
-        app.buttons["Mutual funds performance"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2)).tap()
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirC + "/connect-3.png"))
+        // Its close puts it away, and the stored analysis opens again
+        sleep(1)
+        app.buttons["Close"].tap()
         sleep(1)
         XCTAssertFalse(app.staticTexts["We will import mutual funds via MFCentral"].exists)
         app.buttons["View analysis"].tap()
         XCTAssertTrue(app.staticTexts["Fund rank movements"].waitForExistence(timeout: 3))
+    }
+
+    func testImportFlow() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-onboardingStep", "1", "-welcomeDone", "-welcomeAnalysis", "-welcomeAdvice", "-importFlow"]
+        app.launch()
+        let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        func shot(_ name: String) {
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/" + name + ".png"))
+        }
+        // It ticks its steps off, then asks for the one-time password over the number pad
+        XCTAssertTrue(app.staticTexts["Connecting securely"].waitForExistence(timeout: 4))
+        shot("import-connecting")
+        XCTAssertTrue(app.staticTexts["Account connected"].waitForExistence(timeout: 6))
+        sleep(1)
+        shot("import-connected")
+        XCTAssertTrue(app.staticTexts["MFCentral OTP"].waitForExistence(timeout: 5))
+        sleep(2)
+        shot("import-otp")
+        // The code offered from Messages fills it in, and it moves on by itself
+        let offer = app.buttons["From Messages 889302"]
+        if offer.waitForExistence(timeout: 3) { offer.tap() } else { app.typeText("889302") }
+        XCTAssertTrue(app.staticTexts["Mobile verified"].waitForExistence(timeout: 4))
+        // then the security questions, one after the other
+        XCTAssertTrue(app.staticTexts["Answer security question"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Where were you born"].exists)
+        sleep(1)
+        shot("import-question")
+        app.buttons["I know the answer"].tap()
+        XCTAssertTrue(app.staticTexts["What was the name of your first school"].waitForExistence(timeout: 3))
+        app.textFields["Answer"].tap()
+        app.typeText("Springfield")
+        sleep(1)
+        shot("import-typing")
+        app.buttons["I know the answer"].tap()
+        // and it finishes, and says so in a sheet
+        XCTAssertTrue(app.staticTexts["Security verified"].waitForExistence(timeout: 5))
+        shot("import-complete")
+        // the card clears to the houses while the funds load
+        sleep(3)
+        XCTAssertFalse(app.staticTexts["Security verified"].isHittable)
+        shot("import-loading")
+        // then what came in, and View carries on
+        let done = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Mutual fund portfolio'")).firstMatch
+        XCTAssertTrue(done.waitForExistence(timeout: 8))
+        XCTAssertTrue(app.staticTexts["Portfolio analysis started"].exists)
+        sleep(1)
+        shot("import-done")
+        app.buttons["View"].tap()
+        // back in the chat the card says it's connected, and a second report is prepared under it
+        XCTAssertTrue(app.staticTexts["Connected successfully"].waitForExistence(timeout: 4))
+        XCTAssertTrue(app.staticTexts["MFCentral Account"].exists)
+        sleep(3)
+        shot("chat-connected")
+        // which opens, and its Understood leads to the congratulations and then the advisor
+        let understood = app.buttons["Understood"]
+        XCTAssertTrue(understood.waitForExistence(timeout: 10))
+        sleep(2)
+        understood.tap()
+        sleep(2)
+        shot("congrats")
+        let meet = app.buttons["Great!"]
+        XCTAssertTrue(meet.waitForExistence(timeout: 8))
+        XCTAssertTrue(app.staticTexts["Arindam, meet your personal advisor"].exists)
+        sleep(1)
+        shot("meet-advisor")
+        meet.tap()
+        // she goes up into the corner, and the permissions come up under her
+        XCTAssertTrue(app.staticTexts["Select permissions you want advisor to communicate from"].waitForExistence(timeout: 8))
+        sleep(3)
+        shot("comms-1")
+        // WhatsApp needs nothing from the system
+        let whatsApp = app.switches["WhatsApp"]
+        whatsApp.tap()
+        XCTAssertEqual(whatsApp.value as? String, "1")
+        // App notifications: the system asks (the first time), and the switch stays on once it's allowed
+        app.switches["Advisory notifications"].tap()
+        let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
+        if allow.waitForExistence(timeout: 3) {
+            shot("comms-ask")
+            allow.tap()
+            sleep(1)
+            XCTAssertEqual(app.switches["Advisory notifications"].value as? String, "1")
+        }
+        shot("comms-2")
+        app.buttons["Continue"].tap()
+        sleep(2)
+        // on to the guides
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'What feels comfortable'")).firstMatch.exists)
+    }
+
+    /// The three guides after the permissions: reading level, hold, swipe; the last Continue ends the onboarding
+    func testGuides() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-onboardingStep", "12"]
+        app.launch()
+        sleep(2)
+        let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        func shot(_ name: String) {
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/" + name + ".png"))
+        }
+        func point(_ x: CGFloat, _ y: CGFloat) -> XCUICoordinate {
+            app.coordinate(withNormalizedOffset: CGVector(dx: x / 402, dy: y / 874))
+        }
+        func heading(_ start: String) -> XCUIElement {
+            app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", start)).firstMatch
+        }
+        XCTAssertTrue(heading("What feels comfortable").exists)
+        XCTAssertTrue(app.staticTexts["BEGINNER"].exists)
+        shot("guide-read-1")
+        // The knob, from BEGINNER to PRO
+        point(60, 698).press(forDuration: 0.05, thenDragTo: point(350, 698), withVelocity: .slow, thenHoldForDuration: 0.3)
+        sleep(4)
+        shot("guide-read-2")
+        app.buttons["Continue"].tap()
+        XCTAssertTrue(heading("Tap & hold the widget").waitForExistence(timeout: 3))
+        sleep(1)
+        shot("guide-hold-1")
+        // Continue sleeps until the hold's been done
+        app.buttons["Continue"].firstMatch.tap()
+        sleep(1)
+        XCTAssertTrue(heading("Tap & hold the widget").exists)
+        point(200, 520).press(forDuration: 0.9)
+        sleep(2)
+        shot("guide-hold-2")
+        point(200, 780).tap()
+        XCTAssertTrue(heading("Swipe the widget").waitForExistence(timeout: 3))
+        sleep(1)
+        shot("guide-swipe-1")
+        point(80, 520).press(forDuration: 0.05, thenDragTo: point(320, 520), withVelocity: .slow, thenHoldForDuration: 0.2)
+        sleep(2)
+        shot("guide-swipe-2")
+        point(200, 780).tap()
+        // and the farewell, before the app itself
+        XCTAssertTrue(app.staticTexts["You’re in, have a wealthy life"].waitForExistence(timeout: 4))
+        shot("farewell")
+        sleep(5)
+        XCTAssertFalse(app.staticTexts["You’re in, have a wealthy life"].exists)
+        XCTAssertFalse(heading("Swipe the widget").exists)
     }
 
     func testChangeNumber() {
@@ -559,7 +765,7 @@ final class GestureTests: XCTestCase {
         sleep(1)
         change.tap()
         // and takes you back to entering it
-        XCTAssertTrue(app.staticTexts["Add your mobile number linked with official records"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Add your mobile number"].waitForExistence(timeout: 3))
         sleep(1)
         XCTAssertFalse(app.staticTexts["Enter the one-time password sent to your mobile"].exists)
     }
@@ -592,7 +798,7 @@ final class GestureTests: XCTestCase {
             top.press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.95)))
         }
         sleep(1)
-        XCTAssertGreaterThan(app.staticTexts["with a topic you’re"].frame.minY, 150)
+        XCTAssertGreaterThan(app.staticTexts["you’re interested in?"].frame.minY, 150)
     }
 
     func testAnalysis() {
@@ -639,26 +845,33 @@ final class GestureTests: XCTestCase {
 
     func testWelcomeChat() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "1"]
+        // A long research, so it's still running through every step that looks at it
+        app.launchArguments = ["-onboardingStep", "1", "-researchSeconds", "90"]
         app.launch()
         // Continue forms under the card and sends the message
-        let next = app.buttons["Continue"]
+        let next = app.buttons["Lets get started"]
         XCTAssertTrue(next.waitForExistence(timeout: 8))
         sleep(1)
+        let dirW = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-welcome.png"))
         next.tap()
         // How the research is done comes up first, and nothing is said until it's understood
         let understood = app.buttons["Understood"]
         XCTAssertTrue(understood.waitForExistence(timeout: 4))
-        XCTAssertTrue(app.staticTexts["Research"].exists)
-        XCTAssertFalse(app.staticTexts["with a topic you’re"].exists)
+        XCTAssertTrue(app.staticTexts["Decade Research"].exists)
+        XCTAssertTrue(app.staticTexts["Advisory Decisioning"].exists)
+        XCTAssertFalse(app.staticTexts["you’re interested in?"].exists)
         sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-research.png"))
         understood.tap()
         // The agent opens with a heading, an offer, and topics to start on
-        XCTAssertTrue(app.staticTexts["with a topic you’re"].waitForExistence(timeout: 4))
+        XCTAssertTrue(app.staticTexts["you’re interested in?"].waitForExistence(timeout: 4))
         let topic = app.buttons["How mutual funds performed in the last 6 months?"]
         XCTAssertTrue(topic.waitForExistence(timeout: 6))
         sleep(2)
-        topic.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-topics.png"))
+        // Its frame takes in the whole two-row rail, so aim at the first card, top left
+        topic.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.2)).tap()
         // The topic goes in as the message, then a reply and the plan it's preparing
         XCTAssertTrue(app.staticTexts["How mutual funds performed in the last 6 months?"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["Mutual funds research plan"].waitForExistence(timeout: 6))
@@ -676,13 +889,22 @@ final class GestureTests: XCTestCase {
         sleep(1)
         XCTAssertFalse(app.staticTexts["Research plan created"].exists)
         XCTAssertTrue(app.buttons["Mutual funds research plan"].isHittable)
-        // While the research runs, the chip says what it's reading
+        // While the research runs, what it's doing shows under the chip, and under that the report being prepared
         sleep(3)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Preparing'")).firstMatch.exists
+            || app.otherElements.matching(NSPredicate(format: "label CONTAINS 'Preparing'")).firstMatch.exists)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-preparing.png"))
         // and the chip opens it again, already all there
         app.buttons["Mutual funds research plan"].tap()
+        // The chip shifts as the live research under it changes height; a tap that lands mid-shift is tried once more
+        if !app.staticTexts["Research plan created"].waitForExistence(timeout: 3) {
+            app.buttons["Mutual funds research plan"].tap()
+        }
         XCTAssertTrue(app.staticTexts["Research plan created"].waitForExistence(timeout: 3))
         sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-plan-again.png"))
         // The close at the top right folds it away too
+        XCTAssertTrue(app.buttons["Close research"].waitForExistence(timeout: 3))
         app.buttons["Close research"].tap()
         sleep(1)
         XCTAssertFalse(app.staticTexts["Research plan created"].exists)
@@ -715,9 +937,24 @@ final class GestureTests: XCTestCase {
         app.launchArguments = ["-onboarding"]
         app.launch()
         sleep(4)
-        // The card shrinks into the phone form and the number pad comes up
-        app.buttons["Agree & Continue"].tap()
+        // The terms open as a sheet that scrolls, and Understood puts it away
+        let termsLink = app.buttons["Read the terms and conditions"]
+        termsLink.tap()
+        sleep(1)
+        XCTAssertTrue(app.staticTexts["Terms & Conditions"].exists)
+        let dir0 = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir0 + "/terms.png"))
+        app.swipeUp()
+        sleep(1)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir0 + "/terms-scrolled.png"))
+        app.buttons["Understood"].tap()
+        sleep(1)
+        XCTAssertFalse(app.staticTexts["Terms & Conditions"].exists)
+        // The page shrinks into the phone card and the number pad comes up
+        app.buttons["Agree and Continue"].tap()
         sleep(2)
+        let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/intro-phone.png"))
         app.textFields.firstMatch.typeText("9871156837")
         sleep(1)
         // The phone card steps back with the number; the OTP card drops in
@@ -728,11 +965,14 @@ final class GestureTests: XCTestCase {
         // The OTP card steps back into the heading; the sphere card lands
         app.buttons["Verify"].tap()
         sleep(3)
-        XCTAssertTrue(app.staticTexts["Verify your identity"].exists)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Verify your pan")).firstMatch.exists)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir0 + "/kyc-loading.png"))
         // Five seconds on, the sphere flattens over the card and reveals the PAN card; Verify comes back
         sleep(8)
         XCTAssertTrue(app.staticTexts["VANGIPURAPPU VENKATA"].exists)
-        XCTAssertTrue(app.buttons["Verify"].isHittable)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Confirm your")).firstMatch.exists)
+        XCTAssertTrue(app.buttons["Confirm"].isHittable)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir0 + "/kyc-found.png"))
     }
 
     func testChatSend() {
@@ -785,8 +1025,15 @@ final class GestureTests: XCTestCase {
         app.swipeUp(velocity: .slow)
         sleep(1)
         shot("home-4")
-        // The first card of the second run, under the advisor's tiles
-        at(200, 640).tap()
+        // A bank's card opens its page; found by name, wherever the page has scrolled to
+        let card = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Suryoday SF Bank'")).firstMatch
+        var tries = 0
+        while !(card.exists && card.isHittable && card.frame.midY < 700) && tries < 6 {
+            app.swipeDown(velocity: .slow)
+            sleep(1)
+            tries += 1
+        }
+        card.tap()
         sleep(2)
         XCTAssertTrue(app.staticTexts["FIXED DEPOSIT"].exists)
         shot("home-bank")
@@ -796,6 +1043,90 @@ final class GestureTests: XCTestCase {
     }
 
     /// Search on the fixed deposits page: an intent narrows the deposits, a bank opens its page, and a pull down opens it too
+    /// The switch's "Your deposits" side: the chart, the states and a card per deposit
+    func testFDYourDeposits() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-fd"]
+        app.launch()
+        sleep(2)
+        func shot(_ name: String) {
+            let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/" + name + ".png"))
+        }
+        app.buttons["Your deposits"].tap()
+        usleep(600_000)
+        shot("yours-growing")
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["Total deposits"].exists)
+        XCTAssertTrue(app.staticTexts["Active fixed deposit"].exists)
+        XCTAssertFalse(app.staticTexts["Browse all fixed deposits"].exists)
+        XCTAssertTrue(app.buttons["3Y"].isSelected)
+        shot("yours-1")
+        app.buttons["5Y"].tap()
+        sleep(1)
+        XCTAssertTrue(app.buttons["5Y"].isSelected)
+        app.swipeUp()
+        sleep(1)
+        shot("yours-2")
+        // A row opens that deposit's own page, and Back returns
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Bajaj Finance'")).firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["Fixed deposit growth"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["View FD Certificate"].exists)
+        sleep(2)
+        shot("held-1")
+        app.swipeUp()
+        sleep(1)
+        shot("held-2")
+        app.swipeUp()
+        sleep(1)
+        shot("held-3")
+        app.swipeDown()
+        app.swipeDown()
+        sleep(1)
+        app.buttons.matching(identifier: "Back").allElementsBoundByIndex.last?.tap()
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["Active fixed deposit"].exists)
+        XCTAssertFalse(app.buttons["View FD Certificate"].exists)
+        app.swipeDown()
+        sleep(1)
+        app.buttons["All"].tap()
+        sleep(1)
+        XCTAssertTrue(app.staticTexts["Create your fixed deposit plan"].exists)
+    }
+
+    /// "Compare returns" joins the bar once the banks have started to show
+    func testFDCompare() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-fd"]
+        app.launch()
+        sleep(2)
+        func shot(_ name: String) {
+            let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/" + name + ".png"))
+        }
+        XCTAssertFalse(app.buttons["Compare returns"].exists)
+        app.swipeUp()
+        sleep(2)
+        XCTAssertTrue(app.buttons["Compare returns"].exists)
+        shot("compare-bar")
+        app.buttons["Compare returns"].tap()
+        sleep(2)
+        XCTAssertTrue(app.staticTexts["Enter investment amount"].exists)
+        shot("compare-sheet")
+        for key in ["5", "0", "0", "0", "0"] { app.buttons[key].tap() }
+        app.buttons["Calculate Returns"].tap()
+        sleep(2)
+        // The heading stays; the cards carry what the amount comes to
+        XCTAssertTrue(app.staticTexts["Browse all fixed deposits"].exists)
+        XCTAssertTrue(app.staticTexts["Rs53,725"].exists)
+        shot("compare-done")
+        app.swipeDown()
+        app.swipeDown()
+        sleep(2)
+        XCTAssertFalse(app.buttons["Compare returns"].exists)
+        shot("compare-gone")
+    }
+
     func testFDSearch() {
         let app = XCUIApplication()
         app.launchArguments = ["-fd"]

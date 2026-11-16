@@ -9,6 +9,12 @@ struct FixedDepositsHomeView: View {
 
     /// The bank whose page is pushed over this one
     @State private var openedBank: FixedDepositsView.Deposit?
+    /// One of your own deposits, opened from "Your deposits"
+    @State private var openedHeld: FDHeldDeposit?
+    /// The row it grew out of, and how far it has travelled (`heldMove`) and grown (`heldGrow`): 0 in the row, 1 the page
+    @State private var heldSource: CGRect = .zero
+    @State private var heldMove: CGFloat = 0
+    @State private var heldGrow: CGFloat = 0
     private static let push = Animation.spring(response: 0.45, dampingFraction: 0.92)
 
     // Search: pull the page down past the threshold and let go, or tap the glass. It finds a bank, which opens
@@ -84,7 +90,7 @@ struct FixedDepositsHomeView: View {
         }
 
     private func openSearch() {
-        guard !searching, openedBank == nil else { return }
+        guard !searching, openedBank == nil, openedHeld == nil else { return }
         Haptics.lift()
         searching = true
     }
@@ -98,6 +104,15 @@ struct FixedDepositsHomeView: View {
     }
 
     /// The four deposits drawn in the frame
+    /// The "Your deposits" side of the switch
+    @State private var showsYours = false
+    /// The banks' cards have started to show, so the bar offers "Compare returns"
+    @State private var banksInView = false
+    /// The compare sheet is up; and the amount compared on, once calculated
+    @State private var comparing = false
+    @State private var compared: Int?
+    @Namespace private var switchSpace
+
     static let browse: [FixedDepositsView.Deposit] = ["Bajaj Finance", "Suryoday SF Bank", "Jana SF Bank", "AU SF Bank"]
         .compactMap { name in FixedDepositsView.deposits.first { $0.name == name } }
 
@@ -107,32 +122,44 @@ struct FixedDepositsHomeView: View {
                 switcher
                     .padding(.horizontal, SpacingScale.spaceLg)
                     .padding(.top, SpacingScale.spaceLg)
-                advisoryCard
-                    .padding(.horizontal, 11) // Gap: the card sits 11 from the screen edge, no spacing token
-                    .padding(.top, SpacingScale.space3xl)
-                DsText("Fixed deposits", variant: .h3)
-                    .padding(.leading, SpacingScale.spaceXl)
-                    .padding(.top, 56) // Gap: 56 above the title, no spacing token
-                benefits
-                    .padding(.horizontal, 11) // Gap: the card sits 11 from the screen edge, no spacing token
-                    .padding(.top, SpacingScale.spaceLg)
-                browseTitle
-                    .padding(.leading, SpacingScale.spaceXl)
-                    .padding(.trailing, SpacingScale.spaceMd)
-                    .padding(.top, 56) // Gap: 56 above the section title, no spacing token
-                cards(slot: 0, intent?.deposits.map { ($0.0, FixedDepositsView.percent($0.1)) })
-                    .padding(.top, 33) // Gap: 33 under the section title, no spacing token
-                DsText("Ask your advisor", variant: .h3)
-                    .padding(.leading, SpacingScale.spaceXl)
-                    .padding(.top, SpacingScale.space5xl)
-                questions
-                    .padding(.horizontal, SpacingScale.spaceSm)
-                    .padding(.top, SpacingScale.space3xl)
-                if intent == nil {
-                    cards(slot: 1, nil)
-                        .padding(.top, 56) // Gap: 56 above the second run of cards, no spacing token
+                if showsYours {
+                    // Figma 733:2075: what you hold, in place of the page
+                    FDYourDepositsView { held, frame in openHeld(held, from: frame) }
+                        .padding(.top, 19) // Gap: 19 under the switch, no spacing token
+                } else {
+                    planCard
+                        .padding(.horizontal, 11) // Gap: the card sits 11 from the screen edge, no spacing token
+                        .padding(.top, SpacingScale.space3xl)
+                    DsText("Fixed deposits", variant: .h3)
+                        .padding(.leading, SpacingScale.spaceXl)
+                        .padding(.top, 56) // Gap: 56 above the title, no spacing token
+                    benefits
+                        .padding(.horizontal, 11) // Gap: the card sits 11 from the screen edge, no spacing token
+                        .padding(.top, SpacingScale.spaceLg)
+                    browseTitle
+                        .padding(.leading, SpacingScale.spaceXl)
+                        .padding(.trailing, SpacingScale.spaceMd)
+                        .padding(.top, 56) // Gap: 56 above the section title, no spacing token
+                    cards(slot: 0, comparison ?? intent?.deposits.map { ($0.0, FixedDepositsView.percent($0.1)) })
+                        .padding(.top, 33) // Gap: 33 under the section title, no spacing token
+                        // Once the banks have started to show, the bar offers "Compare returns"
+                        .onGeometryChange(for: Bool.self) { proxy in
+                            proxy.frame(in: .scrollView).minY < (proxy.bounds(of: .scrollView)?.height ?? 700) - 160
+                        } action: { inView in
+                            banksInView = inView
+                        }
+                    DsText("Ask your advisor", variant: .h3)
+                        .padding(.leading, SpacingScale.spaceXl)
+                        .padding(.top, SpacingScale.space5xl)
+                    FDQuestionTiles()
+                        .padding(.horizontal, SpacingScale.spaceSm)
+                        .padding(.top, SpacingScale.space3xl)
+                    if intent == nil, compared == nil {
+                        cards(slot: 1, nil)
+                            .padding(.top, 56) // Gap: 56 above the second run of cards, no spacing token
+                    }
                 }
-            }
+                }
             .frame(maxWidth: .infinity, alignment: .leading)
             // Room to scroll the last card clear of the advisor pill
             .padding(.bottom, SpacingScale.space10xl)
@@ -153,6 +180,7 @@ struct FixedDepositsHomeView: View {
         }
         .safeAreaInset(edge: .top, spacing: 0) { header }
         .background(ColorScale.surfaceBase.ignoresSafeArea())
+        .background(AdvisorBarActionListener { openCompare() })
         .allowsHitTesting(!searching)
         .overlay {
             if searching {
@@ -161,8 +189,31 @@ struct FixedDepositsHomeView: View {
             }
         }
         // The advisor pill steps aside for search
-        .preference(key: AdvisorBarHiddenKey.self, value: searching)
-        .accessibilityHidden(openedBank != nil)
+        .preference(key: AdvisorBarHiddenKey.self, value: searching || comparing)
+        .preference(key: AdvisorBarActionKey.self, value: banksInView && !showsYours ? "Compare returns" : nil)
+        .overlay {
+            // "Compare returns": the amount sheet over the dimmed page; a tap outside puts it away
+            ZStack(alignment: .bottom) {
+                if comparing {
+                    ColorScale.surfaceInverse.opacity(0.25)
+                        .ignoresSafeArea()
+                        .onTapGesture { withAnimation(Self.sheet) { comparing = false } }
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityLabel("Back to deposits")
+                        .transition(.opacity)
+                    CompareReturnsSheet(amount: compared) { entered in
+                        Haptics.settle()
+                        withAnimation(Self.sheet) {
+                            compared = entered
+                            comparing = false
+                        }
+                    }
+                    .padding(.bottom, SpacingScale.spaceLg)
+                    .transition(.move(edge: .bottom).combined(with: .opacity.animation(.easeOut(duration: 0.2))))
+                }
+            }
+        }
+        .accessibilityHidden(openedBank != nil || openedHeld != nil)
         // The advisor stays at the foot of the page, as on the fund page
         .advisorBar()
         .overlay {
@@ -180,9 +231,59 @@ struct FixedDepositsHomeView: View {
                     .advisorBar()
                     .transition(.move(edge: .trailing))
                 }
+                if let openedHeld {
+                    // The row itself opens up into the page, the way a chat grows out of its icon
+                    FixedDepositHeldView(deposit: openedHeld, onBack: closeHeld)
+                        .advisorBar()
+                        .modifier(ZoomFromSource(
+                            move: heldMove, grow: heldGrow,
+                            source: ChatSource(frame: heldSource, fill: ColorScale.surfaceWidget),
+                            screen: UIScreen.main.bounds.size
+                        ))
+                        .transition(.identity)
+                }
             }
         }
         .preferredColorScheme(.light)
+    }
+
+    private static let sheet = Animation.spring(response: 0.55, dampingFraction: 0.88)
+
+    /// Grows a held deposit's page out of its row: the same springs as the chat's zoom, travel a little ahead of size
+    private func openHeld(_ held: FDHeldDeposit, from frame: CGRect) {
+        guard openedHeld == nil else { return }
+        heldSource = frame
+        heldMove = 0
+        heldGrow = 0
+        openedHeld = held
+        // Placed in the row first, then opened on the next frame
+        DispatchQueue.main.async {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.78)) { heldMove = 1 }
+            withAnimation(.spring(response: 0.58, dampingFraction: 0.7)) { heldGrow = 1 }
+        }
+    }
+
+    /// Tucks the page back into the row it came from
+    private func closeHeld() {
+        withAnimation(.spring(response: 0.42, dampingFraction: 0.84)) { heldMove = 0 }
+        withAnimation(.spring(response: 0.46, dampingFraction: 0.76)) {
+            heldGrow = 0
+        } completion: {
+            openedHeld = nil
+        }
+    }
+
+    private func openCompare() {
+        withAnimation(Self.sheet) { comparing = true }
+    }
+
+    /// What the compared amount comes to at each of the four banks after a year, most first
+    private var comparison: [(FixedDepositsView.Deposit, String)]? {
+        guard let compared else { return nil }
+        return Self.browse
+            .map { deposit in (deposit, FDOffer(term: "", rate: String(deposit.rates[0] ?? deposit.best), years: 1).maturity(of: compared)) }
+            .sorted { $0.1 > $1.1 }
+            .map { ($0.0, FixedDepositsView.rupees($0.1)) }
     }
 
     private func openBank(_ deposit: FixedDepositsView.Deposit) {
@@ -234,116 +335,40 @@ struct FixedDepositsHomeView: View {
     private var switcher: some View {
         Surface(surface: .surfaceSunken2, radius: .radius27, shadow: .none) {
             HStack(spacing: 0) {
-                Surface(surface: .surfaceWidget, shape: .capsule, shadow: .none) {
-                    DsText("All", variant: .p4, color: .contentPrimary)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 47)
-                }
-                // Gap: Rg 17/23 in black 67% has no content token
-                GapText("Your deposits", family: .walsheim, medium: false, size: 17, lineHeight: 23, color: Color.black.opacity(0.67)) // Gap: unbound black 67%
-                    .frame(maxWidth: .infinity)
+                side("All", chosen: !showsYours) { showsYours = false }
+                side("Your deposits", chosen: showsYours) { showsYours = true }
             }
             .padding(3) // Gap: the chosen side sits 3 inside the track, no spacing token
         }
     }
 
-    // MARK: Advisor
-
-    /// Figma 679:22715: the advisor's note on a white panel under an amber header, over a tilted fund card
-    /// that runs off the bottom edge
-    private var advisoryCard: some View {
-        let shape = RoundedRectangle(cornerRadius: RadiusToken.radius27.value, style: .continuous)
-        return ZStack(alignment: .top) {
-            // Gap: Reckless Condensed SemiBold 25/45 at 0.25 tracking in blue/900 has no text style or content token
-            Text(verbatim: "DEPOSIT ADVICE") // ds-lint-ignore: no_raw_text
-                .font(.custom("RecklessCondensedS-TRIAL-SemiBold", fixedSize: 25)) // ds-lint-ignore: no_hand_set_type
-                .tracking(0.25) // ds-lint-ignore: no_hand_set_type
-                .foregroundStyle(ColorPrimitives.blue900) // ds-lint-ignore: no_tier1
-                .frame(height: 45)
-                .padding(.top, 3) // Gap: 3 from the card's top, no spacing token
-
-            // The white panel, 213 tall from 51 down
-            ZStack(alignment: .top) {
-                HStack(alignment: .top, spacing: 15) { // Gap: 15 between the face and the note, no spacing token
-                    Image("FDAdvisorFace")
-                        .resizable()
-                        .frame(width: 53, height: 53)
-                        .clipShape(Circle())
-                        .padding(.top, 2.5) // Gap: the face sits 2.5 below the note's top
-                        .accessibilityHidden(true)
-                    VStack(alignment: .leading, spacing: 2) { // Gap: 2 between the lines, no spacing token
-                        HStack(spacing: 0) {
-                            // Gap: Rg 17/19 in black has no text style
-                            GapText("From your ", family: .walsheim, medium: false, size: 17, lineHeight: 19, color: Color.black) // Gap: unbound black
-                            Spacer(minLength: 0)
-                            // Gap: SF Pro Regular 15/17 in #E0E0E2 has no text style or content token
-                            Text(verbatim: "9:14 AM") // ds-lint-ignore: no_raw_text
-                                .font(.system(size: 15)) // ds-lint-ignore: no_hand_set_type
-                                .foregroundStyle(Color(hex: 0xE0E0E2)) // Gap: unbound #E0E0E2
-                                .frame(height: 17)
-                        }
-                        // Gap: Rg 15/21 in #8C8C8C has no text style or content token
-                        GapText("Have you heard of Calathea? It’s a patterned tropical houseplant…", family: .walsheim, medium: false, size: 15, lineHeight: 21, color: Color(hex: 0x8C8C8C)) // Gap: unbound #8C8C8C
-                            .lineLimit(2)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
+    /// One side of the switch (665:20187); the black pill slides to the chosen one
+    private func side(_ title: String, chosen: Bool, pick: @escaping () -> Void) -> some View {
+        Button {
+            guard !chosen else { return }
+            Haptics.tap()
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.86)) { pick() }
+        } label: {
+            ZStack {
+                if chosen {
+                    Capsule().fill(Color(hex: 0x1F1513)) // Gap: #1F1513, the buttons' colour, is unbound
+                        .matchedGeometryEffect(id: "side", in: switchSpace)
+                    DsText(title, variant: .p4, color: .contentOnColor)
+                } else {
+                    // Gap: Rg 17/23 in black 67% has no content token
+                    GapText(title, family: .walsheim, medium: false, size: 17, lineHeight: 23, color: Color.black.opacity(0.67)) // Gap: unbound black 67%
                 }
-                .padding(.leading, SpacingScale.spaceLg)
-                .padding(.trailing, 28) // Gap: 28 from the panel's side, no spacing token
-                .padding(.top, 13) // Gap: 13 from the panel's top, no spacing token
-
-                fundCard
-                    .rotationEffect(.degrees(4.7))
-                    .padding(.top, 116) // Gap: the tilted card's box starts 104 down the panel and is 12 taller than the card
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 213, alignment: .top)
-            .background(ColorScale.surfaceWidget)
-            .clipShape(shape)
-            .padding(.top, 51) // Gap: the panel starts 51 down, no spacing token
+            .frame(height: 47)
+            .contentShape(Capsule())
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 264, alignment: .top)
-        .background(Color(hex: 0xFEC568)) // Gap: unbound #FEC568
-        .clipShape(shape)
-        .shadow(color: Color.black.opacity(0.07), radius: 28.5, x: 0, y: 2) // Gap: 0 2 57 spread 5 at 7%, not a Shadow style; the spread is not drawn. ds-lint-ignore: no_raw_shadow
-        .accessibilityElement(children: .combine)
-    }
-
-    /// The 300 × 191.6 fund card inside the advisory view
-    private var fundCard: some View {
-        let ink = Color.black // Gap: unbound black, used at 93%, 43% and 7%
-        return ZStack(alignment: .topLeading) {
-            // Gap: Rg 13.859/20.38 in black 93% has no text style or content token
-            GapText("Fund performance", family: .walsheim, medium: false, size: 13.859, lineHeight: 20.38, color: ink.opacity(0.93))
-                .offset(x: 13.86, y: 12.23)
-            GapText("Doing great", family: .walsheim, medium: false, size: 13.859, lineHeight: 20.38, color: ink.opacity(0.93))
-                .frame(width: 270.47, alignment: .trailing)
-                .offset(y: 12.23)
-            Rectangle().fill(ink.opacity(0.07))
-                .frame(width: 300, height: 1.63)
-                .offset(y: 44.84 - 1.63)
-            // Four bars standing on one line, 93.75 down
-            ForEach(Array([13.043, 15.489, 20.38, 29.348].enumerated()), id: \.offset) { index, height in
-                Capsule().fill(Color(hex: 0x3FD519)) // Gap: unbound #3FD519
-                    .frame(width: 5.707, height: height)
-                    .offset(x: 17.12 + 9.783 * Double(index), y: 93.746 - height)
-            }
-            // Gap: Md 13.859/20.38 in black has no text style
-            GapText("Steady growth over years", family: .walsheim, medium: true, size: 13.859, lineHeight: 20.38, color: ink)
-                .offset(x: 92.12, y: 58.69)
-            // Gap: Rg 12.228/18.75 in black 43% has no text style or content token
-            GapText("NAV re-invested", family: .walsheim, medium: false, size: 12.228, lineHeight: 18.75, color: ink.opacity(0.43))
-                .offset(x: 92.12, y: 81.52)
-        }
-        .frame(width: 300, height: 191.576, alignment: .topLeading)
-        .background(Color(hex: 0xFBF6F0)) // Gap: unbound #FBF6F0
-        .clipShape(RoundedRectangle(cornerRadius: 18.75, style: .continuous)) // Gap: 18.75 radius, no radius token
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(chosen ? .isSelected : [])
     }
 
     // MARK: Create your plan
 
-    /// Not shown for now: the advisory view card takes its place.
     /// Figma 665:20272: the reader over "Create your fixed deposit plan" and "Lets start"
     private var planCard: some View {
         Surface(surface: .surfaceWidget, radius: .radius27, border: .borderSubtle, shadow: .token(.shadow2)) {
@@ -363,6 +388,8 @@ struct FixedDepositsHomeView: View {
                         }
                     }
                     .clipped()
+                    // The picture is drawn taller than its window; it must not take taps meant for the switch above
+                    .allowsHitTesting(false)
                     .accessibilityHidden(true)
                 // Gap: Reckless Medium 35/39 in #212121 has no text style or content token
                 GapText("Create your fixed deposit plan", family: .reckless, medium: true, size: 35, lineHeight: 39, color: Color(hex: 0x212121)) // Gap: unbound #212121
@@ -436,7 +463,8 @@ struct FixedDepositsHomeView: View {
 
     /// "Browse all fixed deposits"; or the intent searched for, with a cross to go back to all of them
     @ViewBuilder private var browseTitle: some View {
-        if let intent {
+        // Comparing returns leaves the heading as it is
+        if let intent, compared == nil {
             HStack(spacing: SpacingScale.spaceMd) {
                 DsText(intent.rawValue, variant: .h4)
                 Spacer(minLength: 0)
@@ -466,6 +494,9 @@ struct FixedDepositsHomeView: View {
 
     // MARK: Ask your advisor
 
+}
+/// The advisor's four question tiles, two by two (also under "Your deposits", 777:3307)
+struct FDQuestionTiles: View {
     /// Each tile's wash, left to right. Gap: the fills are unbound gradients, read off the frame
     private static let washes: [[Gradient.Stop]] = [
         [.init(color: Color(hex: 0xFFD24F), location: 0), .init(color: Color(hex: 0xFCCB9F), location: 1)], // Gap: unbound gradient
@@ -474,7 +505,7 @@ struct FixedDepositsHomeView: View {
         [.init(color: Color(hex: 0xE8DAAE), location: 0), .init(color: Color(hex: 0xDCD4C7), location: 0.7), .init(color: Color(hex: 0xDACBCD), location: 1)], // Gap: unbound gradient
     ]
 
-    private var questions: some View {
+    var body: some View {
         VStack(spacing: SpacingScale.spaceMdLg) {
             ForEach(0..<2, id: \.self) { row in
                 HStack(spacing: 11) { // Gap: 11 between tiles, no spacing token
@@ -505,6 +536,7 @@ struct FixedDepositsHomeView: View {
         .shadow(color: Color.black.opacity(0.07), radius: 28.5, x: 0, y: 2) // Gap: 0 2 57 +5 at 7%, not a Shadow style. ds-lint-ignore: no_raw_shadow
     }
 }
+
 
 /// One deposit on the fixed deposits page: who, a badge and the rate, then how safe it is
 struct FDHomeCard: View {

@@ -3,22 +3,22 @@ import SwiftUI
 
 /// The first onboarding screen and the one after it, as one surface.
 ///
-/// Welcome — Figma "iPhone 14 Plus - 84" (130:1921): a tall white card with the watch-movement film playing on peach
-/// in its top half under the Decade mark, "Personal Wealth Advisory Standard" and a line about it under that, a link
-/// to the terms, and a dark Agree & Continue below the card, on white.
+/// Welcome — Figma "iPhone 14 Plus - 439" (802:5409): the reader's picture across the top of the page under the Decade
+/// mark, "Your Research Backed Personal Advisor" and a line about it under that, a dark Agree and Continue, and a
+/// link to the terms.
 ///
-/// Phone — Figma "iPhone 14 Plus - 287" (31:801): tapping Agree & Continue doesn't slide in a new page. The same card
-/// shrinks to fit the phone-number form, the film and copy fade away, the Decade wordmark glides up to become the
-/// card's heading, the white gives way to the pale blobs, and the number pad comes up.
+/// Phone — Figma "iPhone 14 Plus - 395" (679:22978): tapping Agree and Continue doesn't slide in a new page. The
+/// page shrinks into a card that fits the phone-number form, the picture and copy fade away, the Decade wordmark
+/// glides to the card's top-left, a full-width Verify comes in under the card, and the number pad comes up.
 ///
 /// One-time password — Figma "iPhone 14 Plus - 288" (31:1021): Verify sends the phone card back, smaller, keeping just
 /// the number that was entered, while the OTP card drops in over it from 1.3× to its size. The number pad stays up.
 ///
-/// Identity — Figma "iPhone 14 Plus - 291" (44:2228): the second Verify puts the keyboard away and does it again. The
-/// OTP card steps back to become the "Verify your identity" heading card, the phone card slips away behind it, and a
-/// black card with a slowly turning particle sphere lands over them from 1.3×. Five seconds later the sphere swells,
-/// flattens over the card and resolves, top to bottom, into the PAN card (44:3351) that was found, with a live
-/// hologram, and Verify comes back.
+/// KYC — Figma "iPhone 14 Plus - 397" (679:23694): the second Verify puts the keyboard away and does it again. The
+/// OTP card slips away behind with the phone card, and a white "Confirm kyc" card lands over them from 1.3× with a
+/// slowly turning particle sphere in its box. Five seconds later the sphere swells, flattens over the box and
+/// resolves, top to bottom, into the PAN card that was found, with a live hologram. The card then grows into
+/// "Confirm your details" (679:23796) with "Change details" under the PAN card, and Verify becomes Confirm.
 struct OnboardingIntroView: View {
     let onContinue: () -> Void
 
@@ -36,6 +36,13 @@ struct OnboardingIntroView: View {
         Color.clear
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(alignment: .top) { content }
+            .overlay {
+                if stage.showsTerms {
+                    OnboardingTermsSheet(top: Self.statusBarHeight + 16) {
+                        withAnimation(.spring(duration: 0.45, bounce: 0.12)) { stage.showsTerms = false }
+                    }
+                }
+            }
             .preferredColorScheme(.light)
             .background(background.ignoresSafeArea())
             // The number pad rises over the empty lower half; the card stays put
@@ -47,7 +54,8 @@ struct OnboardingIntroView: View {
     private var content: some View {
         ZStack(alignment: .topLeading) {
             card
-                .at(stage.otp ? 35 : 13, stage.phone ? 0 : 9)
+                // The welcome fills the screen; the phone card is what it shrinks into
+                .at(stage.otp ? 35 : stage.phone ? 13 : -Self.margin, stage.otp ? 0 : stage.phone ? 4 : -(Self.statusBarHeight + 13))
                 // Slips away behind once the OTP card has stepped back over it
                 .scaleEffect(stage.identity ? 0.9 : 1, anchor: .top)
                 .opacity(stage.identity ? 0 : 1)
@@ -55,47 +63,70 @@ struct OnboardingIntroView: View {
             // Lands from 1.3× over the phone card as it steps back
             if stage.otp {
                 otpCard
-                    .at(stage.identity ? 27 : 13, stage.identity ? 19 : 51)
+                    .at(13, 51)
+                    // Slips away behind in turn once the KYC card has landed over it
+                    .scaleEffect(stage.identity ? 0.9 : 1, anchor: .top)
+                    .opacity(stage.identity ? 0 : 1)
                     .transition(.scale(scale: 1.3).combined(with: .opacity))
             }
 
             // And again over the OTP card
             if stage.identity {
-                identityCard
-                    .at(13, 158)
-                    // Solid almost at once, so the black never washes grey over the white cards while it scales in
+                kycCard
+                    .at(13, 4)
+                    // Solid almost at once, so the cards behind never show through while it scales in
                     .transition(.scale(scale: 1.3).combined(with: .opacity.animation(.easeOut(duration: 0.12))))
                     // Over the Verify button as it fades
                     .zIndex(1)
             }
 
             agreeButton
-                .at(86, 690)
+                .at(19, 558)
                 .opacity(stage.welcomeShown ? 1 : 0)
                 .scaleEffect(stage.welcomeShown ? 1 : 0.96)
                 .allowsHitTesting(!stage.phone)
 
+            termsLink
+                .at(81, 701)
+                .opacity(stage.welcomeShown ? 1 : 0)
+                .allowsHitTesting(!stage.phone)
+
             verifyButton
-                .at(280, stage.identity ? 469 : 358)
+                // Full width under the phone card (679:23205), then small under the later cards' right edge
+                .at(verifyWide ? 23 : 280, stage.identity ? 687 : stage.otp ? 358 : 356)
                 .opacity(verifyShown ? 1 : 0)
                 .scaleEffect(verifyShown ? 1 : 0.9)
-                .allowsHitTesting(verifyShown)
+                // Waits for the PAN card while the sphere turns
+                .allowsHitTesting(verifyShown && (!stage.identity || stage.idCard))
         }
         .frame(width: 390, alignment: .topLeading)
         // The flow ignores the safe area: 13pt below the status bar, as in Figma
         .padding(.top, Self.statusBarHeight + 13)
     }
 
-    /// Under the phone and OTP forms, then gone while the sphere turns, then back under the PAN card
+    /// Under the phone and OTP forms and the KYC card
     private var verifyShown: Bool {
-        stage.identity ? stage.idCard : stage.formShown || stage.otp
+        stage.identity || stage.formShown || stage.otp
     }
+
+    /// Full width under the phone card and the KYC card, small under the OTP card
+    private var verifyWide: Bool { !stage.otp || stage.identity }
 
     /// The app window's top inset. Not the key window's: while the number pad is up that's the keyboard's, with none.
     private static var statusBarHeight: CGFloat {
         let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
         return scene?.windows.first?.safeAreaInsets.top ?? 44
     }
+
+    private static var screenSize: CGSize {
+        let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+        return scene?.screen.bounds.size ?? CGSize(width: 390, height: 844)
+    }
+
+    /// The 390-wide layout sits in the middle of the screen; this is what's left on each side
+    private static var margin: CGFloat { (screenSize.width - 390) / 2 }
+    /// How much taller the status bar is than the frame's 44
+    private static var drop: CGFloat { statusBarHeight - 44 }
 
     // MARK: Morph
 
@@ -162,9 +193,9 @@ struct OnboardingIntroView: View {
             .frame(maxWidth: .infinity, alignment: .top)
             Color.white.opacity(0.87)
 
-            // The welcome's surface/base, giving way to the blobs as the card turns
+            // The welcome's and the phone card's surface/base, giving way to the blobs once the OTP card lands
             ColorScale.surfaceBase
-                .opacity(stage.phone ? 0 : 1)
+                .opacity(stage.otp && !stage.identity ? 0 : 1)
         }
     }
 
@@ -174,23 +205,36 @@ struct OnboardingIntroView: View {
         ZStack(alignment: .topLeading) {
             Color.white
 
-            // The welcome (555:9689): a rule under the Decade mark, the heading and its line, then the watch movement
+            // The welcome (802:5409): the reader's picture across the top under the Decade mark and its rule, then the
+            // heading and its line on surface/base
             Group {
+                ColorScale.surfaceBase
+
+                // Gap: Figma #FDF6EE behind the picture, unbound
+                Color(hex: 0xFDF6EE)
+                    .frame(width: Self.screenSize.width, height: 351 + Self.drop)
+                    .overlay(alignment: .topLeading) {
+                        let fit = Self.screenSize.width / 390
+                        Image("OnboardingReader")
+                            .resizable()
+                            .frame(width: 481 * fit, height: 579 * fit)
+                            .offset(x: -129 * fit, y: -52 * fit + Self.drop)
+                    }
+                    .clipped()
+
                 // Gap: Figma black 57%, 1 pt, no token
                 Color.black.opacity(0.57)
-                    .frame(width: 328, height: 1)
-                    .at(18, 52)
+                    .frame(width: 358, height: 1)
+                    .at(13 + Self.margin, 101 + Self.drop)
 
-                DsText("Personal advisory wealth standard", variant: .h1)
-                    .frame(width: 330, alignment: .leading)
-                    .at(17, 70)
+                // Gap: Reckless Medium 45/49 in #33302D; H1 is Regular and the colour is unbound
+                GapText("Your Research Backed Personal Advisor", family: .reckless, medium: true, size: 45, lineHeight: 49, color: Color(hex: 0x33302D))
+                    .frame(width: 355, alignment: .leading)
+                    .at(18 + Self.margin, 380 + Self.drop)
 
-                DsText("Thoughtful wealth management for people who’ve outgrown generic advice.", variant: .p3)
+                DsText("Thoughtful wealth management for people who’ve outgrown generic advice.", variant: .p3, color: .contentSecondary)
                     .frame(width: 312, alignment: .leading)
-                    .at(17, 226)
-
-                media
-                    .at(0, 290)
+                    .at(18 + Self.margin, 542 + Self.drop)
             }
             .opacity(stage.welcomeShown ? 1 : 0)
 
@@ -219,15 +263,15 @@ struct OnboardingIntroView: View {
         .frame(width: cardSize.width, height: cardSize.height, alignment: .topLeading)
         .clipShape(RoundedRectangle(cornerRadius: cardCorner, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: cardCorner, style: .continuous).stroke(Color.white.opacity(0.09), lineWidth: 3))
-        // Gap: the welcome's shadow is 0 4 100 +23 at 8% in Figma, not a Shadow/* style; SwiftUI can't draw the spread
-        .shadow(color: Color.black.opacity(0.08), radius: 50, x: 0, y: 4)
+        // Gap: Shadow/1 under the phone card is 0 4 100 +12 at 5%; SwiftUI can't draw the spread
+        .shadow(color: Color.black.opacity(stage.phone && !stage.otp ? 0.05 : 0.08), radius: 50, x: 0, y: 4)
     }
 
     private var cardSize: CGSize {
-        stage.otp ? CGSize(width: 321, height: 298.95) : CGSize(width: 364, height: stage.phone ? 339 : 652)
+        stage.otp ? CGSize(width: 321, height: 298.95) : stage.phone ? CGSize(width: 364, height: 339) : Self.screenSize
     }
 
-    private var cardCorner: CGFloat { stage.otp ? 23 : stage.phone ? 27 : RadiusToken.radius23.value }
+    private var cardCorner: CGFloat { stage.otp ? 23 : stage.phone ? 27 : 0 }
 
     /// "Change number" (316:16628), 123 × 31: a grey capsule with a pencil
     private var changeNumberButton: some View {
@@ -272,17 +316,6 @@ struct OnboardingIntroView: View {
                 .multilineTextAlignment(.center)
                 .frame(width: 260)
                 .at(52, 37)
-                .opacity(stage.identity ? 0 : 1)
-
-            // The heading it becomes once it steps back (44:2328)
-            Text("Verify your identity")
-                .font(FigmaFont.reckless(45))
-                .tracking(-0.45)
-                .foregroundStyle(Color.black.opacity(0.93))
-                .multilineTextAlignment(.center)
-                .frame(width: 318)
-                .at(9, 23)
-                .opacity(stage.identity ? 1 : 0)
 
             ZStack(alignment: .topLeading) {
                 OneTimeCodeField(code: $stage.code)
@@ -306,46 +339,117 @@ struct OnboardingIntroView: View {
             .frame(width: 318, height: 107, alignment: .topLeading)
             .overlay(RoundedRectangle(cornerRadius: 17, style: .continuous).stroke(Color(hex: 0xC2C2C2).opacity(0.33), lineWidth: 1))
             .at(23, 104)
-            .opacity(stage.identity ? 0 : 1)
         }
-        // 364 × 288, stepping back to the 336 × 181 heading card (44:2327)
-        .frame(width: stage.identity ? 336 : 364, height: stage.identity ? 181 : 288, alignment: .topLeading)
+        .frame(width: 364, height: 288, alignment: .topLeading)
         .clipShape(RoundedRectangle(cornerRadius: 27, style: .continuous))
         .shadow(color: Color.black.opacity(0.08), radius: 50, x: 0, y: 4)
     }
 
-    // MARK: Identity card (44:2329 → 44:3351), 364 × 255
+    // MARK: KYC card (679:23697 → 679:23799), 364 × 512 growing to 364 × 572
 
-    /// Black, with the particle sphere (44:2367) turning in it, a little above centre. Five seconds in, the sphere
-    /// swells and flattens over the whole card, the card turns white, and the PAN card is revealed from the top down.
+    /// "Confirm kyc" over a rule, the heading, and the box the sphere turns in. Once the PAN card is found the heading
+    /// changes, "Personal details" comes in over the box and "Change details" under it, and the card grows to fit.
+    private var kycCard: some View {
+        ZStack(alignment: .topLeading) {
+            Color.white
+
+            Image("OnboardingKycCard")
+                .frame(width: 24.924, height: 21)
+                .at(17, 16)
+            // Gap: Md 19/29 in black has no text style
+            GapText("Confirm kyc", family: .walsheim, medium: true, size: 19, lineHeight: 29, color: Color.black)
+                .fixedSize()
+                .at(53, 12)
+
+            // Gap: Figma black 57%, 1 pt, no token
+            Color.black.opacity(0.57)
+                .frame(width: 328, height: 1)
+                .at(18, 52)
+
+            // Gap: Reckless Medium 45/49 in #33302D; H1 is Regular and the colour is unbound. Broken as in the frame:
+            // left alone, iOS evens the two lines out
+            GapText("Verify your pan\ndetails", family: .reckless, medium: true, size: 45, lineHeight: 49, color: Color(hex: 0x33302D))
+                .frame(width: 318, alignment: .leading)
+                .at(17, 76)
+                .opacity(stage.idCard ? 0 : 1)
+            GapText("Confirm your\ndetails", family: .reckless, medium: true, size: 45, lineHeight: 49, color: Color(hex: 0x33302D))
+                .frame(width: 318, alignment: .leading)
+                .at(17, 76)
+                .opacity(stage.idCard ? 1 : 0)
+
+            DsText("Personal details", variant: .h4)
+                .fixedSize()
+                .at(17, 199)
+                .opacity(stage.idCard ? 1 : 0)
+
+            // 802:5818 / 802:5673: the earlier 364 × 255 card, drawn at 330 wide
+            identityCard
+                .scaleEffect(330.0 / 364, anchor: .topLeading)
+                .frame(width: 330, height: 231.882, alignment: .topLeading)
+                .at(17, 245)
+
+            changeDetailsButton
+                .at(17, 500)
+                .opacity(stage.idCard ? 1 : 0)
+                .allowsHitTesting(stage.idCard)
+        }
+        .frame(width: 364, height: stage.idCard ? 572 : 512, alignment: .topLeading)
+        .clipShape(RoundedRectangle(cornerRadius: 27, style: .continuous))
+        // Gap: Shadow/1 (0 4 100 +12 at 5%) then Shadow/2 (0 4 97 +7 at 7%); SwiftUI can't draw the spread
+        .shadow(color: Color.black.opacity(stage.idCard ? 0.07 : 0.05), radius: 50, x: 0, y: 4)
+    }
+
+    /// "Change details" (802:5687), 330 × 45: outlined, under the PAN card
+    private var changeDetailsButton: some View {
+        Button {
+            Haptics.tap()
+        } label: {
+            Text("Change details")
+                .font(FigmaFont.walsheimMedium(17))
+                .foregroundStyle(Color(hex: 0x212121))
+                .frame(width: 330, height: 45)
+                .background(Capsule().fill(Color.white))
+                .overlay(Capsule().strokeBorder(ColorScale.borderSubtle, lineWidth: 1))
+                .shadow(color: Color.black.opacity(0.03), radius: 15, x: 0, y: 3)
+        }
+        .buttonStyle(PressScaleStyle())
+    }
+
+    /// The box in the KYC card: the particle sphere turning in it, a little above centre. Five seconds in, the sphere
+    /// swells and flattens over the whole box and the PAN card is revealed from the top down.
     private var identityCard: some View {
-        let corner: CGFloat = stage.idCard ? 19 : 27
-        let shape = RoundedRectangle(cornerRadius: corner, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: 19, style: .continuous)
         return ZStack(alignment: .topLeading) {
             // Swapped outright: the reveal's last frame is already the finished card
             if stage.idCard {
-                Color.white
-                    .transition(.identity)
                 panCard
+                    .background(Self.panTint)
                     .transition(.identity)
             } else {
-                SphereToCardReveal(start: stage.identityStart) { panCard.background(Color.white) }
+                SphereToCardReveal(start: stage.identityStart) { panCard.background(Self.panTint) }
                     .transition(.identity)
             }
         }
         .frame(width: 364, height: 255, alignment: .topLeading)
         .clipShape(shape)
         .modifier(RevealBump(start: stage.identityStart, active: stage.identity && !stage.idCard))
-        .overlay(shape.strokeBorder(Color(red: 100 / 255, green: 96 / 255, blue: 92 / 255).opacity(stage.idCard ? 0.17 : 0), lineWidth: 0.7))
-        .shadow(color: Color.black.opacity(stage.idCard ? 0.11 : 0.08), radius: stage.idCard ? 58 : 50, x: 0, y: 4)
+        .overlay(shape.strokeBorder(ColorScale.borderSubtle, lineWidth: 0.7))
         .task(id: stage.identity) {
             guard stage.identity, !stage.idCard else { return }
             let left = SphereToCardReveal.endsAt - Date().timeIntervalSince(stage.identityStart)
             try? await Task.sleep(for: .seconds(max(0, left)))
             guard !Task.isCancelled else { return }
-            // The card is fully revealed by now; this just settles its corners and edge and brings Verify back
+            // The card is fully revealed by now; this brings in the rest of the KYC card around it
             withAnimation(.easeInOut(duration: 0.45)) { stage.idCard = true }
         }
+    }
+
+    /// Gap: the PAN card's faint cool tint over white (802:5673), 13%; the frame's gradient has no token
+    private static let panTint = ZStack {
+        Color.white
+        LinearGradient(colors: [Color(red: 182 / 255, green: 183 / 255, blue: 205 / 255).opacity(0.13),
+                                Color(red: 173 / 255, green: 202 / 255, blue: 225 / 255).opacity(0.13)],
+                       startPoint: .leading, endPoint: .trailing)
     }
 
     /// The PAN card that was found (44:3351): department header, ruled panel with name, PAN and date of birth, and the
@@ -408,63 +512,56 @@ struct OnboardingIntroView: View {
             .animation(.snappy(duration: 0.2), value: code)
     }
 
-    /// The Decade wordmark: at the card's top-left with its mark (555:9693, 26pt at 19, 13), then the card's heading
-    /// (31:1013, 45pt at 23, 30). It's drawn once at 45pt and scaled down for the welcome, so it glides between the two.
+    /// The Decade wordmark with its mark: at the welcome's top-left (802:5413, 26pt at 15, 59), then a touch smaller at
+    /// the phone card's (679:23675, 24.2pt at 17, 13). It's drawn once at 45pt and scaled down, so it glides between the two.
     private var wordmark: some View {
-        let scale: CGFloat = stage.phone ? 1 : 25.999 / 45
-        // Gap: Figma #33302D on the mark and wordmark, no token
-        let ink = Color(hex: 0x33302D)
+        let scale: CGFloat = (stage.phone ? 24.206 : 25.999) / 45
+        // Gap: Figma #33302D on the welcome's mark and wordmark, black on the phone card's; neither is a token
+        let ink = stage.phone ? Color.black : Color(hex: 0x33302D)
+        let markSize: CGFloat = stage.phone ? 18.254 : 19.606
         return ZStack(alignment: .topLeading) {
             Image("DecadeMarkPlum")
                 .renderingMode(.template)
                 .resizable()
                 .foregroundStyle(ink)
-                .frame(width: 19.606, height: 19.606)
-                .offset(x: stage.phone ? -12 : 19, y: stage.phone ? 40 : 18.1)
-                .opacity(stage.phone ? 0 : 1)
+                .frame(width: markSize, height: markSize)
+                .offset(x: stage.phone ? 17 : 15 + Self.margin, y: stage.phone ? 17.76 : 64.1 + Self.drop)
             Text("Decade")
                 .font(FigmaFont.superMedium(45))
                 .tracking(-0.45)
-                .foregroundStyle(stage.phone ? Color.black.opacity(0.93) : ink)
+                .foregroundStyle(ink)
                 .fixedSize()
                 .frame(height: 46)
                 .scaleEffect(scale, anchor: .topLeading)
-                .offset(x: stage.phone ? 23 : 44.15, y: stage.phone ? 30 : 14.2)
+                .offset(x: stage.phone ? 40.42 : 40.15 + Self.margin, y: stage.phone ? 14.1 : 60.2 + Self.drop)
         }
         .allowsHitTesting(false)
-    }
-
-    /// The watch movement (555:9690): 364 × 362 at the card's foot, the picture 311 square in its middle
-    private var media: some View {
-        // Gap: Figma #F7F4F4, unbound; surface/sunken-1 (#F5F3F2) is the nearest role
-        Color(hex: 0xF7F4F4)
-            .frame(width: 364, height: 362)
-            .overlay {
-                Image("OnboardingWatch")
-                    .resizable()
-                    .frame(width: 311, height: 311)
-                    .offset(x: -0.5, y: 0.5)
-            }
     }
 
     // MARK: Phone form (31:901, 31:904)
 
     private var phoneForm: some View {
         ZStack(alignment: .topLeading) {
-            Text("Add your mobile number linked with official records")
-                .font(FigmaFont.walsheim(19))
-                .lineSpacing(2)
-                .foregroundStyle(Color(hex: 0x212121).opacity(0.85))
-                .frame(width: 318, alignment: .leading)
-                .at(23, 141)
+            // Gap: Figma black 57%, 1 pt, no token
+            Color.black.opacity(0.57)
+                .frame(width: 328, height: 1)
+                .at(18, 52)
+
+            DsText("Add your mobile number", variant: .h4)
+                .fixedSize()
+                .at(17, 149)
 
             ZStack(alignment: .topLeading) {
+                // Gap: Rg 35/48 at 7% tracking has no text style
+                GapText("+91", family: .walsheim, medium: false, size: 35, lineHeight: 48, trackingPercent: 7, color: ColorScale.contentTertiary)
+                    .fixedSize()
+                    .at(12, 11)
                 PhoneNumberField(number: $stage.number)
-                    .frame(width: 300, height: 48)
-                    .at(13, 11)
+                    .frame(width: 245, height: 48)
+                    .at(77, 11)
                 Rectangle()
                     .fill(Color(hex: 0xEBEBEB))
-                    .frame(width: 316, height: 1)
+                    .frame(width: 329, height: 1)
                     .at(0, 67)
                 Text("We will send the confirmation on your mobile to confirm it.")
                     .font(FigmaFont.walsheim(13))
@@ -473,42 +570,65 @@ struct OnboardingIntroView: View {
                     .frame(width: 286, alignment: .leading)
                     .at(13, 74)
             }
-            .frame(width: 318, height: 117, alignment: .topLeading)
+            .frame(width: 330, height: 117, alignment: .topLeading)
             .overlay(RoundedRectangle(cornerRadius: 17, style: .continuous).stroke(Color(hex: 0xC2C2C2).opacity(0.33), lineWidth: 1))
-            .at(23, 199)
+            .at(17, 195)
         }
     }
 
     // MARK: Buttons
 
-    /// Agree & Continue (555:9681), 218 × 53
+    /// Agree and Continue (802:5419), 352 × 51
     private var agreeButton: some View {
         Button(action: agree) {
-            DsText("Agree & Continue", variant: .h6, color: .contentOnColor)
-                .frame(width: 218, height: 53)
-                // Gap: Figma #341F1B fill, 2 pt black 5% border and 0 3 30 +8 3% shadow; none are tokens
-                .background(Capsule().fill(Color(hex: 0x341F1B)))
+            DsText("Agree and Continue", variant: .h6, color: .contentOnColor)
+                .frame(width: 352, height: 51)
+                // Gap: Figma #1F1513 fill, 2 pt black 5% border and 0 3 30 +8 3% shadow; none are tokens
+                .background(Capsule().fill(Color(hex: 0x1F1513)))
                 .overlay(Capsule().strokeBorder(Color.black.opacity(0.05), lineWidth: 2))
                 .shadow(color: Color.black.opacity(0.03), radius: 15, x: 0, y: 3)
         }
         .buttonStyle(PressScaleStyle())
     }
 
-    /// Verify (31:906), 93 × 45, under the card's right edge
+    /// "Read the terms and conditions" with its chevron (802:5458), 229 × 21
+    private var termsLink: some View {
+        Button {
+            Haptics.tap()
+            withAnimation(.spring(duration: 0.5, bounce: 0.18)) { stage.showsTerms = true }
+        } label: {
+            ZStack(alignment: .topLeading) {
+                // Gap: Rg 15/21 in black 70% has no text style or content token
+                GapText("Read the terms and conditions", family: .walsheim, medium: false, size: 15, lineHeight: 21, color: Color.black.opacity(0.7))
+                    .fixedSize()
+                Image("OnboardingTermsChevron")
+                    .frame(width: 21, height: 21)
+                    .at(208, 0)
+            }
+            .frame(width: 229, height: 21, alignment: .topLeading)
+            .contentShape(Rectangle().inset(by: -12))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Read the terms and conditions")
+    }
+
+    /// Verify: 344 × 45 under the phone card (679:23205) and at the foot of the KYC step (802:5552), where it turns
+    /// into Confirm; 93 × 45 under the OTP card's right edge (31:906)
     private var verifyButton: some View {
         Button(action: verify) {
             ZStack {
-                Text("Verify")
+                Text(stage.idCard ? "Confirm" : "Verify")
                     .font(FigmaFont.walsheimMedium(17))
                     .foregroundStyle(Color.white)
-                    .offset(x: -9)
+                    .offset(x: verifyWide ? -0.5 : -9)
                 Image("VerifyChevron")
                     .frame(width: 23, height: 23)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.trailing, 5)
             }
-            .frame(width: 93, height: 45)
-            .background(Capsule().fill(Color.black))
+            .frame(width: verifyWide ? 344 : 93, height: 45)
+            // Gap: Figma #1F1513 fill, 2 pt black 5% border and 0 3 30 +8 3% shadow; none are tokens
+            .background(Capsule().fill(Color(hex: 0x1F1513)))
             .overlay(Capsule().stroke(Color.black.opacity(0.05), lineWidth: 2))
             .shadow(color: Color.black.opacity(0.03), radius: 15, x: 0, y: 3)
         }
@@ -535,6 +655,8 @@ struct OnboardingIntroView: View {
     /// The welcome's black version (130:1977): the film on black under a white wordmark, rather than on peach (130:1921).
     /// `-welcomeBlack` opens on it; tapping the film switches between the two.
     var black = args.contains("-welcomeBlack")
+    /// The terms sheet is up over the welcome. `-onboardingTerms` opens on it.
+    var showsTerms = args.contains("-onboardingTerms")
     /// The sphere card has turned into the PAN card. `-onboardingPAN` opens on it.
     var idCard = args.contains("-onboardingPAN")
     /// When the sphere card landed; its reveal runs from here
@@ -598,13 +720,14 @@ private struct OTPResendStatus: View {
     }
 }
 
-/// The big mobile-number entry (31:905): digits only, at most 10, widely tracked, with the number pad up as soon as
+/// The big mobile-number entry (679:23200): digits only, at most 10, with the number pad up as soon as
 /// it appears. A UIKit field so its first-responder work stays out of the morphing card's SwiftUI updates.
 private struct PhoneNumberField: UIViewRepresentable {
     @Binding var number: String
 
     private static let font = UIFont(name: "GTWalsheimTrial-Rg", size: 35) ?? .systemFont(ofSize: 35)
-    private static let ink = UIColor(red: 33 / 255, green: 33 / 255, blue: 33 / 255, alpha: 0.85)
+    /// content/secondary
+    private static let ink = UIColor(ColorScale.contentSecondary)
 
     func makeUIView(context: Context) -> UITextField {
         // Takes focus as soon as it's on screen, retrying through the morph
@@ -614,9 +737,9 @@ private struct PhoneNumberField: UIViewRepresentable {
         field.font = Self.font
         field.textColor = Self.ink
         field.tintColor = Self.ink
-        field.defaultTextAttributes[.kern] = 8.05
+        field.defaultTextAttributes[.kern] = 2.45
         field.attributedPlaceholder = NSAttributedString(string: "9871156837", attributes: [
-            .font: Self.font, .kern: 8.05, .foregroundColor: Self.ink.withAlphaComponent(0.18),
+            .font: Self.font, .kern: 2.45, .foregroundColor: Self.ink.withAlphaComponent(0.25),
         ])
         field.delegate = context.coordinator
         field.addTarget(context.coordinator, action: #selector(Coordinator.changed(_:)), for: .editingChanged)

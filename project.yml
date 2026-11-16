@@ -22,6 +22,8 @@ targets:
           - GT-Walsheim-Medium-Trial.otf
           - RecklessStandardS-TRIAL-Medium.otf
           - RecklessStandardS-TRIAL-Regular.otf
+          - RecklessStandardS-TRIAL-RegularItalic.otf
+          - RecklessStandardS-TRIAL-MediumItalic.otf
           - GT-Super-Text-Medium-Trial.otf
           - RecklessStandardS-TRIAL-SemiBold.otf
           - RecklessCondensedS-TRIAL-SemiBold.otf

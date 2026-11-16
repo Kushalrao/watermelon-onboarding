@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,7 @@
 		0B60BAA22CEFB46FE29C7EAA /* OnboardingAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60CB34EED9EDF90E33340FC /* OnboardingAnalysis.swift */; };
 		0F0A6EDFA08CE3CC604E504D /* TokenContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0FC638931B4840CAE7F7E5F /* TokenContractTests.swift */; };
 		13585C4FE2CC307CB8A79968 /* OnboardingComplexity.swift in Sources */ = {isa = PBXBuildFile; fileRef = C25DAB2D73D46956C45AADA0 /* OnboardingComplexity.swift */; };
+		137F8386215FBECBA4FD80AC /* FixedDepositHeld.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18DBABB52400FFD9F25F599 /* FixedDepositHeld.swift */; };
 		178898E59940FB05475B2981 /* FundExperienceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3EEA42DC05AD98BBCB5985 /* FundExperienceView.swift */; };
 		17DBD69DA81B64E8787B2420 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 451B861C43AC353D133C5649 /* Assets.xcassets */; };
 		1C9E954DCDED34AE0F25F14E /* ContainerTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C51897D87B5AFF7254EBB6 /* ContainerTokens.swift */; };
@@ -21,6 +22,7 @@
 		1FA6AC57F6D629C310FEC80C /* DsText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1782E778D8036E4106D116A1 /* DsText.swift */; };
 		21D8DC1BD2C169921C8D028E /* ParticleSphere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5B773165C094CD9AC46CE1 /* ParticleSphere.swift */; };
 		233A203931C53AAB49BE992B /* hsbc_midcap_nav.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F5D23A8585AEC04626177E9 /* hsbc_midcap_nav.json */; };
+		2613832F3D88E67E9F6A0415 /* RecklessStandardS-TRIAL-RegularItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0B4E0B8365D3CAD219CE01E5 /* RecklessStandardS-TRIAL-RegularItalic.otf */; };
 		28C758469B8769420BCCC60C /* MutualFundScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDEF03A6301197E88CE72D8 /* MutualFundScreen.swift */; };
 		2A1295A8D6FDCC5B4B6AEE83 /* HomeV4View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7357B2BFCB5B2CFB4E7D5CC9 /* HomeV4View.swift */; };
 		3035B2D08D918D105B2ACEB0 /* Composer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342921007836A09A10668B81 /* Composer.swift */; };
@@ -42,15 +44,18 @@
 		6ED19616B7ED08DD45C31D96 /* ShadowScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3429AD9ABD543181AD0D54 /* ShadowScale.swift */; };
 		6F9AF9A4C96F7BBAA8F2ECA9 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9D0BE599C1B23DD4DB8891 /* Theme.swift */; };
 		6FEBC983E67539A51C964E41 /* RecklessStandardS-TRIAL-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = A66EEA31E663B7F2F6057A4A /* RecklessStandardS-TRIAL-Medium.otf */; };
+		75097D7657A8006150C0E8D9 /* OnboardingImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6184CF36E5BC95CEC2CB3D /* OnboardingImport.swift */; };
 		767A5DC5730C18A40E47F52A /* ChatExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A0FD62A9BEC1C173AEBBD2 /* ChatExperience.swift */; };
 		77CD1AD2C20145FE33DA032C /* TypographyScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3BDC74C8CD1B45996CBBB8 /* TypographyScale.swift */; };
 		7E02598271F4CD342C0C032F /* FundChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D7572D9AB1F5B261DF8D /* FundChart.swift */; };
 		85D4ABDBB6D55AEECE7D7794 /* BorderLightSweep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56F2EA3C4A8F2D0B586F26B7 /* BorderLightSweep.swift */; };
 		868B21A67867E704C4CB09E2 /* AdvisorBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95CACFCA18A48950C43DEEA /* AdvisorBar.swift */; };
 		8A9BCA88DD3A9D4C3B863A3D /* HomeV3View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B19625AA88AADF91AC70DF /* HomeV3View.swift */; };
+		8AE51B31DB18770E2D63C933 /* OnboardingGuides.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33FC65FBD7A1293060752AB3 /* OnboardingGuides.swift */; };
 		8B84CE549A5FAA926B28711A /* FixedDepositBank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9184857403AD230A8264C4 /* FixedDepositBank.swift */; };
 		989A6D2A0862DB64254B22CE /* OnboardingAdvisory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695C74C0E2633C118F2462BC /* OnboardingAdvisory.swift */; };
 		9E8E0050E1F98A32783C1E71 /* fund_curves.json in Resources */ = {isa = PBXBuildFile; fileRef = FD6C2832BEDA5FAACE813174 /* fund_curves.json */; };
+		9F60C7C89810ECFAACBAF80D /* FixedDepositsYours.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E9A9E0C86CE12AE7EA967C /* FixedDepositsYours.swift */; };
 		A36F2A41B2C17355250AC43F /* DecadeBackdrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1821E9B8DB68FB3FE760E2 /* DecadeBackdrop.swift */; };
 		A381709FF9FD13160A794339 /* HomeV2View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDB613F01BDD9F3898AE0E9 /* HomeV2View.swift */; };
 		A3C9EEF4B26F48F395B941EA /* watch_movement_black.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = FFCD3FFD872432085BAE8160 /* watch_movement_black.mp4 */; };
@@ -60,17 +65,21 @@
 		AC5A4F528BBC96D4C9F93453 /* FixedDepositPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23F99BC946D8856AE3120B9A /* FixedDepositPlan.swift */; };
 		B19B8550B5E99E6B8C91D51F /* DSPlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77D3E96BF44F0AD3985F5C6 /* DSPlatform.swift */; };
 		B1B7B7204BB4F1E090FFA5DB /* RecklessStandardS-TRIAL-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 36C4580E9EDC267EC4485020 /* RecklessStandardS-TRIAL-Regular.otf */; };
+		B2FB5F224A0A92929CDD4889 /* FixedDepositGrowth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 017E341F8842401D51C2BD8D /* FixedDepositGrowth.swift */; };
 		B3E706D54BED4166B31DDED5 /* GT-Super-Text-Medium-Trial.otf in Resources */ = {isa = PBXBuildFile; fileRef = F50B0885996CDFA7C8558BD7 /* GT-Super-Text-Medium-Trial.otf */; };
 		B7EE2004868AF9082451B2FE /* QuickSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8666537369AF62AE0D950F74 /* QuickSearch.swift */; };
+		B8E2C3C17995F316446397E2 /* OnboardingPersonalise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3556CF44D92E8E38EB97A81E /* OnboardingPersonalise.swift */; };
 		BBB0B8FC3A66A14A5979F181 /* GT-Walsheim-Regular-Trial.otf in Resources */ = {isa = PBXBuildFile; fileRef = 58107783B7588FE3B9FFAF14 /* GT-Walsheim-Regular-Trial.otf */; };
 		BFC1BD2DBC96A300F2044E0F /* HeldWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5022775BEE4179BDD6E6DC5A /* HeldWidget.swift */; };
 		C192556CC1F6D90D6C6990A6 /* ColorPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A912E78837659BDA956E9EA /* ColorPrimitives.swift */; };
+		C78261403520EA753F182F79 /* OnboardingTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A530D6C57A47D34A5C92B /* OnboardingTerms.swift */; };
 		C919A142A64A317BB9F32D48 /* OnboardingHold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 286B272FFC314EE872A4963D /* OnboardingHold.swift */; };
 		CF444B9D737DA514A53C484C /* GearWormPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3017FF5D1A7EEC715D3ECA /* GearWormPattern.swift */; };
 		CFF305172B5A29502695708B /* ChatZoomTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827BCB10B8CE20D351194C62 /* ChatZoomTransition.swift */; };
 		D2CB72A07F7A1943E87731F5 /* MoodDial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74CB77CD82F51F0153726B70 /* MoodDial.swift */; };
 		D3DFC4B6371904A04D33BF31 /* SpacingScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69E55D6CF28CECFFAEAB461 /* SpacingScale.swift */; };
 		DDC385EE75605E76D771BBA5 /* OnboardingResearchLive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A70B1766BB61E60DC60590 /* OnboardingResearchLive.swift */; };
+		DF529094FC4612FDBB0E9205 /* RecklessStandardS-TRIAL-MediumItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = BE863854DA84A66D7535FC10 /* RecklessStandardS-TRIAL-MediumItalic.otf */; };
 		E3B81DA46551334A1D03658C /* HomeV5View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D39E0469B178A31E7D290B7 /* HomeV5View.swift */; };
 		E4AF3D0384BDC398B1CA9183 /* FixedDepositBankV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3860D4ED1FD3AE699E8C581D /* FixedDepositBankV2.swift */; };
 		E8DC5B6FFE213FF13A8E4669 /* FixedDepositsHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4ABD2919B9F933EFB1EDA87 /* FixedDepositsHome.swift */; };
@@ -101,8 +110,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		017E341F8842401D51C2BD8D /* FixedDepositGrowth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositGrowth.swift; sourceTree = "<group>"; };
 		06934B535ABBC1308E73FE27 /* GestureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureTests.swift; sourceTree = "<group>"; };
 		09690633B508FAE640B603D8 /* Hairline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hairline.swift; sourceTree = "<group>"; };
+		0B4E0B8365D3CAD219CE01E5 /* RecklessStandardS-TRIAL-RegularItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RecklessStandardS-TRIAL-RegularItalic.otf"; sourceTree = "<group>"; };
 		0C3429AD9ABD543181AD0D54 /* ShadowScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowScale.swift; sourceTree = "<group>"; };
 		0C570918A6C39BC217169D4B /* MutualFundsPrototypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundsPrototypeApp.swift; sourceTree = "<group>"; };
 		0E5B773165C094CD9AC46CE1 /* ParticleSphere.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleSphere.swift; sourceTree = "<group>"; };
@@ -118,13 +129,16 @@
 		2F5D23A8585AEC04626177E9 /* hsbc_midcap_nav.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = hsbc_midcap_nav.json; sourceTree = "<group>"; };
 		3259D7C083D4614EF0322C9C /* OnboardingResearchIntro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingResearchIntro.swift; sourceTree = "<group>"; };
 		336D74AB1533798904BF4EBD /* Surface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Surface.swift; sourceTree = "<group>"; };
+		33FC65FBD7A1293060752AB3 /* OnboardingGuides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingGuides.swift; sourceTree = "<group>"; };
 		342921007836A09A10668B81 /* Composer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Composer.swift; sourceTree = "<group>"; };
+		3556CF44D92E8E38EB97A81E /* OnboardingPersonalise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPersonalise.swift; sourceTree = "<group>"; };
 		35C1E9C9C6D5640F6AD337DF /* BandWarp.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BandWarp.metal; sourceTree = "<group>"; };
 		36C4580E9EDC267EC4485020 /* RecklessStandardS-TRIAL-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RecklessStandardS-TRIAL-Regular.otf"; sourceTree = "<group>"; };
 		3860D4ED1FD3AE699E8C581D /* FixedDepositBankV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositBankV2.swift; sourceTree = "<group>"; };
 		43BD9A9F918A7C671514D487 /* ColorScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorScale.swift; sourceTree = "<group>"; };
 		451B861C43AC353D133C5649 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4A912E78837659BDA956E9EA /* ColorPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPrimitives.swift; sourceTree = "<group>"; };
+		4D6184CF36E5BC95CEC2CB3D /* OnboardingImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingImport.swift; sourceTree = "<group>"; };
 		4EC9109F06A2C38E1DCBA7F6 /* MovementWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementWatch.swift; sourceTree = "<group>"; };
 		5022775BEE4179BDD6E6DC5A /* HeldWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeldWidget.swift; sourceTree = "<group>"; };
 		56F2EA3C4A8F2D0B586F26B7 /* BorderLightSweep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderLightSweep.swift; sourceTree = "<group>"; };
@@ -139,7 +153,7 @@
 		7357B2BFCB5B2CFB4E7D5CC9 /* HomeV4View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeV4View.swift; sourceTree = "<group>"; };
 		7359B7EA93ED2CD16CC46D85 /* WalkingHorse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkingHorse.swift; sourceTree = "<group>"; };
 		74CB77CD82F51F0153726B70 /* MoodDial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodDial.swift; sourceTree = "<group>"; };
-		757D37E4B04D269C7ADA2C8E /* MutualFundsPrototype.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MutualFundsPrototype.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		757D37E4B04D269C7ADA2C8E /* MutualFundsPrototype.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MutualFundsPrototype.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		75A0FD62A9BEC1C173AEBBD2 /* ChatExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExperience.swift; sourceTree = "<group>"; };
 		7A1821E9B8DB68FB3FE760E2 /* DecadeBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecadeBackdrop.swift; sourceTree = "<group>"; };
 		7C9D0BE599C1B23DD4DB8891 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -165,19 +179,23 @@
 		B4ABD2919B9F933EFB1EDA87 /* FixedDepositsHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositsHome.swift; sourceTree = "<group>"; };
 		B69E55D6CF28CECFFAEAB461 /* SpacingScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacingScale.swift; sourceTree = "<group>"; };
 		BB3EEA42DC05AD98BBCB5985 /* FundExperienceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FundExperienceView.swift; sourceTree = "<group>"; };
+		BE863854DA84A66D7535FC10 /* RecklessStandardS-TRIAL-MediumItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RecklessStandardS-TRIAL-MediumItalic.otf"; sourceTree = "<group>"; };
 		C25DAB2D73D46956C45AADA0 /* OnboardingComplexity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingComplexity.swift; sourceTree = "<group>"; };
 		C64E3A581EA31AD74677209D /* Hologram.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hologram.swift; sourceTree = "<group>"; };
 		CC3017FF5D1A7EEC715D3ECA /* GearWormPattern.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearWormPattern.swift; sourceTree = "<group>"; };
 		CCDEF03A6301197E88CE72D8 /* MutualFundScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundScreen.swift; sourceTree = "<group>"; };
+		D5E9A9E0C86CE12AE7EA967C /* FixedDepositsYours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositsYours.swift; sourceTree = "<group>"; };
+		D90A530D6C57A47D34A5C92B /* OnboardingTerms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTerms.swift; sourceTree = "<group>"; };
 		DC3BDC74C8CD1B45996CBBB8 /* TypographyScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypographyScale.swift; sourceTree = "<group>"; };
+		E18DBABB52400FFD9F25F599 /* FixedDepositHeld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositHeld.swift; sourceTree = "<group>"; };
 		E60CB34EED9EDF90E33340FC /* OnboardingAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAnalysis.swift; sourceTree = "<group>"; };
-		E89842D9244C8CA992DEC32A /* watch_movement.mp4 */ = {isa = PBXFileReference; path = watch_movement.mp4; sourceTree = "<group>"; };
+		E89842D9244C8CA992DEC32A /* watch_movement.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = watch_movement.mp4; sourceTree = "<group>"; };
 		F0FC638931B4840CAE7F7E5F /* TokenContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenContractTests.swift; sourceTree = "<group>"; };
 		F50B0885996CDFA7C8558BD7 /* GT-Super-Text-Medium-Trial.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GT-Super-Text-Medium-Trial.otf"; sourceTree = "<group>"; };
 		FABE71BAEDDA2FE57FEEEBB1 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		FD6C2832BEDA5FAACE813174 /* fund_curves.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fund_curves.json; sourceTree = "<group>"; };
 		FE5C767C9C134BD5E609DAB6 /* GT-Walsheim-Medium-Trial.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GT-Walsheim-Medium-Trial.otf"; sourceTree = "<group>"; };
-		FFCD3FFD872432085BAE8160 /* watch_movement_black.mp4 */ = {isa = PBXFileReference; path = watch_movement_black.mp4; sourceTree = "<group>"; };
+		FFCD3FFD872432085BAE8160 /* watch_movement_black.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = watch_movement_black.mp4; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -227,7 +245,9 @@
 				58107783B7588FE3B9FFAF14 /* GT-Walsheim-Regular-Trial.otf */,
 				9CE9C954222289BE0CD27DB7 /* RecklessCondensedS-TRIAL-SemiBold.otf */,
 				A66EEA31E663B7F2F6057A4A /* RecklessStandardS-TRIAL-Medium.otf */,
+				BE863854DA84A66D7535FC10 /* RecklessStandardS-TRIAL-MediumItalic.otf */,
 				36C4580E9EDC267EC4485020 /* RecklessStandardS-TRIAL-Regular.otf */,
+				0B4E0B8365D3CAD219CE01E5 /* RecklessStandardS-TRIAL-RegularItalic.otf */,
 				6CD2BA32733950AA322506E9 /* RecklessStandardS-TRIAL-SemiBold.otf */,
 			);
 			path = Fonts;
@@ -302,9 +322,12 @@
 				7A1821E9B8DB68FB3FE760E2 /* DecadeBackdrop.swift */,
 				8A9184857403AD230A8264C4 /* FixedDepositBank.swift */,
 				3860D4ED1FD3AE699E8C581D /* FixedDepositBankV2.swift */,
+				017E341F8842401D51C2BD8D /* FixedDepositGrowth.swift */,
+				E18DBABB52400FFD9F25F599 /* FixedDepositHeld.swift */,
 				23F99BC946D8856AE3120B9A /* FixedDepositPlan.swift */,
 				92FFCE4B65EFCAF5355288FB /* FixedDeposits.swift */,
 				B4ABD2919B9F933EFB1EDA87 /* FixedDepositsHome.swift */,
+				D5E9A9E0C86CE12AE7EA967C /* FixedDepositsYours.swift */,
 				278FEBA3945BB8CC06C218C9 /* ForYouScreen.swift */,
 				A4F7D7572D9AB1F5B261DF8D /* FundChart.swift */,
 				BB3EEA42DC05AD98BBCB5985 /* FundExperienceView.swift */,
@@ -328,12 +351,16 @@
 				C25DAB2D73D46956C45AADA0 /* OnboardingComplexity.swift */,
 				813007FA0378B80310F6619D /* OnboardingCurveGuess.swift */,
 				7CD3C67AE116B393EF7A5C5B /* OnboardingDecadeWelcome.swift */,
+				33FC65FBD7A1293060752AB3 /* OnboardingGuides.swift */,
 				286B272FFC314EE872A4963D /* OnboardingHold.swift */,
+				4D6184CF36E5BC95CEC2CB3D /* OnboardingImport.swift */,
 				6391215D0C659F193FBABF7D /* OnboardingIntro.swift */,
+				3556CF44D92E8E38EB97A81E /* OnboardingPersonalise.swift */,
 				67EE2A6607A856821B88ECF0 /* OnboardingResearch.swift */,
 				3259D7C083D4614EF0322C9C /* OnboardingResearchIntro.swift */,
 				94A70B1766BB61E60DC60590 /* OnboardingResearchLive.swift */,
 				AF19B5B5CC54602344E1DD2B /* OnboardingSwipe.swift */,
+				D90A530D6C57A47D34A5C92B /* OnboardingTerms.swift */,
 				0E5B773165C094CD9AC46CE1 /* ParticleSphere.swift */,
 				8666537369AF62AE0D950F74 /* QuickSearch.swift */,
 				964936155125499D0D77D9D1 /* RevealBump.metal */,
@@ -426,7 +453,6 @@
 			);
 			mainGroup = B0519802EB8D34F31ECD13AD;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -448,7 +474,9 @@
 				BBB0B8FC3A66A14A5979F181 /* GT-Walsheim-Regular-Trial.otf in Resources */,
 				4B546DE2CF7B2451AF64BED3 /* RecklessCondensedS-TRIAL-SemiBold.otf in Resources */,
 				6FEBC983E67539A51C964E41 /* RecklessStandardS-TRIAL-Medium.otf in Resources */,
+				DF529094FC4612FDBB0E9205 /* RecklessStandardS-TRIAL-MediumItalic.otf in Resources */,
 				B1B7B7204BB4F1E090FFA5DB /* RecklessStandardS-TRIAL-Regular.otf in Resources */,
+				2613832F3D88E67E9F6A0415 /* RecklessStandardS-TRIAL-RegularItalic.otf in Resources */,
 				629871A6C1835376BC3A1F98 /* RecklessStandardS-TRIAL-SemiBold.otf in Resources */,
 				9E8E0050E1F98A32783C1E71 /* fund_curves.json in Resources */,
 				233A203931C53AAB49BE992B /* hsbc_midcap_nav.json in Resources */,
@@ -508,9 +536,12 @@
 				1FA6AC57F6D629C310FEC80C /* DsText.swift in Sources */,
 				8B84CE549A5FAA926B28711A /* FixedDepositBank.swift in Sources */,
 				E4AF3D0384BDC398B1CA9183 /* FixedDepositBankV2.swift in Sources */,
+				B2FB5F224A0A92929CDD4889 /* FixedDepositGrowth.swift in Sources */,
+				137F8386215FBECBA4FD80AC /* FixedDepositHeld.swift in Sources */,
 				AC5A4F528BBC96D4C9F93453 /* FixedDepositPlan.swift in Sources */,
 				051FA9EF2F568F6217D3D833 /* FixedDeposits.swift in Sources */,
 				E8DC5B6FFE213FF13A8E4669 /* FixedDepositsHome.swift in Sources */,
+				9F60C7C89810ECFAACBAF80D /* FixedDepositsYours.swift in Sources */,
 				F7553E168E70FE12262D2150 /* ForYouScreen.swift in Sources */,
 				639F8998C1780357C3171E7E /* FoundationTokens.swift in Sources */,
 				7E02598271F4CD342C0C032F /* FundChart.swift in Sources */,
@@ -536,12 +567,16 @@
 				13585C4FE2CC307CB8A79968 /* OnboardingComplexity.swift in Sources */,
 				44AACEF34318F453DEA71152 /* OnboardingCurveGuess.swift in Sources */,
 				0341C5C2F741BD5852D689D3 /* OnboardingDecadeWelcome.swift in Sources */,
+				8AE51B31DB18770E2D63C933 /* OnboardingGuides.swift in Sources */,
 				C919A142A64A317BB9F32D48 /* OnboardingHold.swift in Sources */,
+				75097D7657A8006150C0E8D9 /* OnboardingImport.swift in Sources */,
 				F5F088C7B73225144BC99576 /* OnboardingIntro.swift in Sources */,
+				B8E2C3C17995F316446397E2 /* OnboardingPersonalise.swift in Sources */,
 				5F1693AB2A71609DB1188B30 /* OnboardingResearch.swift in Sources */,
 				00D31676AF44B326EE07082B /* OnboardingResearchIntro.swift in Sources */,
 				DDC385EE75605E76D771BBA5 /* OnboardingResearchLive.swift in Sources */,
 				430D3C12E0830D055C502212 /* OnboardingSwipe.swift in Sources */,
+				C78261403520EA753F182F79 /* OnboardingTerms.swift in Sources */,
 				21D8DC1BD2C169921C8D028E /* ParticleSphere.swift in Sources */,
 				B7EE2004868AF9082451B2FE /* QuickSearch.swift in Sources */,
 				ABC1F3350E453717180E2D85 /* RevealBump.metal in Sources */,
@@ -667,6 +702,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = D76GU59P59;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -758,6 +794,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = D76GU59P59;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

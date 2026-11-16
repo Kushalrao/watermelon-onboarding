@@ -7,6 +7,8 @@ struct OnboardingFlow: View {
 
     @State private var step = OnboardingFlow.debugStartStep
     @State private var introStage = OnboardingIntroStage()
+    /// The status bar's height, for the screens that place themselves under it
+    @State private var top: CGFloat = 62
 
     /// Launch argument `-onboardingStep N` starts the flow at step N
     private static var debugStartStep: Int {
@@ -51,13 +53,53 @@ struct OnboardingFlow: View {
             case 6:
                 OnboardingComplexityView(onContinue: advance)
                     .transition(Self.pageTransition)
+            case 10:
+                // After the second report's Understood: "Congrats! you have a proactive personal advisor now"
+                // (1027:11565), its ground coming in over the chat
+                OnboardingCongratsView(onContinue: advance)
+                    .transition(.opacity)
+                    .zIndex(3)
+            case 15:
+                // then the advisor herself (973:16066), who goes up into the corner for the permissions (973:16336)
+                OnboardingCommunicationsView(introduces: true, onContinue: advance)
+                    .transition(.opacity)
+                    .zIndex(3)
+            case 11:
+                // The permissions on their own, for `-onboardingStep 11`
+                OnboardingCommunicationsView(onContinue: advance)
+                    .transition(.opacity)
+                    .zIndex(3)
+            case 12:
+                // The three guides (973:17046, 973:17264, 973:17547): how plainly things are put, hold, and swipe
+                OnboardingComplexityGuideView(onContinue: advance)
+                    .transition(.opacity)
+                    .zIndex(3)
+            case 13:
+                OnboardingHoldGuideView(onContinue: advance)
+                    .transition(.opacity)
+                    .zIndex(3)
+            case 14:
+                OnboardingSwipeGuideView(onContinue: advance)
+                    .transition(.opacity)
+                    .zIndex(3)
+            case 16:
+                // The last screen (973:17796): "You’re in, have a wealthy life", and then the app
+                OnboardingCongratsView(text: "You’re in, have a\nwealthy life", textTop: 356, label: "You’re in, have a wealthy life", onContinue: advance)
+                    .transition(.opacity)
+                    .zIndex(3)
             default:
                 // Next screen not designed yet
                 OnboardingBackground()
                     .transition(Self.pageTransition)
             }
         }
+        .environment(\.onboardingTop, top)
         .ignoresSafeArea()
+        // Read from the window once the flow is on screen (not while anything is being drawn), and handed down
+        .onAppear {
+            let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+            if let inset = scene?.windows.first?.safeAreaInsets.top, inset > 0 { top = inset }
+        }
     }
 
     private static let pageTransition: AnyTransition = .asymmetric(
@@ -69,7 +111,19 @@ struct OnboardingFlow: View {
         Haptics.tap()
         // Intro → welcome → advisory: each brings its colour in over the last; the rest slide
         let animation: Animation = step <= 1 ? .easeInOut(duration: 0.4) : .spring(response: 0.45, dampingFraction: 0.9)
-        withAnimation(animation) { step += 1 }
+        switch step {
+        // Past the chat and the import the personalising screens take over; the screens numbered 2 to 6 are the
+        // earlier flow, reached only with `-onboardingStep`
+        case 1: withAnimation(animation) { step = 10 }
+        // The congratulations, then the advisor and her permissions, then the guides
+        case 10: withAnimation(.easeInOut(duration: 0.3)) { step = 15 }
+        case 15, 11: withAnimation(.easeInOut(duration: 0.35)) { step = 12 }
+        case 12, 13: withAnimation(.easeInOut(duration: 0.35)) { step += 1 }
+        // After the last guide, the farewell; when its words have gone the onboarding ends
+        case 14: withAnimation(.easeInOut(duration: 0.4)) { step = 16 }
+        case 16: onFinish()
+        default: withAnimation(animation) { step += 1 }
+        }
     }
 }
 

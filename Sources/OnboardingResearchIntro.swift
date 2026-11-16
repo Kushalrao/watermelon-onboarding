@@ -119,6 +119,90 @@ struct ResearchIntroSheet: View {
     }
 }
 
+/// "Decade Research" (952:11921), 368 × 631: before the agent says anything, what its wealth intelligence runs on.
+/// White, with the three ways of working and a black Understood.
+struct ResearchPreviewSheet: View {
+    let onUnderstood: () -> Void
+
+    /// What each way of working is for (952:11969)
+    private static let detail = "Thoughtful wealth management for people who’ve outgrown generic advice."
+
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: 27, style: .continuous)
+        ZStack(alignment: .topLeading) {
+            Color.white
+
+            // 952:12025: the mark, then "Decade R" upright and "esearch" in italic, 235 across
+            HStack(spacing: 0) {
+                Image("OnboardingDecadeMarkInk")
+                    .frame(width: 33, height: 33)
+                    .accessibilityHidden(true)
+                (Text("Decade R").font(.custom("RecklessStandardS-TRIAL-Medium", fixedSize: 27))
+                    + Text("esearch").font(.custom("RecklessStandardS-TRIAL-MediumItalic", fixedSize: 27)))
+                    .foregroundStyle(ColorScale.contentPrimary)
+                    .fixedSize()
+                    .frame(height: 35)
+                    .padding(.leading, 5)
+            }
+            .frame(width: 368, height: 35)
+            .at(0.5, 9)
+
+            Color.black.opacity(0.57)
+                .frame(width: 334, height: 1)
+                .at(17, 52)
+
+            // Gap: GT Walsheim Medium 35/43 has no text style; the colour is content/primary
+            GapText("Wealth intelligence\nis powered with", family: .walsheim, medium: true, size: 35, lineHeight: 43, color: ColorScale.contentPrimary)
+                .multilineTextAlignment(.center)
+                .frame(width: 318)
+                .at(23, 100)
+
+            // 952:11973: the three ways of working, 98 apart
+            ForEach(Array(OnboardingDecadeWelcomeView.rows.enumerated()), id: \.offset) { index, title in
+                ZStack(alignment: .topLeading) {
+                    Image("OnboardingWayCheck")
+                        .frame(width: 33, height: 33)
+                        .accessibilityHidden(true)
+                    Text(title)
+                        .font(FigmaFont.walsheim(17))
+                        .foregroundStyle(ColorScale.contentPrimary)
+                        .fixedSize()
+                        .frame(height: 25)
+                        .at(44, 1)
+                    Text(Self.detail)
+                        .font(FigmaFont.walsheim(13))
+                        .lineSpacing(21 - UIFont(name: "GTWalsheimTrial-Rg", size: 13)!.lineHeight)
+                        .foregroundStyle(ColorScale.contentSecondary)
+                        .frame(width: 286, alignment: .leading)
+                        .at(44, 29)
+                }
+                .frame(width: 330, height: 71, alignment: .topLeading)
+                .at(19, 231 + 98 * CGFloat(index))
+            }
+
+            Button {
+                Haptics.tap()
+                onUnderstood()
+            } label: {
+                Text("Understood")
+                    .font(FigmaFont.walsheimMedium(17))
+                    .foregroundStyle(Color.white)
+                    .offset(x: 0.5)
+                    .frame(width: 330, height: 49)
+                    .background(Capsule().fill(Color(hex: 0x1F1513)))
+                    .shadow(color: Color.black.opacity(0.05), radius: 50, x: 0, y: 4)
+            }
+            .buttonStyle(PressScaleStyle())
+            .at(19, 555)
+        }
+        .frame(width: 368, height: 631, alignment: .topLeading)
+        .clipShape(shape)
+        .contentShape(shape)
+        // 0 4 130 +15 at 9% in Figma; SwiftUI can't draw the spread
+        .shadow(color: Color.black.opacity(0.09), radius: 65, x: 0, y: 4)
+    }
+}
+
 #Preview {
     VStack {
         ResearchIntroSheet(onUnderstood: {})

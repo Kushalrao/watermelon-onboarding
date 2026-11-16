@@ -132,7 +132,7 @@ struct DashedRule: View {
 }
 
 /// Frame 2329 (771:12897): yellow ring, blinking slowly until the hold is done
-private struct BlinkingCircle: View {
+struct BlinkingCircle: View {
     let blinking: Bool
     @State private var dim = false
 

@@ -636,7 +636,7 @@ private struct TenurePicker: View {
 
 /// "Enter investment amount", on the inverse surface: the amount in a box over its own number pad, and
 /// "Calculate Returns" between them
-private struct CompareReturnsSheet: View {
+struct CompareReturnsSheet: View {
     let amount: Int?
     let onCalculate: (Int) -> Void
 

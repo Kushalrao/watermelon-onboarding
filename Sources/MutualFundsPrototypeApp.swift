@@ -2,13 +2,8 @@ import SwiftUI
 
 @main
 struct MutualFundsPrototypeApp: App {
-    /// Opens on the fixed deposits page by default; `-onboarding…`, `-home`, `-fund`, `-widgetsOnly` and
-    /// `-homeV1…V4` open the rest of the app instead
-    static let opensOnFixedDeposits: Bool = {
-        let args = ProcessInfo.processInfo.arguments
-        if args.contains("-fd") { return true }
-        return !args.contains { $0.hasPrefix("-onboarding") || $0.hasPrefix("-home") || $0 == "-fund" || $0 == "-widgetsOnly" }
-    }()
+    /// Opens on the onboarding by default; `-fd` (or any `-fd…` flag) opens the fixed deposits page instead
+    static let opensOnFixedDeposits: Bool = ProcessInfo.processInfo.arguments.contains { $0.hasPrefix("-fd") }
 
     var body: some Scene {
         WindowGroup {
@@ -23,7 +18,9 @@ struct MutualFundsPrototypeApp: App {
                     FixedDepositsHomeView()
                 }
             } else {
+                // Nothing in the onboarding moves for the keyboard; each screen places itself around it
                 RootView()
+                    .ignoresSafeArea(.keyboard)
             }
         }
     }

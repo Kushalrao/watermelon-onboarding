@@ -1,13 +1,13 @@
 import SwiftUI
 
-/// Figma "iPhone 14 Plus - 336" (130:2823): after the PAN card's Verify. The soft background flows up over the identity
-/// screen first, then the "Welcome to Decade Advisory" card lands from 1.1× with its photo, and the three ways of
-/// working settle in one under another. A moment later (141:3372) the photo shortens, pulling the card up, and a
-/// Continue button forms under it, the way the advisory chat button does: a dot with the chevron that stretches out.
+/// Figma "iPhone 14 Plus - 435" (679:24216): after the PAN card's Confirm. The background flows up over the identity
+/// screen first, then "Hello Arindam" and the "Welcome to Decade Wealth Advisory" card land, the card from 1.1× with
+/// its photo, and the three ways of working settle in one under another. A moment later Continue comes in under it.
 ///
-/// Continue turns the card into a chat with the agent (225:11648): it sheds the photo and the welcome for the Decade
-/// avatar, and the agent asks "Jojo, lets start with a topic you’re interested in?" over three topics
-/// to start on (225:11778). The one tapped goes in as the user's message; the agent types, replies to it, scrolls up
+/// Continue turns the card into a chat with the agent (699:24516) under a pinned Decade pill: it sheds the photo and
+/// the welcome. What the research runs on comes up first as a navy sheet (699:24374); once that's understood the
+/// agent says "Good evening" and asks "Lets start with a topic you’re interested in?" over topics to start on, in
+/// two rows. The one tapped goes in as the user's message; the agent types, replies to it, scrolls up
 /// and types once more over a "Mutual funds research plan" chip (141:3970), and 1.7s later the plan, written for
 /// that topic, opens over the chat (141:3447) as the card steps back.
 ///
@@ -119,6 +119,15 @@ struct OnboardingDecadeWelcomeView: View {
     @State private var personalPrompt: Int?
     /// Its second page, "We will import mutual funds via MFCentral" (256:15592)
     @State private var importUp = false
+    /// The import itself is running, over everything (817:7117). `-importFlow` opens on it.
+    @State private var importRunning = ProcessInfo.processInfo.arguments.contains("-importFlow")
+    /// The import's done: the chat's card says so (1012:11077)
+    /// The live research's card as it stands, so the report card can sit under it
+    @State private var liveHeight: CGFloat = 0
+    @State private var fundsConnected = false
+    /// With the funds in, a second report is prepared, as a card under the connected one, and then opens
+    @State private var portfolioReportShown = false
+    @State private var portfolioReportReady = false
     /// "Jojo's Personal Wealth Advisor" is up (243:14078), on its way to asking for the funds
     @State private var advisorUp = false
     /// The chat has moved on to decisions: its heading says so (148:6059)
@@ -167,7 +176,7 @@ struct OnboardingDecadeWelcomeView: View {
     /// The chat's headings (256:15910): Reckless 37 on 43pt lines, each line set on its own
     static let headingSize: CGFloat = 37
     static let headingLine: CGFloat = 43
-    private static let questionLines = ["Jojo, lets start", "with a topic you’re", "interested in?"]
+    private static let questionLines = ["Lets start with a topic", "you’re interested in?"]
     /// "We have all its required to analyze it now", as the agent's message: a two-line bubble, its time under it
     /// counted separately
     private static let resultsHeadingHeight: CGFloat = 82
@@ -184,16 +193,16 @@ struct OnboardingDecadeWelcomeView: View {
     ]
     private static let promptRows = 2
     /// Both rows, 13pt apart
-    static let promptsHeight: CGFloat = 192 * 2 + 13
+    static let promptsHeight: CGFloat = ConnectActionCard.size.height + 12
 
     private enum ChatY {
         /// The opening question sits lower in the card, centred, with the topics under it (316:17768)
         static let open: CGFloat = 68
-        static let heading: CGFloat = 25 + open + 3
+        static let heading: CGFloat = 113
         /// Everything under the question sits this much higher than it did under the larger, four-line one
         static let lift: CGFloat = 51
         static let topicsLabel: CGFloat = 271 - lift + open
-        static let topics: CGFloat = 309 - lift + open
+        static let topics: CGFloat = 247
         /// The user's message goes in where the topics were, its time under it
         static let sent: CGFloat = 262 - lift + open
         static let time: CGFloat = sent + 104
@@ -259,7 +268,7 @@ struct OnboardingDecadeWelcomeView: View {
     /// The pull, less the avatar's room once it's gone: what every layer of the chat moves by
     private var drift: CGFloat { back - headerLift }
     /// The topic, pinned over the card once it's picked, and the room it takes there
-    private static let pillSpace: CGFloat = 47 + 8
+    private static let pillSpace: CGFloat = 47 + 11
 
     private var back: CGFloat {
         let raw = pulledBack + pulling
@@ -308,21 +317,23 @@ struct OnboardingDecadeWelcomeView: View {
     static let cardShadow = 0.21
     static let cardShadowRadius: CGFloat = 117
 
-    private static let rows = ["Advisory Research", "Advisory Analysis", "Advisory Decisioning"]
-    private static let rowDetail = "We constantly look at market and find"
+    static let rows = ["Advisory Research", "Advisory Analysis", "Advisory Decisioning"]
+    static let rowDetail = "We constantly look at market and find"
+    /// What the welcome promises, one under each tile (952:11704)
+    static let promises = ["Pro-active\nadvisor", "Research\nbacked", "SEBI backed"]
     private static let hairline = Color(red: 194 / 255, green: 194 / 255, blue: 194 / 255).opacity(0.53)
 
     var body: some View {
-        // Hung from the top, as in Figma: 55pt down, 11 below the status bar
+        // Hung from the top, as in Figma: the welcome 21 below the status bar (952:11575), the chat 11 below it
         ZStack(alignment: .top) {
             card
                 .scaleEffect(shown ? 1 : 1.1)
                 .opacity(shown ? 1 : 0)
-                .padding(.top, 11 + (topicPinned ? Self.pillSpace : 0))
+                .padding(.top, (chatting ? 11 : 21) + (topicPinned ? Self.pillSpace : 0))
 
             // The topic that was picked, pinned over the chat (269:3110)
             if topicPinned {
-                FlipPill(topic: topic?.short, flipped: topicFlipped, width: cardWidth - 16)
+                FlipPill(topic: topic?.short, flipped: topicFlipped, width: cardWidth - 20)
                     // With a sheet up it's what shows of the chat behind, so it puts the sheet away
                     .onTapGesture { if steppedBack { closeSheet() } }
                     .accessibilityAddTraits(steppedBack ? .isButton : [])
@@ -331,17 +342,18 @@ struct OnboardingDecadeWelcomeView: View {
                     .zIndex(1)
             }
 
-            // "Continue" (141:3285), 119 × 45, 19pt under the compact card, 25 in from the right
-            continueButton
-                .frame(width: MutualFundScreen.canvasWidth, alignment: .trailing)
-                .padding(.trailing, 25)
-                .padding(.top, 682)
+            // The button under the card (952:11679), 344 × 49, 686 below the status bar
+            if !chatting {
+                continueButton
+                    .padding(.top, 686)
+                    .transition(.opacity)
+            }
 
-            // Asking for the funds for personal advice, with the prompt that was tapped (256:15540)
-            // and, on Continue, how they'll be brought in (256:15592), in the same sheet
-            if let personalPrompt {
-                ConnectFlowSheet(prompt: Self.advicePrompts[personalPrompt], chart: personalPrompt, importing: $importUp)
-                    .padding(.top, 36)
+            // "Connect securely" on the chat's action card: how the funds will be brought in (952:13599), 13 under the
+            // status bar
+            if personalPrompt != nil {
+                MFCentralImportSheet(onContinue: startImport, onUpload: {}, onClose: closeSheet)
+                    .padding(.top, 13)
                     .transition(.move(edge: .bottom).combined(with: .opacity.animation(.easeOut(duration: 0.2))))
                     .zIndex(3)
             }
@@ -364,8 +376,8 @@ struct OnboardingDecadeWelcomeView: View {
 
             // How the research is done (233:12750), before the agent says anything
             if researchIntroUp {
-                ResearchIntroSheet(onUnderstood: dismissResearchIntro)
-                    .padding(.top, 109)
+                ResearchPreviewSheet(onUnderstood: dismissResearchIntro)
+                    .padding(.top, 116)
                     .transition(.move(edge: .bottom).combined(with: .opacity.animation(.easeOut(duration: 0.2))))
                     .zIndex(3)
             }
@@ -382,6 +394,15 @@ struct OnboardingDecadeWelcomeView: View {
         .padding(.top, insets.top)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(background.mask(flowMask).ignoresSafeArea())
+        // Hung from the top: when the keyboard shrinks the space the page, which doesn't shrink with it, would
+        // otherwise be centred in what's left and ride up under the status bar
+        .overlay(alignment: .top) {
+            if importRunning {
+                MFImportView(top: insets.top, onDone: finishImport)
+                    .ignoresSafeArea(.keyboard)
+                    .transition(.opacity)
+            }
+        }
         .onAppear {
             let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
             if let window = scene?.windows.first {
@@ -390,6 +411,8 @@ struct OnboardingDecadeWelcomeView: View {
             }
         }
         .preferredColorScheme(.light)
+        // The import's answer field brings the keyboard up; nothing here should move for it
+        .ignoresSafeArea(.keyboard)
         .task {
             guard !chatting else {
                 // Opened straight on the chat, with the plan up
@@ -407,14 +430,10 @@ struct OnboardingDecadeWelcomeView: View {
                         if Self.startsAdvice {
                             (analysisStarted, analysisTyping, analysisChipShown, analysisStored) = (.now, false, false, true)
                             (scroll, adviceShown, deciding) = (Self.inAnalysis(AdviceY.prompts + Self.promptsHeight) - visibleDepth, true, true)
-                            advicePromptsShown = Self.advicePrompts.count
+                            advicePromptsShown = 1
                             // `-connectFlow`: the connect sheet up, moving on to its second page a moment later
                             if ProcessInfo.processInfo.arguments.contains("-connectFlow") {
                                 personalPrompt = 0
-                                Task {
-                                    try? await Task.sleep(for: .seconds(1.5))
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.9)) { importUp = true }
-                                }
                             }
                         } else {
                             sheetUp = true
@@ -448,6 +467,48 @@ struct OnboardingDecadeWelcomeView: View {
             try? await Task.sleep(for: .seconds(1))
             Haptics.tap()
             withAnimation(.spring(response: 0.6, dampingFraction: 0.88)) { researchIntroUp = true }
+        }
+    }
+
+    /// Where the report card sits: under the live research's status line and, when it's showing one, its card
+    private func reportCardTop(_ live: CGFloat) -> CGFloat {
+        // its status line, then (when it's showing one) its card and the source line under that
+        ChatY.plan + 65 + 21 + (live > 0 ? 13 + live + 8 + 15 : 0) + 16
+    }
+
+    /// The import's own last screen moved on from: back to the chat, where the card now reads as connected
+    private func finishImport() {
+        Haptics.tap()
+        fundsConnected = true
+        withAnimation(.easeInOut(duration: 0.4)) { importRunning = false }
+        Task { await preparePortfolioReport() }
+    }
+
+    /// With the funds in, the agent prepares one more report: its card under the connected one for a few seconds,
+    /// then the report itself, whose Understood ends the chat
+    private func preparePortfolioReport() async {
+        try? await Task.sleep(for: .seconds(1.4))
+        guard !Task.isCancelled else { return }
+        Haptics.revealGrain(intensity: 0.4)
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.82)) { portfolioReportShown = true }
+        keepInView(Self.inAnalysis(Self.portfolioReportTop + ReportPreparingCard.size.height + 24), toFoot: true)
+        try? await Task.sleep(for: .seconds(5))
+        guard !Task.isCancelled else { return }
+        portfolioReportReady = true
+        Haptics.expand()
+        activeSheet = .analysis
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.88)) { sheetUp = true }
+    }
+
+    /// Where the second report's card sits: under the connected card and its tail
+    private static let portfolioReportTop = AdviceY.prompts + ConnectActionCard.size.height + 26
+
+    /// The MFCentral sheet's Continue: the sheet goes and the import takes the screen
+    private func startImport() {
+        Haptics.tap()
+        withAnimation(.easeInOut(duration: 0.35)) {
+            importRunning = true
+            personalPrompt = nil
         }
     }
 
@@ -648,19 +709,14 @@ struct OnboardingDecadeWelcomeView: View {
         try? await Task.sleep(for: .seconds(1.2))
         keepInView(Self.inAnalysis(AdviceY.prompts + Self.promptsHeight), toFoot: true)
         // one by one, slowly, each easing up into place
-        for _ in Self.advicePrompts {
-            withAnimation(.easeOut(duration: 0.7)) { advicePromptsShown += 1 }
-            Haptics.revealGrain(intensity: 0.4)
-            try? await Task.sleep(for: .seconds(0.45))
-        }
+        Haptics.revealGrain(intensity: 0.4)
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.82)) { advicePromptsShown = 1 }
     }
 
     /// A personal-advice prompt tapped: advice that personal needs the funds
     private func askPersonal(_ index: Int) {
         guard !steppedBack else { return }
         Haptics.tap()
-        // on its first page
-        importUp = false
         withAnimation(.spring(response: 0.6, dampingFraction: 0.88)) { personalPrompt = index }
     }
 
@@ -748,7 +804,9 @@ struct OnboardingDecadeWelcomeView: View {
                                   researching: researchStarted != nil && !researchDone, onClose: closeSheet)
                 case .analysis:
                     AnalysisSheet(started: analysisStarted ?? .now, done: analysisDone, answer: $mythAnswer, animatesIn: !analysisSeen,
-                                  onClose: doneWithAnalysis, onUnderstood: doneWithAnalysis)
+                                  onClose: doneWithAnalysis,
+                                  // On the second report, Understood ends the chat: on to the congratulations
+                                  onUnderstood: portfolioReportReady ? { Haptics.tap(); onContinue() } : doneWithAnalysis)
                 }
             }
             .scaleEffect(sheetClosing ? 0.85 : 1)
@@ -786,20 +844,30 @@ struct OnboardingDecadeWelcomeView: View {
             guard !Task.isCancelled else { return }
             withAnimation(.spring(response: 0.5, dampingFraction: 0.86)) { rowsShown += 1 }
         }
-        // A beat to read it, then the photo gives up some height and Continue forms in the room it leaves
-        try? await Task.sleep(for: .seconds(1.2))
+        // A beat to read it, then Continue comes in under the card
+        try? await Task.sleep(for: .seconds(0.6))
         guard !Task.isCancelled else { return }
-        withAnimation(.spring(response: 0.7, dampingFraction: 0.88)) { compact = true }
-        try? await Task.sleep(for: .seconds(0.3))
         Haptics.settle()
-        withAnimation(.spring(response: 0.38, dampingFraction: 0.7)) { button = .dot }
-        try? await Task.sleep(for: .seconds(0.22))
-        withAnimation(.spring(response: 0.55, dampingFraction: 0.86)) { button = .open }
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.82)) { button = .open }
     }
 
-    /// Black pill with a chevron: a 45pt dot first, then it stretches out to the left and the word comes in
+    /// The full-width button under the welcome card (952:11679): 344 × 49, the label centred
     private var continueButton: some View {
-        pillButton("Continue", width: 119, stage: button, action: send)
+        Button(action: send) {
+            Text("Lets get started")
+                .font(FigmaFont.walsheimMedium(17))
+                .foregroundStyle(Color.white)
+                .offset(x: 0.5)
+                .frame(width: 344, height: 49)
+                // Gap: Figma #1F1513 fill and Shadow/1 (0 4 100 +12 at 5%), drawn without its spread
+                .background(Capsule().fill(Color(hex: 0x1F1513)))
+                .shadow(color: Color.black.opacity(0.05), radius: 50, x: 0, y: 4)
+        }
+        .buttonStyle(PressScaleStyle())
+        .scaleEffect(button == .open ? 1 : 0.96)
+        .opacity(button == .open ? 1 : 0)
+        .allowsHitTesting(button == .open)
+        .accessibilityHidden(button != .open)
     }
 
     /// Black pill with a chevron: a 45pt dot first, then it stretches out to the left and the words come in
@@ -830,7 +898,7 @@ struct OnboardingDecadeWelcomeView: View {
     }
 
     /// Once chatting, the card runs down to the foot of the screen, 11pt short of it, as it sits 11pt under the top
-    private var chatHeight: CGFloat { insets.height - insets.top - insets.bottom - 22 - (topicPinned ? Self.pillSpace : 0) }
+    private var chatHeight: CGFloat { insets.height - insets.top - insets.bottom - 19 - (topicPinned ? Self.pillSpace : 0) }
 
     /// Opaque from the bottom up to the rising edge, feathered so the background seeps rather than wipes
     private var flowMask: some View {
@@ -847,10 +915,10 @@ struct OnboardingDecadeWelcomeView: View {
         .ignoresSafeArea()
     }
 
-    /// The soft backdrop the advisory screens share
-    private var background: some View { DecadeBackdrop() }
+    /// surface/base, as in the frames (679:24216, 699:24516)
+    private var background: some View { ColorScale.surfaceBase }
 
-    /// "Flight card background" (137:3194), 364 × 736; 652 once compact, 613 as the chat
+    /// "Flight card background" (952:11578), 364 × 622; the chat's card (699:24519) once chatting
     private var card: some View {
         ZStack(alignment: .topLeading) {
             Color.white
@@ -879,54 +947,54 @@ struct OnboardingDecadeWelcomeView: View {
 
             Group {
 
-            // 137:3196: the photo, cropped to the top of the card, over the brown it was shot against
-            LinearGradient(colors: [Color(hex: 0xAD898E), Color(hex: 0x70523A)], startPoint: .top, endPoint: .bottom)
-                .overlay {
-                    Image("WelcomePhone")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 572, height: 775)
-                        .offset(x: 15, y: -0.5)
-                }
-                .frame(width: 364, height: 316 - lift)
+            // 952:11684: the photo across the top of the card, 218 tall
+            Image("WelcomeAdvisoryPhoto")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 378, height: 290)
+                .offset(x: -6, y: -44)
+                .frame(width: 364, height: 218, alignment: .topLeading)
                 .clipped()
                 .scaleEffect(shown ? 1 : 1.06)
-                .at(0, -18)
 
-            Text("Hello Jojo")
-                .font(FigmaFont.walsheimMedium(23))
-                .foregroundStyle(Color.black)
-                .frame(width: 364, height: 29)
-                .at(0.5, 321 - lift)
+            // "Hello Arindam" with its wave (952:11707), inside the card now
+            HStack(spacing: 10) {
+                Image("OnboardingWave")
+                    .frame(width: 25.261, height: 25.577)
+                DsText("Hello Arindam", variant: .h3)
+                    .fixedSize()
+            }
+            .frame(width: 364, height: 39)
+            .at(0, 253)
 
-            Text("Welcome to Decade Advisory")
-                .font(FigmaFont.reckless(44))
-                .lineSpacing(45 - 44 * 1.2)
-                .foregroundStyle(Color(hex: 0x212121))
+            // Gap: Reckless Medium 35/43 has no text style; the colour is content/primary
+            GapText("Welcome to Decade Wealth Advisory", family: .reckless, medium: true, size: 35, lineHeight: 43, color: ColorScale.contentPrimary)
                 .multilineTextAlignment(.center)
-                .frame(width: 330)
-                .at(17, 357 - lift)
+                .frame(width: 318)
+                .at(23, 299)
 
-            Text("How we work")
-                .font(FigmaFont.walsheimMedium(15))
-                .tracking(1.05)
-                .textCase(.uppercase)
-                .foregroundStyle(Color.black.opacity(0.46))
-                .frame(width: 364, height: 23)
-                .at(0.5, 464 - lift)
+            // 952:11687: three outlined tiles, each over its line
+            ForEach(Array(Self.promises.enumerated()), id: \.offset) { index, promise in
+                let centre = 64.5 + 118 * CGFloat(index)
+                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    .strokeBorder(ColorScale.borderSubtle, lineWidth: 1)
+                    .frame(width: 93, height: 91)
+                    .at(centre - 46.5, 422)
+                    .accessibilityHidden(true)
+                Text(promise)
+                    .font(FigmaFont.walsheim(17))
+                    .lineSpacing(23 - UIFont(name: "GTWalsheimTrial-Rg", size: 17)!.lineHeight)
+                    .foregroundStyle(ColorScale.contentSecondary)
+                    .multilineTextAlignment(.center)
+                    .frame(width: 111, alignment: .top)
+                    .at(centre - 55.5, 524)
+            }
             }
             // The welcome goes, rising a little as it fades
             .opacity(chatting ? 0 : 1)
             .offset(y: chatting ? -30 : 0)
             // Faded out, but still where the topics are; it mustn't catch their taps
             .allowsHitTesting(!chatting)
-
-            // 17pt off the bottom, 25 once compact; it gives way to the avatar once chatting
-            list
-                .at(17, 736 - 17 - 219 - (compact ? 92 : 0))
-                .opacity(chatting ? 0 : 1)
-                .offset(y: chatting ? -30 : 0)
-                .allowsHitTesting(!chatting)
 
             // The agent, heading the chat (225:11773)
             if chatting {
@@ -955,16 +1023,17 @@ struct OnboardingDecadeWelcomeView: View {
                     .transition(.scale(scale: 0.9, anchor: .leading).combined(with: .opacity).combined(with: .offset(y: 8)))
             }
         }
-        .frame(width: cardWidth, height: chatting ? chatHeight : 736 - (compact ? 84 : 0),
-               alignment: .topLeading)
-        .clipShape(RoundedRectangle(cornerRadius: 27, style: .continuous))
+        .frame(width: cardWidth, height: chatting ? chatHeight : 622, alignment: .topLeading)
+        // radius/27 as the welcome, radius/23 as the chat (699:24519)
+        .clipShape(RoundedRectangle(cornerRadius: chatting ? 23 : 27, style: .continuous))
         // Pulled down to see what came before, while nothing's open over it
         .simultaneousGesture(scrollBack, including: chatting && !steppedBack ? .all : .subviews)
         .onChange(of: latest) { _, _ in
             guard pulledBack != 0 else { return }
             withAnimation(.spring(response: 0.55, dampingFraction: 0.9)) { pulledBack = 0 }
         }
-        .shadow(color: Color.black.opacity(Self.cardShadow), radius: Self.cardShadowRadius, x: 0, y: 4)
+        // Gap: Shadow/3 (0 2 85 +7 at 11%) as the welcome, Shadow/1 (0 4 100 +12 at 5%) as the chat; no spread in SwiftUI
+        .shadow(color: Color.black.opacity(chatting ? 0.05 : 0.11), radius: chatting ? 50 : 42, x: 0, y: chatting ? 4 : 2)
         // Steps back under the research plan (141:4031: 338 wide, from the top); tapping it there brings it forward
         .scaleEffect(steppedBack ? 338 / 364 : 1, anchor: .top)
         .overlay {
@@ -982,15 +1051,27 @@ struct OnboardingDecadeWelcomeView: View {
     private var chat: some View {
         ZStack(alignment: .topLeading) {
             if headingShown {
-                // 45pt lines, tighter than the font's own, so each is set on its own
+                // "Good evening" with its wave (802:6023), over the question
+                HStack(spacing: 10) {
+                    Image("OnboardingWave")
+                        .frame(width: 25.261, height: 25.577)
+                    DsText("Good evening", variant: .h3)
+                        .fixedSize()
+                }
+                .frame(width: cardWidth, height: 39)
+                .at(0, ChatY.heading - 54)
+                .transition(.opacity.combined(with: .offset(y: 10)))
+                // 699:24520: Reckless Medium 35 on 43pt lines, tighter than the font's own, so each is set on its own
                 VStack(alignment: .center, spacing: 0) {
                     ForEach(Self.questionLines, id: \.self) { line in
                         Text(line)
-                            .font(FigmaFont.reckless(Self.headingSize))
-                            .frame(height: Self.headingLine)
+                            .font(FigmaFont.reckless(35))
+                            .fixedSize()
+                            .frame(height: 43)
                     }
                 }
-                .foregroundStyle(Color(hex: 0x212121))
+                // Gap: Figma #33302D, unbound
+                .foregroundStyle(Color(hex: 0x33302D))
                 .frame(width: cardWidth)
                 .at(0, ChatY.heading)
                 .transition(.opacity.combined(with: .offset(y: 10)))
@@ -999,11 +1080,17 @@ struct OnboardingDecadeWelcomeView: View {
             // While the research runs, what it's doing, and now and then the data it's going over (270:16266)
             if let researchStarted, !researchDone, planShown {
                 ResearchLive(started: researchStarted) { height in
-                    keepInView(ChatY.plan + 65 + 21 + (height > 0 ? 13 + height + 8 + 15 : 0) + 16)
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.86)) { liveHeight = height }
+                    // As much of the report card as fits with the plan chip still in view above
+                    keepInView(min(reportCardTop(height) + ReportPreparingCard.size.height + 16, ChatY.plan - 12 + readingDepth))
                 }
                 .frame(width: ResearchLive.cardWidth, alignment: .leading)
                 .at((cardWidth - ResearchLive.cardWidth) / 2, ChatY.plan + 65)
                 .transition(.opacity)
+                // and, under it, the report that's being prepared from it (1027:11737)
+                ReportPreparingCard(title: topic?.short ?? "Small caps performance", subject: topic?.plan ?? "Small cap funds")
+                    .at((cardWidth - ResearchLive.cardWidth) / 2, reportCardTop(liveHeight))
+                    .transition(.scale(scale: 0.94, anchor: .topLeading).combined(with: .opacity).combined(with: .offset(y: 12)))
             }
             if sent, let topic {
                 ChatBubble(message: ChatMessage(text: topic.title, fromAgent: false), showsRead: false, timestamp: Self.sentAt)
@@ -1030,40 +1117,34 @@ struct OnboardingDecadeWelcomeView: View {
         .frame(width: cardWidth, alignment: .topLeading)
     }
 
-    /// "Popular right now" and the topics as cards (233:12989), under the question
+    /// The topics as cards under the question (699:24609 onwards): two rows, running off the card's right edge
     private var topics: some View {
-        ZStack(alignment: .topLeading) {
-            // "Popular right now" (233:13015), over the cards
-            Text("Popular right now")
-                .font(FigmaFont.walsheimMedium(15))
-                .tracking(1.05)
-                .textCase(.uppercase)
-                .foregroundStyle(Color.black.opacity(0.46))
-                .frame(width: cardWidth, height: 23)
-                .at(0, ChatY.topicsLabel)
-                .opacity(topicsShown > 0 ? 1 : 0)
-                .offset(y: topicsShown > 0 ? 0 : 10)
-            // The topics as cards, sideways (233:13249): 221 × 242, 21pt apart, running off the card's edge
-            SidewaysRail(width: cardWidth) {
-                HStack(alignment: .top, spacing: 11) {
-                    ForEach(Array(Topic.all.enumerated()), id: \.offset) { index, option in
-                        Button { start(option) } label: { topicCard(option, index: index) }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel(option.title)
-                            .opacity(topicsShown > index + 1 ? 1 : 0)
-                            .offset(y: topicsShown > index + 1 ? 0 : 12)
-                            .allowsHitTesting(topicsShown > index + 1)
-                            .accessibilityHidden(topicsShown <= index + 1)
+        // Across first: the top row fills before the bottom one
+        let top = Array(Topic.all.indices.prefix((Topic.all.count + 1) / 2))
+        let bottom = Array(Topic.all.indices.dropFirst(top.count))
+        return SidewaysRail(width: cardWidth) {
+            VStack(alignment: .leading, spacing: 17) {
+                ForEach([top, bottom], id: \.self) { row in
+                    HStack(alignment: .top, spacing: 17) {
+                        ForEach(row, id: \.self) { index in
+                            let option = Topic.all[index]
+                            Button { start(option) } label: { topicCard(option, index: index) }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(option.title)
+                                .opacity(topicsShown > index + 1 ? 1 : 0)
+                                .offset(y: topicsShown > index + 1 ? 0 : 12)
+                                .allowsHitTesting(topicsShown > index + 1)
+                                .accessibilityHidden(topicsShown <= index + 1)
+                        }
                     }
                 }
-                .padding(.horizontal, 17)
-                // Room for the cards' shadows
-                .padding(.vertical, 20)
             }
-            .frame(width: cardWidth, height: 282)
-            .at(0, ChatY.topics - 20)
-            .allowsHitTesting(topicsShown > 1)
+            .padding(.horizontal, 19)
+            .padding(.vertical, 20)
         }
+        .frame(width: cardWidth, height: 192 + 17 + 213 + 40, alignment: .topLeading)
+        .at(0, ChatY.topics - 20)
+        .allowsHitTesting(topicsShown > 1)
     }
 
     /// What each topic's card shows over its question (256:15685): bars, in the scale of Figma's earlier, larger
@@ -1080,23 +1161,22 @@ struct OnboardingDecadeWelcomeView: View {
     /// one with rising bars
     @ViewBuilder private func topicCard(_ topic: Topic, index: Int) -> some View {
         let shape = RoundedRectangle(cornerRadius: 33, style: .continuous)
-        let dark = index == 0
+        let wash = Self.topicWashes[index % Self.topicWashes.count]
         ZStack(alignment: .topLeading) {
-            (dark ? Color(hex: 0x151515) : Color(hex: 0xFEFEFE))
-            if !dark {
-                Text("Mutual funds market")
-                    .font(FigmaFont.walsheim(15))
-                    .foregroundStyle(Color.black.opacity(0.57))
-                    .fixedSize()
-                    .frame(height: 19)
-                    .at(15, 13)
-            }
+            Color(hex: 0xFEFEFE)
+            LinearGradient(colors: wash.colors.map { Color(hex: $0).opacity(wash.opacity) }, startPoint: .leading, endPoint: .trailing)
+            Text("Mutual funds market")
+                .font(FigmaFont.walsheim(15))
+                .foregroundStyle(Color.black.opacity(0.57))
+                .fixedSize()
+                .frame(height: 19)
+                .at(15, 13)
             Group {
                 switch index {
-                case 0: TopicReturnsMini().offset(x: -3, y: -19)
                 case 1: TopicRatingMini()
                 default:
-                    Self.topicChart([30.75, 37.5, 49.125, 72.75], color: Color(hex: 0x19D522))
+                    let chart = Self.topicCharts[index == 0 ? 0 : 1] ?? ([30.75, 37.5, 49.125, 72.75], Color(hex: 0x19D522))
+                    Self.topicChart(chart.bars, color: chart.color)
                         .scaleEffect(0.7105, anchor: .topLeading)
                         .frame(width: 89.5, height: 73, alignment: .topLeading)
                 }
@@ -1105,15 +1185,27 @@ struct OnboardingDecadeWelcomeView: View {
             Text(topic.title)
                 .font(FigmaFont.walsheim(17))
                 .lineSpacing(21 - 17 * 1.2)
-                .foregroundStyle(dark ? Color.white : Color.black)
-                .frame(width: 156, alignment: .leading)
+                .foregroundStyle(Color.black)
+                .frame(width: 140, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
                 .at(15, 110)
+            // 802:6028: the arrow beside the question
+            Image("OnboardingTopicArrow")
+                .frame(width: 23, height: 23)
+                .at(150, 110)
         }
         .frame(width: 186, height: index == 2 ? 213 : 192, alignment: .topLeading)
         .clipShape(shape)
-        .shadow(color: Color.black.opacity(0.07), radius: 22, x: 0, y: 2)
     }
+
+    /// Gap: the topic cards' washes over #FEFEFE, left to right, read off 699:24609, 802:6031, 802:6043 and 802:6037
+    /// (their gradients don't export cleanly); none are tokens
+    private static let topicWashes: [(colors: [UInt32], opacity: Double)] = [
+        ([0xFFCB41, 0xFFC189], 0.13),
+        ([0xB6B7CD, 0xADCAE1], 0.12),
+        ([0xB9D4C9, 0xB8C6A3], 0.13),
+        ([0xFFE589, 0xD1B8C9], 0.15),
+    ]
 
 /// The personal-advice prompts' washes of colour, left to right, sampled from 316:18337 (its gradients don't
     /// export cleanly): top row yellow-to-peach and mauve-to-lavender, under them sage-and-mint and gold-to-blush;
@@ -1150,6 +1242,38 @@ struct OnboardingDecadeWelcomeView: View {
         .frame(width: 186, height: 192, alignment: .topLeading)
         .clipShape(shape)
         .shadow(color: Color.black.opacity(0.07), radius: 22, x: 0, y: 2)
+    }
+
+    /// A prompt as the connect sheet shows it (802:6423, 817:6434), 186 × 192: the label, the question and its arrow,
+    /// on a faint wash of colour, or on plain #FEFEFE with a hairline edge
+    static func tintedPromptCard(_ title: String, washed: Bool) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 33, style: .continuous)
+        let wash = topicWashes[0]
+        return ZStack(alignment: .topLeading) {
+            Color(hex: 0xFEFEFE)
+            if washed {
+                LinearGradient(colors: wash.colors.map { Color(hex: $0).opacity(wash.opacity) }, startPoint: .leading, endPoint: .trailing)
+            }
+            Text("Mutual funds market")
+                .font(FigmaFont.walsheim(15))
+                .foregroundStyle(Color.black.opacity(0.57))
+                .fixedSize()
+                .frame(height: 19)
+                .at(15, 13)
+            Text(title)
+                .font(FigmaFont.walsheim(17))
+                .lineSpacing(21 - 17 * 1.2)
+                .foregroundStyle(Color.black)
+                .frame(width: 140, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .at(15, 110)
+            Image("OnboardingTopicArrow")
+                .frame(width: 23, height: 23)
+                .at(150, 110)
+        }
+        .frame(width: 186, height: 192, alignment: .topLeading)
+        .clipShape(shape)
+        .overlay(shape.strokeBorder(ColorScale.borderSubtle.opacity(washed ? 0 : 1), lineWidth: 0.7))
     }
 
     /// A prompt as a card (256:15732): "Mutual funds market", a small chart or ring, then the question
@@ -1284,31 +1408,18 @@ struct OnboardingDecadeWelcomeView: View {
                 .transition(.opacity.combined(with: .offset(y: 10)))
                 Self.stamp.at(17, AdviceY.heading + AdviceY.headingHeight + 10)
                     .transition(.opacity)
-                // What could be asked, sideways like the topics
-                SidewaysRail(width: cardWidth) {
-                    VStack(alignment: .leading, spacing: 13) {
-                        ForEach(0..<Self.promptRows, id: \.self) { row in
-                            let perRow = Self.advicePrompts.count / Self.promptRows
-                            HStack(alignment: .top, spacing: 11) {
-                                ForEach(row * perRow..<(row + 1) * perRow, id: \.self) { index in
-                                    let prompt = Self.advicePrompts[index]
-                                    Button { askPersonal(index) } label: { Self.advicePromptCard(prompt, index: index) }
-                                        .buttonStyle(.plain)
-                                        .accessibilityLabel(prompt)
-                                        .opacity(advicePromptsShown > index ? 1 : 0)
-                                        .scaleEffect(advicePromptsShown > index ? 1 : 0.94)
-                                        .offset(y: advicePromptsShown > index ? 0 : 24)
-                                        .allowsHitTesting(advicePromptsShown > index)
-                                        .accessibilityHidden(advicePromptsShown <= index)
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 17)
-                    .padding(.vertical, 20)
+                // What it needs for that, as its own card in the chat (1012:10877); no prompts, no sheet first
+                if advicePromptsShown > 0 {
+                    ConnectActionCard(connected: fundsConnected, onConnect: { askPersonal(0) })
+                        .at(17, AdviceY.prompts)
+                        .transition(.scale(scale: 0.92, anchor: .bottomLeading).combined(with: .opacity).combined(with: .offset(y: 14)))
                 }
-                .frame(width: cardWidth, height: Self.promptsHeight + 40)
-                .at(0, AdviceY.prompts - 20)
+                // and, once they're in, the report it prepares on them (1027:11737 again)
+                if portfolioReportShown {
+                    ReportPreparingCard(title: "Your portfolio performance", subject: "Your mutual funds")
+                        .at(17, Self.portfolioReportTop)
+                        .transition(.scale(scale: 0.94, anchor: .topLeading).combined(with: .opacity).combined(with: .offset(y: 12)))
+                }
             }
         }
         .frame(width: cardWidth, alignment: .topLeading)
@@ -1423,19 +1534,19 @@ struct OnboardingDecadeWelcomeView: View {
             ForEach(Array(Self.rows.enumerated()), id: \.offset) { index, title in
                 let top = 73 * CGFloat(index)
                 ZStack(alignment: .topLeading) {
-                    Image("HowWeWorkGlyph")
-                        .frame(width: 33, height: 33)
-                        .at(14, [16, 17, 20][index])
+                    Image("OnboardingWayYellow")
+                        .frame(width: 39, height: 39)
+                        .at(14, 16)
                     Text(index == 0 && deciding ? "Advisory Decisioning" : title)
                         .font(FigmaFont.walsheim(17))
                         .foregroundStyle(Color.black.opacity(0.85))
                         .frame(height: 25)
-                        .at(57, 12)
+                        .at(67, 12)
                     Text(Self.rowDetail)
                         .font(FigmaFont.walsheim(13))
                         .foregroundStyle(Color.black.opacity(0.45))
                         .frame(height: 21)
-                        .at(57, 38)
+                        .at(67, 38)
                 }
                 .frame(width: 330, height: 73, alignment: .topLeading)
                 .opacity(rowsShown > index && !(chatting && index > 0) ? 1 : 0)
@@ -1544,7 +1655,8 @@ struct FlipPill: View {
         }
         .padding(.leading, 11)
         .frame(width: width, height: 47, alignment: .leading)
-        .background(Capsule().fill(Color.white))
+        .background(Capsule().fill(ColorScale.surfaceWidget))
+        .overlay(Capsule().strokeBorder(ColorScale.borderSubtle, lineWidth: 1))
         .accessibilityElement(children: .combine)
     }
 }

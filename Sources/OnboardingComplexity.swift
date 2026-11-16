@@ -68,8 +68,10 @@ enum ComplexityLevel: String, CaseIterable {
 
 // MARK: - Card
 
-private struct ComplexityCard: View {
+struct ComplexityCard: View {
     let level: ComplexityLevel
+    /// The newer look (973:17210): the page's own colour, rounded 23, a wider shadow
+    var soft = false
 
     /// What the card shows on each side of the sweeping heat band
     @State private var fromLevel: ComplexityLevel = .simply
@@ -99,10 +101,11 @@ private struct ComplexityCard: View {
             content(toLevel)
         }
         .frame(width: Self.width, height: cardHeight, alignment: .topLeading)
-        .background(Color(hex: 0xF2F2F2))
-        .clipped()
-        .overlay(Rectangle().stroke(Color.black.opacity(0.05), lineWidth: 1))
-        .shadow(color: Color.black.opacity(0.03), radius: 40, x: 0, y: 3)
+        .background(soft ? ColorScale.surfaceBase : Color(hex: 0xF2F2F2))
+        .clipShape(RoundedRectangle(cornerRadius: soft ? 23 : 0, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: soft ? 23 : 0, style: .continuous).stroke(Color.black.opacity(0.05), lineWidth: 1))
+        // Shadow/2 (0 4 97 +7 at 7%) on the newer card; SwiftUI can't draw the spread
+        .shadow(color: Color.black.opacity(soft ? 0.07 : 0.03), radius: soft ? 48.5 : 40, x: 0, y: soft ? 4 : 3)
         .onAppear { fromLevel = level; toLevel = level; cardHeight = height(level) }
         .onChange(of: level) { _, new in
             // Reset the sweep instantly (no animation), so the new content is only revealed by the band
@@ -337,16 +340,20 @@ struct HeatSweep<Before: View, After: View>: View, Animatable {
 
 // MARK: - Slider (792:13228), 325 × 61
 
-private struct ComplexitySlider: View {
+struct ComplexitySlider: View {
     @Binding var position: CGFloat
     let onLevel: (ComplexityLevel) -> Void
 
     // Knob centre travels between the track ends (knob 25pt, track x 2…324)
     private static let minX: CGFloat = 21.5
     private static let maxX: CGFloat = 304.5
-    private static let stops: [(CGFloat, UInt32)] = [
-        (0, 0x7F00ED), (0.34615, 0xD8B000), (0.65385, 0x00E1A9), (1, 0x0063D4),
-    ]
+    /// The newer look (973:17229): BEGINNER · FAMILIAR · PRO over a quieter track
+    var soft = false
+
+    private var stops: [(CGFloat, UInt32)] {
+        soft ? [(0, 0xB9D1BF), (0.39335, 0xD8B000), (0.65385, 0xD1BBB3), (1, 0xB4BAD0)]
+            : [(0, 0x7F00ED), (0.34615, 0xD8B000), (0.65385, 0x00E1A9), (1, 0x0063D4)]
+    }
 
     @State private var dragStart: CGFloat?
 
@@ -354,12 +361,12 @@ private struct ComplexitySlider: View {
         let knobX = Self.minX + (Self.maxX - Self.minX) * position
 
         ZStack(alignment: .topLeading) {
-            Text("SIMPLY").modifier(LabelStyle()).at(0, 0)
-            Text("ANY").modifier(LabelStyle()).frame(width: 325).at(0, 0)
-            Text("TERMS").modifier(LabelStyle()).frame(width: 325, alignment: .trailing).at(0, 0)
+            Text(soft ? "BEGINNER" : "SIMPLY").modifier(LabelStyle()).at(0, 0)
+            Text(soft ? "FAMILIAR" : "ANY").modifier(LabelStyle()).frame(width: 325).at(0, 0)
+            Text(soft ? "PRO" : "TERMS").modifier(LabelStyle()).frame(width: 325, alignment: .trailing).at(0, 0)
 
             LinearGradient(
-                stops: Self.stops.map { .init(color: Color(hex: $0.1), location: $0.0) },
+                stops: stops.map { .init(color: Color(hex: $0.1), location: $0.0) },
                 startPoint: .leading, endPoint: .trailing
             )
             .frame(width: 322, height: 5)
@@ -367,7 +374,7 @@ private struct ComplexitySlider: View {
 
             // Knob: 25pt ring in the track colour under it, white 19pt centre
             Circle()
-                .fill(Self.color(at: (knobX - 2) / 322))
+                .fill(color(at: (knobX - 2) / 322))
                 .frame(width: 25, height: 25)
                 .overlay(Circle().fill(Color.white).frame(width: 19, height: 19))
                 .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
@@ -393,7 +400,7 @@ private struct ComplexitySlider: View {
     }
 
     /// Track gradient colour at `t` (0…1)
-    private static func color(at t: CGFloat) -> Color {
+    private func color(at t: CGFloat) -> Color {
         let t = min(1, max(0, t))
         var lower = stops[0], upper = stops[stops.count - 1]
         for i in 0..<(stops.count - 1) where t >= stops[i].0 && t <= stops[i + 1].0 {

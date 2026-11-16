@@ -2,7 +2,8 @@ import SwiftUI
 
 /// Figma "iPhone 14 Plus - 434" (571:11578): the second version of a bank's page. A "Fixed Deposit" bar, then the
 /// bank's card with its building across the top, "Things to know" as picture tiles, and the FDs on offer grouped by
-/// how long they run. It is the default; `-fdBankV1` opens the first version (`FixedDepositBankView`).
+/// how long they run. It is the default, ending on "How your money could grow?" (`FDGrowthWidget`) in place of the
+/// plans unless `-fdBankV2` is passed; `-fdBankV1` opens the first version (`FixedDepositBankView`).
 struct FixedDepositBankV2View: View {
     let deposit: FixedDepositsView.Deposit
     var onBack: () -> Void = {}
@@ -13,6 +14,18 @@ struct FixedDepositBankV2View: View {
         let offer: Int
         let frame: CGRect
     }
+
+    /// The page ends on the growth widget by default; `-fdBankV2` keeps the plans on offer there instead
+    static let showsGrowth = !ProcessInfo.processInfo.arguments.contains("-fdBankV2")
+
+    /// "Select your plan", opened by the bar's "View plans"
+    @State private var showsPlans = false
+    /// Scrolled to the end of the page
+    @State private var atEnd = false
+    /// The kind of deposit chosen on "Select your plan"
+    @State private var depositKind = "One time deposit"
+    @Environment(\.advisorBarActionTaps) private var viewPlansTaps
+    private static let plansTransition = Animation.spring(response: 0.45, dampingFraction: 0.92)
 
     @State private var plan: OpenPlan?
     /// false while the card is still (or again) its row
@@ -31,22 +44,43 @@ struct FixedDepositBankV2View: View {
                 thingsToKnowCard
                     .askable(.bank(deposit.name, .thingsToKnow, v2: true))
                     .padding(.top, 27) // Gap: 27 under the section title, no spacing token
-                DsText("Available FD’s", variant: .h4)
-                    .padding(.top, 46) // Gap: 46 above the section title, no spacing token
-                VStack(spacing: SpacingScale.spaceMd) {
-                    ForEach(Self.groups.indices, id: \.self) { index in
-                        offersCard(index)
-                            .askable(.bank(deposit.name, .offers(index), v2: true))
+                if Self.showsGrowth {
+                    // Figma 733:3507: the growth widget in place of the plans
+                    FDGrowthWidget(deposit: deposit)
+                        .padding(.top, 27) // Gap: 27 under the card above, no spacing token
+                } else {
+                    DsText("Available FD’s", variant: .h4)
+                        .padding(.top, 46) // Gap: 46 above the section title, no spacing token
+                    VStack(spacing: SpacingScale.spaceMd) {
+                        ForEach(Self.groups.indices, id: \.self) { index in
+                            offersCard(index)
+                                .askable(.bank(deposit.name, .offers(index), v2: true))
+                        }
                     }
+                    .padding(.top, 33) // Gap: 33 under the section title, no spacing token
                 }
-                .padding(.top, 33) // Gap: 33 under the section title, no spacing token
-            }
+                }
             .padding(.horizontal, 11) // Gap: cards sit 11 from the screen edge, no spacing token
-            .padding(.bottom, 85) // Gap: 85 under the last card, no spacing token
+            // Gap: 85 under the last card, or 145 where the bar stacks to two rows at the end; no spacing tokens
+            .padding(.bottom, Self.showsGrowth ? 145 : 85)
+        }
+        // At the end of the page the bar stacks: the pill over a full-width "View plans"
+        .onScrollGeometryChange(for: Bool.self) { geo in
+            geo.visibleRect.maxY >= geo.contentSize.height - 30
+        } action: { _, reached in
+            atEnd = reached
         }
         // Holds and swipes rest while a plan is open over the page
         .allowsHitTesting(plan == nil)
+        .accessibilityHidden(showsPlans)
         .background(ColorScale.surfaceBase.ignoresSafeArea())
+        .overlay {
+            if showsPlans {
+                plansPage
+                    .allowsHitTesting(plan == nil)
+                    .transition(.move(edge: .trailing))
+            }
+        }
         .overlay {
             if let plan {
                 FixedDepositPlanLayer(
@@ -59,7 +93,13 @@ struct FixedDepositBankV2View: View {
                 )
             }
         }
-        .preference(key: AdvisorBarHiddenKey.self, value: plan != nil)
+        .preference(key: AdvisorBarHiddenKey.self, value: plan != nil || showsPlans)
+        // The growth version has no plans on the page, so the bar carries the way to them
+        .preference(key: AdvisorBarActionKey.self, value: Self.showsGrowth ? "View plans" : nil)
+        .preference(key: AdvisorBarStackedKey.self, value: Self.showsGrowth && atEnd)
+        .onChange(of: viewPlansTaps) {
+            withAnimation(Self.plansTransition) { showsPlans = true }
+        }
         .preferredColorScheme(.light)
     }
 
@@ -300,6 +340,109 @@ struct FixedDepositBankV2View: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    // MARK: Select your plan
+
+    /// Figma "iPhone 14 Plus - 465" (741:24677): every plan in one card, under the bank's name. A row grows into
+    /// its plan's card as it does on the page.
+    private var plansPage: some View {
+        Surface(surface: .surfaceWidget, radius: .radius27, shadow: .token(.shadow2)) {
+            VStack(spacing: 0) {
+                plansBar
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        // Gap: Md 27/35 has no text style (H3 is 27/39)
+                        GapText("Select your plan", family: .walsheim, medium: true, size: 27, lineHeight: 35, color: ColorScale.contentPrimary)
+                            .padding(.top, 11) // Gap: 11 under the bar, no spacing token
+                            .padding(.leading, SpacingScale.spaceXl)
+                        depositKinds
+                            .padding(.top, SpacingScale.spaceXl)
+                            .padding(.leading, 15) // Gap: 15 beside the chips, no spacing token
+                        ForEach(Self.groups.indices, id: \.self) { index in
+                            DsText(Self.groups[index].title, variant: .h6)
+                                .padding(.top, index == 0 ? 25 : 54) // Gap: 25 under the title, 54 between groups; no spacing tokens
+                                .padding(.leading, SpacingScale.spaceXl)
+                            VStack(spacing: 5) { // Gap: 5 between rows, no spacing token
+                                ForEach(Self.groups[index].offers.indices, id: \.self) { offer in
+                                    offerRow(group: index, offer: offer)
+                                }
+                            }
+                            .padding(.top, 13) // Gap: 13 under the group's title, no spacing token
+                            .padding(.leading, 15) // Gap: 15 beside the rows, no spacing token
+                            .padding(.trailing, 11) // Gap: 11 beside the rows, no spacing token
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, SpacingScale.spaceXl)
+                }
+            }
+        }
+        .padding(.horizontal, 13) // Gap: the card sits 13 from the screen edge, no spacing token
+        .padding(.vertical, 13) // Gap: 13 inside the safe area, top and bottom
+        .background(ColorScale.surfaceBase.ignoresSafeArea())
+    }
+
+    /// Figma 741:25141: one-time or recurring. The chosen one is ringed; the plans listed are the same for both.
+    private var depositKinds: some View {
+        HStack(spacing: 0) {
+            ForEach(["One time deposit", "Recurring deposit"], id: \.self) { kind in
+                Button {
+                    guard depositKind != kind else { return }
+                    Haptics.tap()
+                    withAnimation(.snappy(duration: 0.25)) { depositKind = kind }
+                } label: {
+                    // Gap: P4's type in black, or black 67% when not chosen; neither has a content token
+                    GapText(kind, family: .walsheim, medium: false, size: 15, lineHeight: 21, color: Color.black.opacity(depositKind == kind ? 1 : 0.67)) // Gap: unbound black
+                        .fixedSize()
+                        .padding(.horizontal, 17) // Gap: 17 beside the label, no spacing token
+                        .frame(height: 47)
+                        .overlay {
+                            if depositKind == kind {
+                                Capsule().strokeBorder(ColorScale.borderStrong, lineWidth: 1) // Gap: 1pt, not the hairline
+                            }
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(depositKind == kind ? .isSelected : [])
+            }
+        }
+    }
+
+    /// The card's bar: back, and the bank
+    private var plansBar: some View {
+        ZStack {
+            HStack(spacing: SpacingScale.spaceMd) {
+                Image(deposit.logo)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 24, height: 24)
+                    .clipped()
+                    .frame(width: 33, height: 33)
+                    .background(ColorScale.surfaceWidget)
+                    .clipShape(RoundedRectangle(cornerRadius: 9.706, style: .continuous)) // Gap: 9.706 is not a Radius variable
+                    .overlay(RoundedRectangle(cornerRadius: 9.706, style: .continuous).strokeBorder(ColorScale.borderSubtle, lineWidth: BorderTokens.hairline)) // Gap: 9.706 is not a Radius variable
+                    .accessibilityHidden(true)
+                // Gap: Md 17/23 at 5% tracking in black 50% has no text style or content token
+                GapText(deposit.name.uppercased(), family: .walsheim, medium: true, size: 17, lineHeight: 23, trackingPercent: 5,
+                        color: Color.black.opacity(0.5)) // Gap: unbound black 50%
+                    .fixedSize()
+            }
+            Button {
+                Haptics.tap()
+                withAnimation(Self.plansTransition) { showsPlans = false }
+            } label: {
+                Image("FDBack")
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Back to bank")
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading, 3) // Gap: the chevron's leading edge 20 into the card
+        }
+        .frame(height: 63)
     }
 
     /// A plan; a tap grows it into its card

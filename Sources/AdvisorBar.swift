@@ -18,6 +18,12 @@ private struct AdvisorBar: ViewModifier {
     @State private var holdChipsOut = false
     /// A layer of the page has taken over the screen (a plan's card), so the pill steps out of its way
     @State private var hidden = false
+    /// The page's own button beside the pill, by its title ("View plans"), and how often it has been tapped
+    @State private var actionTitle: String?
+    @State private var actionTaps = 0
+    /// The page has reached its end: the pill rises onto the button and both run the full width
+    @State private var stacked = false
+    @State private var appeared = Date()
 
     private static let transition = Animation.spring(response: 0.5, dampingFraction: 0.86)
     /// The pill is 53 tall and sits 13 above the home indicator's 34
@@ -26,6 +32,7 @@ private struct AdvisorBar: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environment(\.askAbout, AskAbout(held: heldWidget?.context, hold: hold, send: { open(with: $0) }))
+            .environment(\.advisorBarActionTaps, actionTaps)
             .overlay {
                 GeometryReader { geo in
                     ZStack {
@@ -37,6 +44,8 @@ private struct AdvisorBar: ViewModifier {
                             isComposing: isComposing,
                             context: composerContext,
                             pillTop: geo.size.height - Self.pillRise,
+                            action: actionTitle.map { title in (title, { Haptics.tap(); actionTaps += 1 }) },
+                            stacked: stacked,
                             onOpen: { open(with: nil) },
                             onClose: close
                         )
@@ -57,6 +66,21 @@ private struct AdvisorBar: ViewModifier {
                 .animation(.easeOut(duration: 0.2), value: hidden)
             }
             .onPreferenceChange(AdvisorBarHiddenKey.self) { hidden = $0 }
+            .onPreferenceChange(AdvisorBarActionKey.self) { title in
+                guard title != actionTitle else { return }
+                // A page that opens with its button has it from the start; one that brings it in later springs it in
+                if Date().timeIntervalSince(appeared) < 0.8 {
+                    actionTitle = title
+                } else {
+                    Haptics.tap()
+                    withAnimation(.spring(duration: 0.55, bounce: 0.28)) { actionTitle = title }
+                }
+            }
+            .onPreferenceChange(AdvisorBarStackedKey.self) { atEnd in
+                guard atEnd != stacked else { return }
+                Haptics.tap()
+                withAnimation(.spring(duration: 0.55, bounce: 0.28)) { stacked = atEnd }
+            }
             .onChange(of: focused) { _, isFocused in
                 // Keyboard put away some other way: fold the card back into the pill
                 if !isFocused && isComposing { close() }
@@ -114,6 +138,30 @@ struct AskAbout {
     var send: (FundContext) -> Void = { _ in }
 }
 
+/// Set by a page that wants its own button beside the advisor pill: the button's title
+struct AdvisorBarActionKey: PreferenceKey {
+    static let defaultValue: String? = nil
+    static func reduce(value: inout String?, nextValue: () -> String?) { value = value ?? nextValue() }
+}
+
+/// Set by a page with its own button in the bar once it is scrolled to its end
+struct AdvisorBarStackedKey: PreferenceKey {
+    static let defaultValue = false
+    static func reduce(value: inout Bool, nextValue: () -> Bool) { value = value || nextValue() }
+}
+
+private struct AdvisorBarActionTapsKey: EnvironmentKey {
+    static let defaultValue = 0
+}
+
+extension EnvironmentValues {
+    /// Counts taps on the page's button beside the advisor pill; a page watches it change
+    var advisorBarActionTaps: Int {
+        get { self[AdvisorBarActionTapsKey.self] }
+        set { self[AdvisorBarActionTapsKey.self] = newValue }
+    }
+}
+
 private struct AskAboutKey: EnvironmentKey {
     static let defaultValue = AskAbout()
 }
@@ -133,6 +181,18 @@ private struct Askable: ViewModifier {
         content
             .widgetHold(isHeld: ask.held == context) { ask.hold(context, $0) }
             .contextSwipe { ask.send(context) }
+    }
+}
+
+/// Sits inside a page under an advisor bar and reports taps on the page's button beside the pill
+struct AdvisorBarActionListener: View {
+    let onTap: () -> Void
+    @Environment(\.advisorBarActionTaps) private var taps
+
+    var body: some View {
+        Color.clear
+            .allowsHitTesting(false)
+            .onChange(of: taps) { onTap() }
     }
 }
 
