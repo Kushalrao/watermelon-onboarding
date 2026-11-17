@@ -77,7 +77,7 @@ struct HeldWidgetLayer<Widget: View>: View {
 }
 
 /// Suggested question chip (753:12225 / 753:12364), 63 tall, hugs its text
-private struct QuestionChip: View {
+struct QuestionChip: View {
     let title: String
 
     var body: some View {

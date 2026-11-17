@@ -34,6 +34,71 @@ final class GestureTests: XCTestCase {
         sleep(2)
     }
 
+    /// The fund page's text can be selected: a long press on text picks up a word with the system's menu, and the
+    /// widget doesn't lift; a long press off the text still lifts it
+    func testFundTextSelection() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-fund"]
+        app.launch()
+        sleep(3)
+        func point(_ x: CGFloat, _ y: CGFloat) -> XCUICoordinate {
+            app.coordinate(withNormalizedOffset: CGVector(dx: x / 402, dy: y / 874))
+        }
+        func shot(_ name: String) {
+            let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/" + name + ".png"))
+        }
+        XCTAssertTrue(app.staticTexts["HSBC midcap direct growth"].waitForExistence(timeout: 5))
+        // On "Lower expense ratio, zero commissions": the word under the finger is picked up; the system's menu
+        // never shows, and once the selection's been still our questions about it and Copy come up
+        // Held on, and dragged out over more words: nothing comes up while the finger's still down
+        point(160, 293).press(forDuration: 1.0, thenDragTo: point(300, 293), withVelocity: .slow, thenHoldForDuration: 1.2)
+        shot("select-word")
+        XCTAssertTrue(app.buttons["Copy"].waitForExistence(timeout: 3))
+        sleep(1)
+        shot("select-suggestions")
+        XCTAssertFalse(app.menuItems["Copy"].exists)
+        XCTAssertFalse(app.menuItems["Look Up"].exists)
+        // Copy copies, says so, and lets the selection go
+        app.buttons["Copy"].tap()
+        shot("select-copied")
+        sleep(2)
+        XCTAssertFalse(app.buttons["Copy"].exists)
+        // Again, and this time a tap off the text lets it go
+        point(160, 293).press(forDuration: 1.0)
+        XCTAssertTrue(app.buttons["Copy"].waitForExistence(timeout: 3))
+        point(330, 180).tap()
+        sleep(1)
+        XCTAssertFalse(app.buttons["Copy"].exists)
+        shot("select-cleared")
+        // Again, and a question opens the composer with it written in
+        point(160, 293).press(forDuration: 1.0)
+        XCTAssertTrue(app.buttons["Copy"].waitForExistence(timeout: 3))
+        app.buttons.matching(NSPredicate(format: "label CONTAINS 'ratio'")).firstMatch.tap()
+        sleep(2)
+        shot("select-asked")
+        point(346, 120).tap()
+        sleep(1)
+    }
+
+    func testFundTextSelectionLift() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-fund"]
+        app.launch()
+        sleep(3)
+        func point(_ x: CGFloat, _ y: CGFloat) -> XCUICoordinate {
+            app.coordinate(withNormalizedOffset: CGVector(dx: x / 402, dy: y / 874))
+        }
+        func shot(_ name: String) {
+            let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/" + name + ".png"))
+        }
+        // On the feature list's icon, off the text: the widget lifts
+        point(36, 343).press(forDuration: 0.9)
+        sleep(2)
+        shot("select-lift")
+    }
+
     func testHoldWidget() {
         let app = XCUIApplication()
         app.launchArguments = ["-style", "collapse", "-fund"]
@@ -564,7 +629,7 @@ final class GestureTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Enter investment amount"].waitForExistence(timeout: 2))
         sleep(1)
         for key in ["1", "5", "0", "0", "0", "0"] { app.buttons[key].tap() }
-        XCTAssertTrue(app.staticTexts["1,50,000"].exists)
+        XCTAssertTrue(app.staticTexts["₹1,50,000"].exists)
         app.buttons["Calculate Returns"].tap()
         // The list shows each deposit's maturity value, and the bar holds the amount
         XCTAssertTrue(app.staticTexts["Rs1,53,188"].firstMatch.waitForExistence(timeout: 3))
@@ -585,14 +650,26 @@ final class GestureTests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-onboardingStep", "1", "-welcomeAnalysis", "-researchSeconds", "2"]
         app.launch()
-        // The finished analysis waits on Understood
-        let understood = app.buttons["Understood"]
-        XCTAssertTrue(understood.waitForExistence(timeout: 12))
-        sleep(1)
-        understood.tap()
+        // The finished report scrolls down to the question that leads on
+        XCTAssertTrue(app.staticTexts["Equity mutual funds performance 26"].waitForExistence(timeout: 12))
+        XCTAssertFalse(app.buttons["Understood"].exists)
+        sleep(2)
+        let dirR = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        let ask = app.buttons["How this affects my portfolio?"]
+        for page in 0..<14 {
+            try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirR + "/report-\(page).png"))
+            if ask.isHittable { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)))
+            sleep(1)
+        }
+        XCTAssertTrue(ask.isHittable)
+        ask.tap()
         // then it's kept in the chat, and the agent turns to personal advice: its own card asking for the funds
         XCTAssertTrue(app.buttons["View analysis"].waitForExistence(timeout: 4))
-        XCTAssertTrue(app.staticTexts["useful when its"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["How this affects my portfolio?"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["That’s a personal advisory question. To answer it I need access to your mutual funds."].waitForExistence(timeout: 6))
+        XCTAssertFalse(app.staticTexts["useful when its"].exists)
         let connect = app.buttons["Connect securely"]
         XCTAssertTrue(connect.waitForExistence(timeout: 6))
         XCTAssertTrue(app.staticTexts["Action required"].exists)
@@ -612,7 +689,7 @@ final class GestureTests: XCTestCase {
         sleep(1)
         XCTAssertFalse(app.staticTexts["We will import mutual funds via MFCentral"].exists)
         app.buttons["View analysis"].tap()
-        XCTAssertTrue(app.staticTexts["Fund rank movements"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Equity mutual funds performance 26"].waitForExistence(timeout: 3))
     }
 
     func testImportFlow() {
@@ -665,11 +742,16 @@ final class GestureTests: XCTestCase {
         // back in the chat the card says it's connected, and a second report is prepared under it
         XCTAssertTrue(app.staticTexts["Connected successfully"].waitForExistence(timeout: 4))
         XCTAssertTrue(app.staticTexts["MFCentral Account"].exists)
+        // then thanks, and it goes through the funds; no plan
+        XCTAssertTrue(app.staticTexts["Thanks for connecting. I’ll now check how this affects your portfolio."].waitForExistence(timeout: 5))
         sleep(3)
         shot("chat-connected")
+        XCTAssertTrue(app.staticTexts["Going through"].exists)
+        sleep(4)
+        shot("chat-comparing")
         // which opens, and its Understood leads to the congratulations and then the advisor
         let understood = app.buttons["Understood"]
-        XCTAssertTrue(understood.waitForExistence(timeout: 10))
+        XCTAssertTrue(understood.waitForExistence(timeout: 16))
         sleep(2)
         understood.tap()
         sleep(2)
@@ -801,33 +883,48 @@ final class GestureTests: XCTestCase {
         XCTAssertGreaterThan(app.staticTexts["you’re interested in?"].frame.minY, 150)
     }
 
+    func testGender() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-onboardingPAN"]
+        app.launch()
+        let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        let field = app.buttons["Gender"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        XCTAssertEqual(field.value as? String, "Select your gender")
+        XCTAssertTrue(app.buttons["Edit details"].exists)
+        sleep(1)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/gender-field.png"))
+        // The field opens the choices over the foot of the card
+        field.tap()
+        XCTAssertTrue(app.buttons["Female"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["Other"].exists)
+        app.buttons["Male"].tap()
+        // and the one picked is shown in the field, and ticked when the choices open again
+        XCTAssertFalse(app.buttons["Female"].waitForExistence(timeout: 1))
+        XCTAssertEqual(field.value as? String, "Male")
+        field.tap()
+        XCTAssertTrue(app.buttons["Male"].waitForExistence(timeout: 2))
+        sleep(1)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/gender-sheet.png"))
+        XCTAssertTrue(app.buttons["Male"].isSelected)
+    }
+
     func testAnalysis() {
         let app = XCUIApplication()
         app.launchArguments = ["-onboardingStep", "1", "-welcomeDone", "-researchSeconds", "9"]
         app.launch()
-        // With the results in, the agent starts the analysis by itself; the chip opens it
-        let chip = app.buttons["Creating analysis"]
-        XCTAssertTrue(chip.waitForExistence(timeout: 4))
+        // With the results in, the agent starts the analysis by itself: the report's card, preparing, which opens it
+        let preparing = app.buttons["Preparing report"]
+        XCTAssertTrue(preparing.waitForExistence(timeout: 6))
+        XCTAssertFalse(app.buttons["Creating analysis"].exists)
         sleep(1)
-        XCTAssertFalse(app.staticTexts["While it happens"].exists)
-        chip.tap()
+        preparing.tap()
         XCTAssertTrue(app.staticTexts["While it happens"].waitForExistence(timeout: 4))
-        // While it works, a curve drawn in the box finds its fund
-        let canvas = app.otherElements["CurveCanvas"]
-        XCTAssertTrue(canvas.waitForExistence(timeout: 3))
-        sleep(1)
-        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.06, dy: 0.85))
-            .press(forDuration: 0.05, thenDragTo: canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.94, dy: 0.15)))
-        XCTAssertTrue(app.staticTexts["This is the fund"].waitForExistence(timeout: 3))
-        // When its time is up it becomes the analysis
-        XCTAssertTrue(app.staticTexts["Fund rank movements"].waitForExistence(timeout: 12))
-        XCTAssertFalse(app.staticTexts["While it happens"].exists)
-        // and folds back into its chip from the card behind
-        sleep(1)
-        app.buttons["Mutual funds performance"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2)).tap()
-        sleep(1)
-        XCTAssertFalse(app.staticTexts["Fund rank movements"].exists)
-        XCTAssertTrue(app.buttons["Analysis ready"].isHittable)
+        let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/a-preparing.png"))
+        // When its time is up the analysis opens by itself
+        XCTAssertTrue(app.staticTexts["Equity mutual funds performance 26"].waitForExistence(timeout: 14))
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/a-open.png"))
     }
 
     func testResearchDone() {
@@ -839,7 +936,7 @@ final class GestureTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["We have all its required to analyze it now"].waitForExistence(timeout: 10))
         XCTAssertFalse(app.staticTexts["Research plan created"].exists)
         XCTAssertFalse(app.buttons["Find insights from research"].exists)
-        XCTAssertTrue(app.buttons["Creating analysis"].waitForExistence(timeout: 4))
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS 'Preparing'")).firstMatch.waitForExistence(timeout: 6))
         XCTAssertTrue(app.buttons["Mutual funds research plan"].exists)
     }
 
@@ -866,14 +963,14 @@ final class GestureTests: XCTestCase {
         understood.tap()
         // The agent opens with a heading, an offer, and topics to start on
         XCTAssertTrue(app.staticTexts["you’re interested in?"].waitForExistence(timeout: 4))
-        let topic = app.buttons["How mutual funds performed in the last 6 months?"]
+        let topic = app.buttons["How have equity mutual funds done over the last year and what does that tell us about the future?"]
         XCTAssertTrue(topic.waitForExistence(timeout: 6))
         sleep(2)
         try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-topics.png"))
         // Its frame takes in the whole two-row rail, so aim at the first card, top left
         topic.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.2)).tap()
         // The topic goes in as the message, then a reply and the plan it's preparing
-        XCTAssertTrue(app.staticTexts["How mutual funds performed in the last 6 months?"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["How have equity mutual funds done over the last year and what does that tell us about the future?"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["Mutual funds research plan"].waitForExistence(timeout: 6))
         XCTAssertFalse(app.staticTexts["Research plan created"].exists)
         // which stays closed, the research running from the chip, until the chip's tapped
@@ -889,9 +986,14 @@ final class GestureTests: XCTestCase {
         sleep(1)
         XCTAssertFalse(app.staticTexts["Research plan created"].exists)
         XCTAssertTrue(app.buttons["Mutual funds research plan"].isHittable)
-        // While the research runs, what it's doing shows under the chip, and under that the report being prepared
+        // While the research runs, what it's doing shows under the chip; no report card until the analysis is built
         sleep(3)
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Preparing'")).firstMatch.exists
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-step-a.png"))
+        sleep(3)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-step-b.png"))
+        sleep(4)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-step-c.png"))
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Preparing'")).firstMatch.exists
             || app.otherElements.matching(NSPredicate(format: "label CONTAINS 'Preparing'")).firstMatch.exists)
         try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-preparing.png"))
         // and the chip opens it again, already all there
@@ -1120,11 +1222,35 @@ final class GestureTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Browse all fixed deposits"].exists)
         XCTAssertTrue(app.staticTexts["Rs53,725"].exists)
         shot("compare-done")
+        // "Compare returns" has given way to the amount and the tenures; another tenure changes the returns
+        XCTAssertFalse(app.buttons["Compare returns"].exists)
+        XCTAssertTrue(app.buttons["Edit amount"].exists)
+        app.buttons["3Y"].tap()
+        sleep(1)
+        XCTAssertFalse(app.staticTexts["Rs53,725"].exists)
+        shot("compare-3y")
+        // The amount reopens the sheet
+        app.buttons["Edit amount"].tap()
+        sleep(1)
+        XCTAssertTrue(app.staticTexts["Enter investment amount"].exists)
+        app.buttons["Back to deposits"].tap()
+        sleep(1)
+        // Scrolled back up, the bar goes with the banks
         app.swipeDown()
         app.swipeDown()
         sleep(2)
-        XCTAssertFalse(app.buttons["Compare returns"].exists)
+        XCTAssertFalse(app.buttons["Edit amount"].exists)
         shot("compare-gone")
+        // (the second pull opens search; put it away)
+        if app.buttons["Cancel"].exists { app.buttons["Cancel"].tap(); sleep(1) }
+        // and the cross puts the rates and "Compare returns" back
+        app.swipeUp()
+        sleep(2)
+        app.buttons["Clear amount"].tap()
+        sleep(1)
+        XCTAssertTrue(app.buttons["Compare returns"].exists)
+        XCTAssertFalse(app.buttons["Edit amount"].exists)
+        shot("compare-cleared")
     }
 
     func testFDSearch() {

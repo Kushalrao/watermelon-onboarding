@@ -2,8 +2,17 @@ import SwiftUI
 
 @main
 struct MutualFundsPrototypeApp: App {
-    /// Opens on the onboarding by default; `-fd` (or any `-fd…` flag) opens the fixed deposits page instead
-    static let opensOnFixedDeposits: Bool = ProcessInfo.processInfo.arguments.contains { $0.hasPrefix("-fd") }
+    /// With no flag the app opens on the onboarding, from its first screen. `-fd` (or any `-fd…` flag)
+    /// opens the fixed deposits page, `-fund` the fund page, `-home` (or a flag that names a home version) the home
+    /// page, `-onboarding…` the onboarding
+    static let opensOnFixedDeposits = ProcessInfo.processInfo.arguments.contains { $0.hasPrefix("-fd") }
+
+    /// No flag of ours given: the onboarding, from the start
+    static let plainLaunch: Bool = {
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains(where: { $0.hasPrefix("-fd") || $0.hasPrefix("-onboarding") || $0.hasPrefix("-welcome") }) { return false }
+        return !args.contains { ["chat", "-fund", "-home", "-widgetsOnly", "-homeV1", "-homeV2", "-homeV3", "-homeV4"].contains($0) }
+    }()
 
     var body: some Scene {
         WindowGroup {
@@ -27,14 +36,13 @@ struct MutualFundsPrototypeApp: App {
 }
 
 /// Opens on the home page (the v5 living-pattern widgets by default; `-homeV1` for the Chats grid, `-homeV2` for the greeting, `-homeV3` for the pinned widgets, `-homeV4` for the plastic widgets); its Investments entries
-/// and chats push the fund page. The onboarding flow shows first (`-onboardingStep N` starts
-/// it at step N); launch with `-home` to skip straight to the home page, `-fund` to open on the fund page, `-fd` for fixed deposits.
+/// and chats push the fund page. With no flag the app opens on the onboarding; launch with `-fund` for the fund page (pushed over the home page), `-home` for the
+/// home page, `-onboarding` for the onboarding flow (`-onboardingStep N` starts it at step N), `-fd` for fixed deposits.
 struct RootView: View {
     @State private var onboarded = {
         let args = ProcessInfo.processInfo.arguments
-        // Onboarding comes first by default; `-home` (or a flag that names a home version or the fund page) skips it
-        if args.contains(where: { $0.hasPrefix("-onboarding") }) { return false }
-        return args.contains { ["-home", "-fund", "-widgetsOnly", "-homeV1", "-homeV2", "-homeV3", "-homeV4"].contains($0) }
+        // The onboarding shows only when asked for (`-onboarding`, or any `-onboarding…` flag)
+        return !MutualFundsPrototypeApp.plainLaunch && !args.contains { $0.hasPrefix("-onboarding") }
     }()
     @State private var showsFund = ProcessInfo.processInfo.arguments.contains("-fund")
     /// The chat page and the icon it grew out of; `chatMove` and `chatGrow` run 0 (in the icon) → 1 (full screen)

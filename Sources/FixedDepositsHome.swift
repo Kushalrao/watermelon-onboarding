@@ -111,6 +111,8 @@ struct FixedDepositsHomeView: View {
     /// The compare sheet is up; and the amount compared on, once calculated
     @State private var comparing = false
     @State private var compared: Int?
+    /// and the tenure it's compared over, changed from the bar that takes the place of "Compare returns"
+    @State private var tenure = FixedDepositsView.Tenure.oneYear
     @Namespace private var switchSpace
 
     static let browse: [FixedDepositsView.Deposit] = ["Bajaj Finance", "Suryoday SF Bank", "Jana SF Bank", "AU SF Bank"]
@@ -190,7 +192,24 @@ struct FixedDepositsHomeView: View {
         }
         // The advisor pill steps aside for search
         .preference(key: AdvisorBarHiddenKey.self, value: searching || comparing)
-        .preference(key: AdvisorBarActionKey.self, value: banksInView && !showsYours ? "Compare returns" : nil)
+        .preference(key: AdvisorBarActionKey.self, value: banksInView && !showsYours && compared == nil ? "Compare returns" : nil)
+        .overlay(alignment: .bottom) {
+            // Once an amount's in: the amount and the tenures, over the advisor's pill. The amount reopens the sheet,
+            // a tenure changes what the cards say, the cross goes back to the rates
+            if let compared, banksInView, !showsYours, !comparing, !searching, openedBank == nil, openedHeld == nil {
+                FDReturnsBar(amount: compared, tenure: $tenure, onEdit: openCompare) {
+                    Haptics.tap()
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.86)) {
+                        self.compared = nil
+                        tenure = .oneYear
+                    }
+                }
+                .padding(.horizontal, SpacingScale.spaceLg)
+                .padding(.bottom, 78) // Gap: 12 over the advisor's pill, which is 53 tall and 13 off the foot; no spacing token
+                .transition(.scale(scale: 0.6).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(response: 0.5, dampingFraction: 0.86), value: banksInView)
         .overlay {
             // "Compare returns": the amount sheet over the dimmed page; a tap outside puts it away
             ZStack(alignment: .bottom) {
@@ -277,11 +296,11 @@ struct FixedDepositsHomeView: View {
         withAnimation(Self.sheet) { comparing = true }
     }
 
-    /// What the compared amount comes to at each of the four banks after a year, most first
+    /// What the compared amount comes to at each of the four banks over the chosen tenure, most first
     private var comparison: [(FixedDepositsView.Deposit, String)]? {
         guard let compared else { return nil }
         return Self.browse
-            .map { deposit in (deposit, FDOffer(term: "", rate: String(deposit.rates[0] ?? deposit.best), years: 1).maturity(of: compared)) }
+            .map { deposit in (deposit, FDOffer(term: "", rate: String(deposit.rate(for: tenure) ?? deposit.best), years: tenure.years).maturity(of: compared)) }
             .sorted { $0.1 > $1.1 }
             .map { ($0.0, FixedDepositsView.rupees($0.1)) }
     }

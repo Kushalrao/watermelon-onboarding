@@ -373,54 +373,10 @@ struct FixedDepositsView: View {
     /// The amount and tenure the returns are worked out on: the amount reopens the sheet, the tenure changes
     /// them in place, the cross goes back to the rates
     private func returnsBar(_ amount: Int) -> some View {
-        Surface(surface: .surfaceRaised, shape: .capsule, shadow: .token(.shadow3)) {
-            Stack(direction: .horizontal, gap: .spaceMd, paddingVertical: .spaceXs, alignment: .center) {
-                Button(action: openSheet) {
-                    Stack(direction: .horizontal, gap: .spaceXs, alignment: .center) {
-                        DsText(Self.rupees(amount), variant: .n4)
-                            .fixedSize()
-                            .contentTransition(.numericText())
-                        Image(systemName: "pencil")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 13, height: 13)
-                            .foregroundStyle(ColorScale.contentTertiary)
-                    }
-                    .frame(minHeight: 44)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Edit amount")
-
-                Hairline(.borderDefault, axis: .vertical)
-
-                TenurePicker(tenure: $tenure)
-                Spacer(minLength: 0)
-
-                // Back to the rates, and "Compare returns"
-                Button {
-                    Haptics.tap()
-                    withAnimation(.spring(response: 0.5, dampingFraction: 0.86)) { self.amount = nil }
-                } label: {
-                    Surface(surface: .surfaceSunken2, shape: .capsule) {
-                        Image(systemName: "xmark")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 11, height: 11)
-                            .foregroundStyle(ColorScale.contentSecondary)
-                            .frame(width: 29, height: 29)
-                    }
-                    .frame(minWidth: 44, minHeight: 44)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Clear amount")
-            }
-            .padding(.leading, SpacingScale.spaceXl)
-            .padding(.trailing, SpacingScale.spaceXs)
-            .frame(maxWidth: .infinity)
+        FDReturnsBar(amount: amount, tenure: $tenure, onEdit: openSheet) {
+            Haptics.tap()
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.86)) { self.amount = nil }
         }
-        .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, SpacingScale.spaceLg)
     }
 
@@ -603,6 +559,63 @@ struct DepositCard: View {
 
 #Preview {
     FixedDepositsView()
+}
+
+/// The amount and tenure the returns are worked out on, as a bar: the amount (which reopens the sheet), the
+/// tenures (which change the returns in place) and a cross (which goes back to the rates)
+struct FDReturnsBar: View {
+    let amount: Int
+    @Binding var tenure: FixedDepositsView.Tenure
+    let onEdit: () -> Void
+    let onClear: () -> Void
+
+    var body: some View {
+        Surface(surface: .surfaceRaised, shape: .capsule, shadow: .token(.shadow3)) {
+            Stack(direction: .horizontal, gap: .spaceMd, paddingVertical: .spaceXs, alignment: .center) {
+                Button(action: onEdit) {
+                    Stack(direction: .horizontal, gap: .spaceXs, alignment: .center) {
+                        DsText(FixedDepositsView.rupees(amount), variant: .n4)
+                            .fixedSize()
+                            .contentTransition(.numericText())
+                        Image(systemName: "pencil")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 13, height: 13)
+                            .foregroundStyle(ColorScale.contentTertiary)
+                    }
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Edit amount")
+
+                Hairline(.borderDefault, axis: .vertical)
+
+                TenurePicker(tenure: $tenure)
+                Spacer(minLength: 0)
+
+                // Back to the rates, and "Compare returns"
+                Button(action: onClear) {
+                    Surface(surface: .surfaceSunken2, shape: .capsule) {
+                        Image(systemName: "xmark")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 11, height: 11)
+                            .foregroundStyle(ColorScale.contentSecondary)
+                            .frame(width: 29, height: 29)
+                    }
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear amount")
+            }
+            .padding(.leading, SpacingScale.spaceXl)
+            .padding(.trailing, SpacingScale.spaceXs)
+            .frame(maxWidth: .infinity)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
 }
 
 /// 1Y, 2Y, 3Y, 5Y as pills, the chosen one filled

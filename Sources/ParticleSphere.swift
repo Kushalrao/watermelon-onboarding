@@ -90,20 +90,30 @@ struct SphereToCardReveal: View {
         self.card = AnyView(card())
     }
 
-    static var growAt: Double { 5.0 }
+    /// The sphere turns for 1.7s before it swells
+    static var growAt: Double { 1.7 }
     private static let growFor = 1.0
-    private static let flattenAt = 5.2
+    private static let flattenAt = growAt + 0.2
     private static let flattenFor = 1.0
     /// The bottom rows land this much later than the top ones
     private static let flattenStagger = 0.55
     /// Picks up just as the top rows land, so the flattening runs straight on into the reveal
-    private static let revealAt = 6.05
+    private static let revealAt = growAt + 1.05
     private static let revealFor = 2.4 / 1.7
     /// When the card is fully there
     static var endsAt: Double { revealAt + revealFor + 0.1 }
 
     private static let size = CGSize(width: 364, height: 255)
-    static let backdrop = Color(hex: 0xFFC489)
+    /// Gap: the box's ground while it loads (930:10749): white under a faint cool wash, 6%; the frame's gradient has
+    /// no token
+    static let backdrop = ZStack {
+        Color.white
+        LinearGradient(colors: [Color(red: 182 / 255, green: 183 / 255, blue: 205 / 255).opacity(0.06),
+                                Color(red: 173 / 255, green: 202 / 255, blue: 225 / 255).opacity(0.06)],
+                       startPoint: .leading, endPoint: .trailing)
+    }
+    /// The particles, dark on that light ground
+    private static let ink = Color(hex: 0x33302D)
     private static let sphereCentre = CGPoint(x: 179, y: 122)
     private static let sphereRadius = 93.0
     /// How ragged the reveal front is, in points
@@ -143,7 +153,7 @@ struct SphereToCardReveal: View {
             let t = context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 3600)
             let front = Self.front(e)
             ZStack(alignment: .topLeading) {
-                // Peach behind the sphere (243:13840)
+                // The light ground behind the sphere (930:10749)
                 Self.backdrop
                 if e > Self.revealAt {
                     card
@@ -275,7 +285,7 @@ struct SphereToCardReveal: View {
             paths[min(levels - 1, level)].addEllipse(in: CGRect(x: x - s / 2, y: y - s / 2, width: s, height: s))
         }
         for level in 1..<levels {
-            ctx.fill(paths[level], with: .color(.white.opacity(Double(level) / Double(levels - 1))))
+            ctx.fill(paths[level], with: .color(ink.opacity(Double(level) / Double(levels - 1))))
         }
     }
 }

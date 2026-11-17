@@ -59,17 +59,25 @@ struct OnboardingDecadeWelcomeView: View {
         let title: String, reply: String, plan: String
         /// What it's called once it's picked, pinned over the chat (269:3110)
         var short = ""
+        /// The line over the question on its card (1080:14025)
+        var label = "Mutual funds"
 
         static let all = [
-            Topic(title: "How mutual funds performed in the last 6 months?",
-                  reply: "Good place to start. I’ll go through six months of NAVs, portfolio disclosures and factsheets across categories, and see which funds held up, which slipped, and why.",
-                  plan: "Mutual funds, the last 6 months", short: "Mutual funds performance"),
-            Topic(title: "Why some high rated funds have performed badly?",
-                  reply: "Ratings look backwards, so this is worth digging into. I’ll set star ratings against recent returns, holdings and manager changes, and find where they part ways.",
-                  plan: "High rated funds, falling behind", short: "High rated funds slipping"),
-            Topic(title: "How fund managers are positioned with current geopolitical situation?",
-                  reply: "I’ll read the latest portfolio disclosures and fund manager commentary to see how they’ve moved across sectors and markets as things have shifted.",
-                  plan: "Fund managers and geopolitics", short: "Fund managers & geopolitics"),
+            Topic(title: "How have equity mutual funds done over the last year and what does that tell us about the future?",
+                  reply: "Good place to start. I’ll compare a year of returns across equity fund categories, see which held up and which slipped, and what that tells us.",
+                  plan: "Equity mutual funds, the last year", short: "Mutual funds performance"),
+            Topic(title: "Can mutual funds still make me wealthy?",
+                  reply: "A fair question. I’ll set long-run fund returns against inflation, fixed deposits and the index, and see what steady investing has really added up to.",
+                  plan: "Mutual funds and building wealth", short: "Wealth from mutual funds"),
+            Topic(title: "How do I know if my mutual fund portfolio is good?",
+                  reply: "I’ll go through what makes a portfolio hold up: how its funds rank, where they overlap, what they cost and how they’ve done against their benchmarks.",
+                  plan: "What makes a good portfolio", short: "A good fund portfolio", label: "Fixed deposit"),
+            Topic(title: "Do Fixed deposits really make sense in 2027?",
+                  reply: "I’ll look at where deposit rates stand against inflation and tax, and set them beside debt funds and other safe options for the year ahead.",
+                  plan: "Fixed deposits in 2027", short: "Fixed deposits in 2027", label: "Mutual funds market"),
+            Topic(title: "How can I invest 10 Lakh for maximum returns in 5 years, and what are the risks?",
+                  reply: "I’ll compare what five years has done for deposits, debt and equity funds, and how much each can fall along the way, so the returns come with their risks.",
+                  plan: "10 Lakh over 5 years", short: "Investing 10 Lakh for 5 years", label: "Fixed deposit"),
         ]
     }
     /// Where the agent's dots are showing, in the chat's own coordinates; nil when it isn't typing
@@ -122,11 +130,13 @@ struct OnboardingDecadeWelcomeView: View {
     /// The import itself is running, over everything (817:7117). `-importFlow` opens on it.
     @State private var importRunning = ProcessInfo.processInfo.arguments.contains("-importFlow")
     /// The import's done: the chat's card says so (1012:11077)
-    /// The live research's card as it stands, so the report card can sit under it
-    @State private var liveHeight: CGFloat = 0
     @State private var fundsConnected = false
     /// With the funds in, a second report is prepared, as a card under the connected one, and then opens
     @State private var portfolioReportShown = false
+    /// Back from connecting: the agent types, thanks for it, and goes through the funds before the report
+    @State private var thanksTyping = false
+    @State private var thanksShown = false
+    @State private var portfolioThinking: Date?
     @State private var portfolioReportReady = false
     /// "Jojo's Personal Wealth Advisor" is up (243:14078), on its way to asking for the funds
     @State private var advisorUp = false
@@ -165,11 +175,13 @@ struct OnboardingDecadeWelcomeView: View {
 
     /// `-welcomeChat` opens on the chat, with the research plan up
     private static let startsInChat = startsDone || ProcessInfo.processInfo.arguments.contains("-welcomeChat")
+
     /// `-welcomeDone` opens on the chat with the research done
     private static let startsDone = startsInAnalysis || ProcessInfo.processInfo.arguments.contains("-welcomeDone")
     /// `-welcomeAnalysis` opens with the analysis up, `-analysisDone` with it finished
     private static let startsInAnalysis = startsAnalysisDone || ProcessInfo.processInfo.arguments.contains("-welcomeAnalysis")
     private static let startsAnalysisDone = startsAdvice || ProcessInfo.processInfo.arguments.contains("-analysisDone")
+
     /// `-welcomeAdvice` opens with the analysis stored and the connect sheet up
     private static let startsAdvice = ProcessInfo.processInfo.arguments.contains("-welcomeAdvice")
     /// Where things sit in the chat, from its top (106pt down the card), as in 225:11778 and 141:3970
@@ -226,8 +238,7 @@ struct OnboardingDecadeWelcomeView: View {
         switch activeSheet {
         case .research: chipOrigin
         case .analysis:
-            analysisStored ? analysedOrigin
-                           : CGPoint(x: Self.analysisChipOrigin.x, y: Self.analysisChipOrigin.y + laterLayers + drift)
+            CGPoint(x: Self.analysisChipOrigin.x, y: Self.analysisChipOrigin.y + laterLayers + drift)
         }
     }
 
@@ -299,7 +310,7 @@ struct OnboardingDecadeWelcomeView: View {
     private var foldSize: CGSize {
         switch activeSheet {
         case .research: CGSize(width: 283, height: 53)
-        case .analysis: analysisStored ? CGSize(width: 299, height: 275) : CGSize(width: 209, height: 53)
+        case .analysis: ReportPreparingCard.size
         }
     }
     /// The analysis's sheet is black once it's done, and 40pt taller, 20 of it upward
@@ -428,8 +439,8 @@ struct OnboardingDecadeWelcomeView: View {
                         analysisDone = Self.startsAnalysisDone
                         activeSheet = .analysis
                         if Self.startsAdvice {
-                            (analysisStarted, analysisTyping, analysisChipShown, analysisStored) = (.now, false, false, true)
-                            (scroll, adviceShown, deciding) = (Self.inAnalysis(AdviceY.prompts + Self.promptsHeight) - visibleDepth, true, true)
+                            (analysisStarted, analysisTyping, analysisChipShown, analysisStored) = (.now, false, true, true)
+                            (scroll, adviceShown, deciding) = (Self.inAnalysis(Self.adviceTop + 200) - visibleDepth, true, true)
                             advicePromptsShown = 1
                             // `-connectFlow`: the connect sheet up, moving on to its second page a moment later
                             if ProcessInfo.processInfo.arguments.contains("-connectFlow") {
@@ -470,8 +481,8 @@ struct OnboardingDecadeWelcomeView: View {
         }
     }
 
-    /// Where the report card sits: under the live research's status line and, when it's showing one, its card
-    private func reportCardTop(_ live: CGFloat) -> CGFloat {
+    /// How far down the live research reaches: its status line and, when it's showing one, its card
+    private func researchFoot(_ live: CGFloat) -> CGFloat {
         // its status line, then (when it's showing one) its card and the source line under that
         ChatY.plan + 65 + 21 + (live > 0 ? 13 + live + 8 + 15 : 0) + 16
     }
@@ -487,12 +498,25 @@ struct OnboardingDecadeWelcomeView: View {
     /// With the funds in, the agent prepares one more report: its card under the connected one for a few seconds,
     /// then the report itself, whose Understood ends the chat
     private func preparePortfolioReport() async {
-        try? await Task.sleep(for: .seconds(1.4))
+        // Thanks, and what it'll do next, as a message
+        try? await Task.sleep(for: .seconds(0.9))
         guard !Task.isCancelled else { return }
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { thanksTyping = true }
+        try? await Task.sleep(for: .seconds(1.1))
+        Haptics.thresholdCrossed()
+        withAnimation(.spring(response: 0.42, dampingFraction: 0.8)) {
+            thanksTyping = false
+            thanksShown = true
+        }
+        // then straight into the work, shown as it goes through the funds; no plan first
+        try? await Task.sleep(for: .seconds(0.6))
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.86)) { portfolioThinking = .now }
+        try? await Task.sleep(for: .seconds(ResearchLive.portfolioDuration))
+        guard !Task.isCancelled else { return }
+        // and the report it prepares from that
         Haptics.revealGrain(intensity: 0.4)
         withAnimation(.spring(response: 0.5, dampingFraction: 0.82)) { portfolioReportShown = true }
-        keepInView(Self.inAnalysis(Self.portfolioReportTop + ReportPreparingCard.size.height + 24), toFoot: true)
-        try? await Task.sleep(for: .seconds(5))
+        try? await Task.sleep(for: .seconds(3))
         guard !Task.isCancelled else { return }
         portfolioReportReady = true
         Haptics.expand()
@@ -532,7 +556,7 @@ struct OnboardingDecadeWelcomeView: View {
             Haptics.thresholdCrossed()
             // and the topics to start on, under it (233:12632)
             try? await Task.sleep(for: .seconds(0.45))
-            for _ in 0..<4 {
+            for _ in 0...Topic.all.count {
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.84)) { topicsShown += 1 }
                 Haptics.revealGrain(intensity: 0.4)
                 try? await Task.sleep(for: .seconds(0.12))
@@ -640,8 +664,8 @@ struct OnboardingDecadeWelcomeView: View {
                 analysisChipShown = true
                 analysisTyping = false
             }
-            // the chip, and what it's doing under it
-            keepInView(Self.inAnalysis(384 + 65 + 21 + 16))
+            // the report on its way
+            keepInView(Self.inAnalysis(384 + ReportPreparingCard.size.height + 16))
             Haptics.settle()
             // It works on it from here, the chip opening it; it comes up by itself once it's done
             startAnalysis()
@@ -678,10 +702,10 @@ struct OnboardingDecadeWelcomeView: View {
     private func storeAnalysis() async {
         guard !analysisStored else { return }
         Haptics.tap()
+        // The question goes in as the user's own message, the report folding back into its card
         withAnimation(.spring(response: 0.6, dampingFraction: 0.88)) {
             analysisStored = true
             analysisTyping = false
-            analysisChipShown = false
             if sheetUp { sheetClosing = true }
         }
         try? await Task.sleep(for: .seconds(0.65))
@@ -691,27 +715,25 @@ struct OnboardingDecadeWelcomeView: View {
             sheetUp = false
             sheetClosing = false
         }
-        keepInView(Self.inAnalysis(AdviceY.card + 275 + 29))
         try? await Task.sleep(for: .seconds(0.5))
-        // room for the dots only, then for each thing as it arrives
-        keepInView(Self.inAnalysis(AdviceY.dots + 40))
         withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { adviceTyping = true }
         try? await Task.sleep(for: .seconds(1.5))
         Haptics.thresholdCrossed()
-        // "Wealth advise is useful when its personalized" (256:15910)
+        // and the agent answers in a bubble: that's personal advice, which needs the funds
         withAnimation(.spring(response: 0.42, dampingFraction: 0.8)) {
             adviceTyping = false
             adviceShown = true
             deciding = true
         }
-        keepInView(Self.inAnalysis(AdviceY.heading + AdviceY.headingHeight + 29))
-        // then what could be sent, once it's personal
+        // then its card asking for them
         try? await Task.sleep(for: .seconds(1.2))
-        keepInView(Self.inAnalysis(AdviceY.prompts + Self.promptsHeight), toFoot: true)
-        // one by one, slowly, each easing up into place
         Haptics.revealGrain(intensity: 0.4)
         withAnimation(.spring(response: 0.5, dampingFraction: 0.82)) { advicePromptsShown = 1 }
     }
+
+    /// Where the question and what follows it sit in the analysis's part of the chat: under the report's card and
+    /// its time
+    private static let adviceTop: CGFloat = AdviceY.card + ReportPreparingCard.size.height + 10 + 19 + 16
 
     /// A personal-advice prompt tapped: advice that personal needs the funds
     private func askPersonal(_ index: Int) {
@@ -720,8 +742,13 @@ struct OnboardingDecadeWelcomeView: View {
         withAnimation(.spring(response: 0.6, dampingFraction: 0.88)) { personalPrompt = index }
     }
 
-    /// Understood, or the close, on the finished analysis: kept in the chat the first time; just put away after
+    /// The close on the analysis: put away into its card, which opens it again
     private func doneWithAnalysis() {
+        closeSheet()
+    }
+
+    /// "How this affects my portfolio?" at the report's foot: asked in the chat, the first time
+    private func askPortfolio() {
         if analysisDone && !analysisStored {
             Task { await storeAnalysis() }
         } else {
@@ -804,9 +831,9 @@ struct OnboardingDecadeWelcomeView: View {
                                   researching: researchStarted != nil && !researchDone, onClose: closeSheet)
                 case .analysis:
                     AnalysisSheet(started: analysisStarted ?? .now, done: analysisDone, answer: $mythAnswer, animatesIn: !analysisSeen,
-                                  onClose: doneWithAnalysis,
+                                  onClose: doneWithAnalysis, portfolio: portfolioReportReady,
                                   // On the second report, Understood ends the chat: on to the congratulations
-                                  onUnderstood: portfolioReportReady ? { Haptics.tap(); onContinue() } : doneWithAnalysis)
+                                  onUnderstood: portfolioReportReady ? { Haptics.tap(); onContinue() } : askPortfolio)
                 }
             }
             .scaleEffect(sheetClosing ? 0.85 : 1)
@@ -815,7 +842,7 @@ struct OnboardingDecadeWelcomeView: View {
                 switch activeSheet {
                 case .research: planChipFace
                 case .analysis:
-                    if analysisStored { AnalysedCard(onView: {}) } else { analysisChipFace }
+                    analysisChipFace
                 }
             }
             .opacity(sheetClosing ? 1 : 0)
@@ -1079,18 +1106,12 @@ struct OnboardingDecadeWelcomeView: View {
             topics
             // While the research runs, what it's doing, and now and then the data it's going over (270:16266)
             if let researchStarted, !researchDone, planShown {
-                ResearchLive(started: researchStarted) { height in
-                    withAnimation(.spring(response: 0.5, dampingFraction: 0.86)) { liveHeight = height }
-                    // As much of the report card as fits with the plan chip still in view above
-                    keepInView(min(reportCardTop(height) + ReportPreparingCard.size.height + 16, ChatY.plan - 12 + readingDepth))
+                ResearchLive(started: researchStarted, equityYear: topic == Topic.all[0]) { height in
+                    keepInView(researchFoot(height))
                 }
                 .frame(width: ResearchLive.cardWidth, alignment: .leading)
                 .at((cardWidth - ResearchLive.cardWidth) / 2, ChatY.plan + 65)
                 .transition(.opacity)
-                // and, under it, the report that's being prepared from it (1027:11737)
-                ReportPreparingCard(title: topic?.short ?? "Small caps performance", subject: topic?.plan ?? "Small cap funds")
-                    .at((cardWidth - ResearchLive.cardWidth) / 2, reportCardTop(liveHeight))
-                    .transition(.scale(scale: 0.94, anchor: .topLeading).combined(with: .opacity).combined(with: .offset(y: 12)))
             }
             if sent, let topic {
                 ChatBubble(message: ChatMessage(text: topic.title, fromAgent: false), showsRead: false, timestamp: Self.sentAt)
@@ -1142,7 +1163,7 @@ struct OnboardingDecadeWelcomeView: View {
             .padding(.horizontal, 19)
             .padding(.vertical, 20)
         }
-        .frame(width: cardWidth, height: 192 + 17 + 213 + 40, alignment: .topLeading)
+        .frame(width: cardWidth, height: 192 + 17 + 192 + 40, alignment: .topLeading)
         .at(0, ChatY.topics - 20)
         .allowsHitTesting(topicsShown > 1)
     }
@@ -1155,46 +1176,32 @@ struct OnboardingDecadeWelcomeView: View {
         nil,
     ]
 
-    /// One topic (256:15732), 186 wide: "Mutual funds market", a small chart, then the question; 192 tall, or 213
-    /// for a four-line question
-    /// The opening topics (316:18557): a dark card of fund returns as bars, a white one with a rating scale, and
-    /// one with rising bars
+    /// One topic (1080:14026), 186 × 192: what it's about, the arrow, and the question under them
     @ViewBuilder private func topicCard(_ topic: Topic, index: Int) -> some View {
         let shape = RoundedRectangle(cornerRadius: 33, style: .continuous)
-        let wash = Self.topicWashes[index % Self.topicWashes.count]
+        // The fourth and fifth share the last wash
+        let wash = Self.topicWashes[min(index, Self.topicWashes.count - 1)]
         ZStack(alignment: .topLeading) {
             Color(hex: 0xFEFEFE)
             LinearGradient(colors: wash.colors.map { Color(hex: $0).opacity(wash.opacity) }, startPoint: .leading, endPoint: .trailing)
-            Text("Mutual funds market")
+            Text(topic.label)
                 .font(FigmaFont.walsheim(15))
                 .foregroundStyle(Color.black.opacity(0.57))
                 .fixedSize()
                 .frame(height: 19)
                 .at(15, 13)
-            Group {
-                switch index {
-                case 1: TopicRatingMini()
-                default:
-                    let chart = Self.topicCharts[index == 0 ? 0 : 1] ?? ([30.75, 37.5, 49.125, 72.75], Color(hex: 0x19D522))
-                    Self.topicChart(chart.bars, color: chart.color)
-                        .scaleEffect(0.7105, anchor: .topLeading)
-                        .frame(width: 89.5, height: 73, alignment: .topLeading)
-                }
-            }
-            .at(15, 32)
             Text(topic.title)
                 .font(FigmaFont.walsheim(17))
                 .lineSpacing(21 - 17 * 1.2)
                 .foregroundStyle(Color.black)
-                .frame(width: 140, alignment: .leading)
+                .frame(width: 156, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
-                .at(15, 110)
-            // 802:6028: the arrow beside the question
-            Image("OnboardingTopicArrow")
+                .at(15, 47)
+            Image("OnboardingTopicArrowWhite")
                 .frame(width: 23, height: 23)
-                .at(150, 110)
+                .at(150, 13)
         }
-        .frame(width: 186, height: index == 2 ? 213 : 192, alignment: .topLeading)
+        .frame(width: 186, height: 192, alignment: .topLeading)
         .clipShape(shape)
     }
 
@@ -1368,87 +1375,86 @@ struct OnboardingDecadeWelcomeView: View {
                     .transition(.scale(scale: 0.8, anchor: .bottomLeading).combined(with: .opacity))
             }
             if analysisChipShown {
+                // The report (1027:11737): being prepared while the analysis is built, and after that the way back
+                // into it. It opens by itself once done.
                 Button(action: openAnalysis) { analysisChipFace }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(analysisDone ? "View analysis" : "Preparing report")
                     .at(Self.analysisChipOrigin.x, Self.analysisChipOrigin.y - Self.analysisLift)
-                    .transition(.scale(scale: 0.9, anchor: .leading).combined(with: .opacity).combined(with: .offset(y: 8)))
+                    .transition(.scale(scale: 0.94, anchor: .topLeading).combined(with: .opacity).combined(with: .offset(y: 12)))
             }
-            // While it works, what it's doing, as the research's line did
-            if let analysisStarted, analysisChipShown, !analysisDone, !analysisStored {
-                AnalysisLive(started: analysisStarted, duration: ResearchSheet.analysisDuration)
-                    .at(Self.analysisChipOrigin.x + 11, Self.analysisChipOrigin.y - Self.analysisLift + 65)
-                    .transition(.opacity)
-            }
-            // The analysis, kept (148:5911); it appears under the sheet folding into it
             if analysisStored {
-                AnalysedCard(onView: viewAnalysis)
-                    .at(17, AdviceY.card)
-                    .opacity(sheetUp && activeSheet == .analysis ? 0 : 1)
-                    .transition(.identity)
-                Self.stamp.at(17, AdviceY.card + 275 + 10)
+                Self.stamp.at(17, AdviceY.card + ReportPreparingCard.size.height + 10)
                     .opacity(sheetUp && activeSheet == .analysis ? 0 : 1)
             }
-            if adviceTyping {
-                TypingBubble()
-                    .frame(width: cardWidth)
-                    .at(0, AdviceY.dots)
-                    .transition(.scale(scale: 0.8, anchor: .bottomLeading).combined(with: .opacity))
-            }
-            if adviceShown {
-                // Lines tighter than the font's own, so each is set on its own
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(Self.adviceLines, id: \.self) { line in
-                        Text(line)
-                            .font(FigmaFont.reckless(Self.headingSize))
-                            .frame(height: Self.headingLine)
+            // What was asked from the report, and what follows, as the chat's own bubbles and cards
+            VStack(alignment: .leading, spacing: 18) {
+                if analysisStored {
+                    ChatBubble(message: ChatMessage(text: "How this affects my portfolio?", fromAgent: false), showsRead: false, timestamp: Self.sentAt)
+                        .frame(width: cardWidth)
+                        .offset(x: 4)
+                        .transition(.scale(scale: 0.9, anchor: .bottomTrailing).combined(with: .opacity).combined(with: .offset(y: 12)))
+                }
+                if adviceTyping {
+                    TypingBubble()
+                        .frame(width: cardWidth)
+                        .transition(.scale(scale: 0.8, anchor: .bottomLeading).combined(with: .opacity))
+                }
+                if adviceShown {
+                    ChatBubble(message: ChatMessage(text: "That’s a personal advisory question. To answer it I need access to your mutual funds.", fromAgent: true),
+                               showsRead: false, timestamp: Self.sentAt)
+                        .frame(width: cardWidth)
+                        .offset(x: 2)
+                        .transition(.scale(scale: 0.9, anchor: .bottomLeading).combined(with: .opacity).combined(with: .offset(y: 12)))
+                    // What it needs for that, as its own card in the chat (1012:10877); no prompts, no sheet first
+                    if advicePromptsShown > 0 {
+                        ConnectActionCard(connected: fundsConnected, onConnect: { askPersonal(0) })
+                            .padding(.leading, 17)
+                            .transition(.scale(scale: 0.92, anchor: .bottomLeading).combined(with: .opacity).combined(with: .offset(y: 14)))
+                    }
+                    if thanksTyping {
+                        TypingBubble()
+                            .frame(width: cardWidth)
+                            .transition(.scale(scale: 0.8, anchor: .bottomLeading).combined(with: .opacity))
+                    }
+                    if thanksShown {
+                        ChatBubble(message: ChatMessage(text: "Thanks for connecting. I’ll now check how this affects your portfolio.", fromAgent: true),
+                                   showsRead: false, timestamp: Self.sentAt)
+                            .frame(width: cardWidth)
+                            .offset(x: 2)
+                            .transition(.scale(scale: 0.9, anchor: .bottomLeading).combined(with: .opacity).combined(with: .offset(y: 12)))
+                    }
+                    // Going through the funds, as the research showed its work; it gives way to the report
+                    if let portfolioThinking, !portfolioReportShown {
+                        ResearchLive(started: portfolioThinking, portfolio: true)
+                            .frame(width: ResearchLive.cardWidth, alignment: .leading)
+                            .padding(.leading, (cardWidth - ResearchLive.cardWidth) / 2)
+                            .transition(.opacity)
+                    }
+                    // and, once it has, the report it prepares on them (1027:11737 again)
+                    if portfolioReportShown {
+                        ReportPreparingCard(title: "Your portfolio performance", subject: "Your mutual funds")
+                            .padding(.leading, 17)
+                            .transition(.scale(scale: 0.94, anchor: .topLeading).combined(with: .opacity).combined(with: .offset(y: 12)))
                     }
                 }
-                .foregroundStyle(Color(hex: 0x212121))
-                .at(17, AdviceY.heading)
-                .transition(.opacity.combined(with: .offset(y: 10)))
-                Self.stamp.at(17, AdviceY.heading + AdviceY.headingHeight + 10)
-                    .transition(.opacity)
-                // What it needs for that, as its own card in the chat (1012:10877); no prompts, no sheet first
-                if advicePromptsShown > 0 {
-                    ConnectActionCard(connected: fundsConnected, onConnect: { askPersonal(0) })
-                        .at(17, AdviceY.prompts)
-                        .transition(.scale(scale: 0.92, anchor: .bottomLeading).combined(with: .opacity).combined(with: .offset(y: 14)))
-                }
-                // and, once they're in, the report it prepares on them (1027:11737 again)
-                if portfolioReportShown {
-                    ReportPreparingCard(title: "Your portfolio performance", subject: "Your mutual funds")
-                        .at(17, Self.portfolioReportTop)
-                        .transition(.scale(scale: 0.94, anchor: .topLeading).combined(with: .opacity).combined(with: .offset(y: 12)))
-                }
             }
+            .frame(width: cardWidth, alignment: .topLeading)
+            // The chat follows it down as it grows
+            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+                guard height > 0 else { return }
+                keepInView(Self.inAnalysis(Self.adviceTop + height + 24), toFoot: true)
+            }
+            .at(0, Self.adviceTop)
         }
         .frame(width: cardWidth, alignment: .topLeading)
         .offset(y: Self.analysisLift + laterLayers + drift)
     }
 
-    /// "Creating analysis" (146:4893), 209 × 53; "Analysis ready" once it's done
+    /// The analysis on its way, as the report's card
     private var analysisChipFace: some View {
-        let shape = Capsule()
-        return HStack(spacing: 0) {
-            Image("PlanDoc")
-                .frame(width: 17, height: 17)
-                .padding(.leading, 15)
-            Text(analysisDone ? "Analysis ready" : "Creating analysis")
-                .font(FigmaFont.walsheim(17))
-                .foregroundStyle(Color.black)
-                .fixedSize()
-                .padding(.leading, 11)
-                .contentTransition(.opacity)
-            Spacer(minLength: 0)
-            Image("PlanChevron")
-                .frame(width: 23, height: 23)
-                .padding(.trailing, 5)
-        }
-        .frame(width: 209, height: 53)
-        .background(Color.white)
-        .clipShape(shape)
-        .overlay(shape.strokeBorder(Color.black.opacity(0.05), lineWidth: 2))
-        .shadow(color: Color.black.opacity(0.03), radius: 30, x: 0, y: 3)
+        ReportPreparingCard(title: topic?.short ?? "Small caps performance", subject: topic?.plan ?? "Small cap funds",
+                            ready: analysisDone)
     }
 
     /// What the research found (146:4615, 146:4794): the counts, sideways, then the heading

@@ -16,9 +16,9 @@ import SwiftUI
 ///
 /// KYC — Figma "iPhone 14 Plus - 397" (679:23694): the second Verify puts the keyboard away and does it again. The
 /// OTP card slips away behind with the phone card, and a white "Confirm kyc" card lands over them from 1.3× with a
-/// slowly turning particle sphere in its box. Five seconds later the sphere swells, flattens over the box and
+/// slowly turning particle sphere in its box. 1.7 seconds later the sphere swells, flattens over the box and
 /// resolves, top to bottom, into the PAN card that was found, with a live hologram. The card then grows into
-/// "Confirm your details" (679:23796) with "Change details" under the PAN card, and Verify becomes Confirm.
+/// "Confirm your details" (679:23796) with "Edit details" beside its heading and "Gender" under the PAN card, and Verify becomes Confirm.
 struct OnboardingIntroView: View {
     let onContinue: () -> Void
 
@@ -78,6 +78,20 @@ struct OnboardingIntroView: View {
                     .transition(.scale(scale: 1.3).combined(with: .opacity.animation(.easeOut(duration: 0.12))))
                     // Over the Verify button as it fades
                     .zIndex(1)
+            }
+
+            // "Select your gender" (952:11175), over the foot of the KYC card; a tap anywhere else puts it away
+            if stage.genderOpen {
+                Color.black.opacity(0.001)
+                    .frame(width: 390, height: 900)
+                    .onTapGesture { closeGender() }
+                    .at(0, -100)
+                    .zIndex(2)
+                    .transition(.identity)
+                genderSheet
+                    .at(13, 4 + 476)
+                    .zIndex(3)
+                    .transition(.scale(scale: 0.94, anchor: .top).combined(with: .opacity))
             }
 
             agreeButton
@@ -348,7 +362,7 @@ struct OnboardingIntroView: View {
     // MARK: KYC card (679:23697 → 679:23799), 364 × 512 growing to 364 × 572
 
     /// "Confirm kyc" over a rule, the heading, and the box the sphere turns in. Once the PAN card is found the heading
-    /// changes, "Personal details" comes in over the box and "Change details" under it, and the card grows to fit.
+    /// changes, "Personal details" and "Edit details" come in over the box and "Gender" under it, and the card grows to fit.
     private var kycCard: some View {
         ZStack(alignment: .topLeading) {
             Color.white
@@ -388,34 +402,130 @@ struct OnboardingIntroView: View {
                 .frame(width: 330, height: 231.882, alignment: .topLeading)
                 .at(17, 245)
 
-            changeDetailsButton
-                .at(17, 500)
+            // 952:11169: beside "Personal details"
+            editDetailsButton
+                .at(249, 195)
+                .opacity(stage.idCard ? 1 : 0)
+                .allowsHitTesting(stage.idCard)
+
+            // 1114:16004: under the PAN card
+            genderField
+                .at(17, 498)
                 .opacity(stage.idCard ? 1 : 0)
                 .allowsHitTesting(stage.idCard)
         }
-        .frame(width: 364, height: stage.idCard ? 572 : 512, alignment: .topLeading)
+        .frame(width: 364, height: stage.idCard ? 612 : 512, alignment: .topLeading)
         .clipShape(RoundedRectangle(cornerRadius: 27, style: .continuous))
         // Gap: Shadow/1 (0 4 100 +12 at 5%) then Shadow/2 (0 4 97 +7 at 7%); SwiftUI can't draw the spread
         .shadow(color: Color.black.opacity(stage.idCard ? 0.07 : 0.05), radius: 50, x: 0, y: 4)
     }
 
-    /// "Change details" (802:5687), 330 × 45: outlined, under the PAN card
-    private var changeDetailsButton: some View {
+    /// "Edit details" (952:11169), 96 × 31: an outlined chip with a pencil
+    private var editDetailsButton: some View {
         Button {
             Haptics.tap()
         } label: {
-            Text("Change details")
-                .font(FigmaFont.walsheimMedium(17))
-                .foregroundStyle(Color(hex: 0x212121))
-                .frame(width: 330, height: 45)
-                .background(Capsule().fill(Color.white))
-                .overlay(Capsule().strokeBorder(ColorScale.borderSubtle, lineWidth: 1))
-                .shadow(color: Color.black.opacity(0.03), radius: 15, x: 0, y: 3)
+            HStack(spacing: 0) {
+                Text("Edit details")
+                    .font(FigmaFont.walsheim(13))
+                    .foregroundStyle(Color(hex: 0x212121).opacity(0.93))
+                    .fixedSize()
+                    .padding(.leading, 9)
+                Spacer(minLength: 0)
+                Image("EditPencil").frame(width: 9, height: 9).padding(.trailing, 9)
+            }
+            .frame(width: 96, height: 31)
+            .background(Capsule().fill(Color.white))
+            .overlay(Capsule().strokeBorder(ColorScale.borderDefault, lineWidth: 1))
         }
         .buttonStyle(PressScaleStyle())
     }
 
-    /// The box in the KYC card: the particle sphere turning in it, a little above centre. Five seconds in, the sphere
+    /// "Gender" over its field (1114:16004), 330 × 91: the field opens the choices and then shows the one picked
+    private var genderField: some View {
+        VStack(alignment: .leading, spacing: 13) {
+            Text("Gender")
+                .font(FigmaFont.walsheimMedium(17))
+                .foregroundStyle(ColorScale.contentPrimary)
+                .frame(height: 23)
+            Button {
+                Haptics.tap()
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.86)) { stage.genderOpen = true }
+            } label: {
+                HStack(spacing: 0) {
+                    Text(stage.gender ?? "Select your gender")
+                        .font(FigmaFont.walsheim(15))
+                        .foregroundStyle(ColorScale.contentPrimary)
+                        .padding(.leading, 15)
+                    Spacer(minLength: 0)
+                    Image("GenderChevron").frame(width: 25, height: 25).padding(.trailing, 13)
+                }
+                .frame(width: 330, height: 55)
+                .contentShape(Rectangle())
+                .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).strokeBorder(ColorScale.borderDefault, lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Gender")
+            .accessibilityValue(stage.gender ?? "Select your gender")
+        }
+    }
+
+    /// The choices (952:11175), 364 × 237: three rows in an outlined box, the one picked ticked
+    private var genderSheet: some View {
+        let shape = RoundedRectangle(cornerRadius: 23, style: .continuous)
+        let box = RoundedRectangle(cornerRadius: 15, style: .continuous)
+        return ZStack(alignment: .topLeading) {
+            Color.white
+            Text("Select your gender")
+                .font(FigmaFont.walsheimMedium(17))
+                .foregroundStyle(ColorScale.contentPrimary)
+                .frame(height: 23)
+                .at(17, 17)
+            VStack(spacing: 0) {
+                ForEach(Array(["Female", "Male", "Other"].enumerated()), id: \.offset) { index, option in
+                    Button {
+                        Haptics.tap()
+                        stage.gender = option
+                        closeGender()
+                    } label: {
+                        HStack(spacing: 0) {
+                            Text(option)
+                                .font(FigmaFont.walsheim(15))
+                                .foregroundStyle(ColorScale.contentPrimary)
+                                .padding(.leading, 15)
+                            Spacer(minLength: 0)
+                            if stage.gender == option {
+                                Image("GenderCheck").frame(width: 25, height: 25).padding(.trailing, 13)
+                            }
+                        }
+                        .frame(width: 330, height: 55)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(stage.gender == option ? .isSelected : [])
+                    if index < 2 {
+                        // Gap: Figma #C2C2C2 at 33%, unbound
+                        Color(hex: 0xC2C2C2).opacity(0.33).frame(width: 330, height: 1).padding(.top, -0.5)
+                    }
+                }
+            }
+            .frame(width: 330, height: 165)
+            .clipShape(box)
+            .overlay(box.strokeBorder(Color(hex: 0xC2C2C2).opacity(0.33), lineWidth: 1))
+            .at(17, 55)
+        }
+        .frame(width: 364, height: 237, alignment: .topLeading)
+        .clipShape(shape)
+        .overlay(shape.strokeBorder(ColorScale.borderSubtle, lineWidth: 0.7))
+        // Gap: Shadow/3 (0 2 85 +7 at 11%); SwiftUI can't draw the spread
+        .shadow(color: Color.black.opacity(0.11), radius: 42, x: 0, y: 2)
+    }
+
+    private func closeGender() {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) { stage.genderOpen = false }
+    }
+
+    /// The box in the KYC card: the particle sphere turning in it, a little above centre. 1.7 seconds in, the sphere
     /// swells and flattens over the whole box and the PAN card is revealed from the top down.
     private var identityCard: some View {
         let shape = RoundedRectangle(cornerRadius: 19, style: .continuous)
@@ -659,6 +769,9 @@ struct OnboardingIntroView: View {
     var showsTerms = args.contains("-onboardingTerms")
     /// The sphere card has turned into the PAN card. `-onboardingPAN` opens on it.
     var idCard = args.contains("-onboardingPAN")
+    /// The gender picked on the KYC card, and whether its choices are up
+    var gender: String?
+    var genderOpen = false
     /// When the sphere card landed; its reveal runs from here
     var identityStart = Date.now
     var number = startsAtOTP ? "9871167820" : ""

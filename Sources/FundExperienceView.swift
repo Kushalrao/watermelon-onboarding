@@ -118,6 +118,12 @@ struct FundExperienceView: View {
                     chipsOut: holdChipsOut,
                     onDismiss: releaseWidget
                 ) { heldWidget?.context.widget }
+
+                // Words selected on the page, and left alone a moment: what could be asked about them, and Copy
+                SelectionSuggestionsLayer { question in
+                    composerText = question
+                    openComposer()
+                }
             }
             // `progress` is the value SwiftUI animates; every layer reads the in-flight value from the
             // environment, so the staggered choreography below runs during animations, not just drags.

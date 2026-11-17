@@ -27,9 +27,7 @@ struct MutualFundScreen: View {
                 BackgroundBlobs()
                     .opacity(1 - (gather?.progress ?? 0))
 
-                Text("HSBC midcap direct growth")
-                    .font(FigmaFont.reckless(43))
-                    .foregroundStyle(Color.ink)
+                SelectableText("HSBC midcap direct growth", .reckless(43), color: Color.ink)
                     .frame(width: 356, alignment: .leading)
                     .gathered(gather, index: 0, y: 131, height: 98)
                     .at(15, 131)
@@ -287,7 +285,9 @@ struct LongPressAttach: UIViewRepresentable {
 
         func gestureRecognizerShouldBegin(_ gesture: UIGestureRecognizer) -> Bool {
             guard let anchor else { return false }
-            return anchor.bounds.contains(gesture.location(in: anchor))
+            let point = gesture.location(in: anchor)
+            // A long press on text is the text's, to select it; the widget lifts from anywhere else on it
+            return anchor.bounds.contains(point) && !SelectableTextView.isText(at: point, in: anchor)
         }
 
         func gestureRecognizer(_ g: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
@@ -593,16 +593,11 @@ struct FundFeatureList: View {
                     .frame(width: 24, height: 23, alignment: .leading)
                     .at(5, row.y + 3)
 
-                Text(row.title)
-                    .font(FigmaFont.walsheim(19))
-                    .foregroundStyle(Color.black)
+                SelectableText(row.title, .walsheim(19), color: Color.black)
                     .frame(height: 25)
                     .at(38, row.y)
 
-                Text(row.detail)
-                    .font(FigmaFont.walsheim(15))
-                    .foregroundStyle(Color.black.opacity(0.43))
-                    .lineSpacing(3)
+                SelectableText(row.detail, .walsheim(15), color: Color.black.opacity(0.43), lineSpacing: 3)
                     .frame(width: 326, alignment: .leading)
                     .at(38, row.detailY)
             }
@@ -808,9 +803,7 @@ struct InvestmentsCard: View {
         ZStack(alignment: .topLeading) {
             Color.white
 
-            Text("For investments")
-                .font(FigmaFont.walsheim(17))
-                .foregroundStyle(Color.black.opacity(0.93))
+            SelectableText("For investments", .walsheim(17), color: Color.black.opacity(0.93))
                 .frame(height: 25)
                 .at(17, 15)
 
@@ -820,23 +813,16 @@ struct InvestmentsCard: View {
                 .at(0, 54)
 
             ForEach(rows, id: \.label) { row in
-                Text(row.label)
-                    .font(FigmaFont.walsheim(17))
-                    .foregroundStyle(Color.black.opacity(0.56))
+                SelectableText(row.label, .walsheim(17), color: Color.black.opacity(0.56))
                     .frame(height: 25)
                     .at(17, row.y)
 
-                Text(row.value)
-                    .font(FigmaFont.walsheimMedium(19))
-                    .foregroundStyle(Color.black)
+                SelectableText(row.value, .walsheimMedium(19), color: Color.black)
                     .frame(width: 336, height: 25, alignment: .trailing)
                     .at(17, row.y - 1)
             }
 
-            Text("Ashima, For the next few weeks the number will move around a bit, up and down. That’s normal and it doesn’t mean anything yet. The part that matters is the 1st of every month, and that’s already handled.")
-                .font(FigmaFont.walsheim(15))
-                .foregroundStyle(Color.black.opacity(0.71))
-                .lineSpacing(3)
+            SelectableText("Ashima, For the next few weeks the number will move around a bit, up and down. That’s normal and it doesn’t mean anything yet. The part that matters is the 1st of every month, and that’s already handled.", .walsheim(15), color: Color.black.opacity(0.71), lineSpacing: 3)
                 .frame(width: 334, alignment: .leading)
                 .at(17, 261)
         }

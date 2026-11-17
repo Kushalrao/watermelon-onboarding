@@ -10,13 +10,10 @@ struct OnboardingFlow: View {
     /// The status bar's height, for the screens that place themselves under it
     @State private var top: CGFloat = 62
 
-    /// Launch argument `-onboardingStep N` starts the flow at step N. With no flag it opens on the advisor's part
-    /// (the congratulations, step 10); `-onboarding` (or any `-onboarding…` flag) starts from the very beginning
+    /// Launch argument `-onboardingStep N` starts the flow at step N
     private static var debugStartStep: Int {
         let args = ProcessInfo.processInfo.arguments
-        guard let i = args.firstIndex(of: "-onboardingStep"), i + 1 < args.count, let n = Int(args[i + 1]) else {
-            return args.contains { $0.hasPrefix("-onboarding") } ? 0 : 10
-        }
+        guard let i = args.firstIndex(of: "-onboardingStep"), i + 1 < args.count, let n = Int(args[i + 1]) else { return 0 }
         return n
     }
 

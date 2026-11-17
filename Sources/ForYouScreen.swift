@@ -70,9 +70,7 @@ struct ForYouScreen: View {
                 .frame(width: 50, height: 50, alignment: .topLeading)
                 .at(17, 326)
 
-                Text("Analysed for you")
-                    .font(FigmaFont.reckless(43))
-                    .foregroundStyle(Color.ink)
+                SelectableText("Analysed for you", .reckless(43), color: Color.ink)
                     .frame(width: 356, alignment: .leading)
                     .at(17, 376)
 
@@ -89,9 +87,7 @@ struct ForYouScreen: View {
                     .contextSwipe { onContext(.summary) }
                     .at(11, 670)
 
-                Text("Details")
-                    .font(FigmaFont.reckless(43))
-                    .foregroundStyle(Color.ink)
+                SelectableText("Details", .reckless(43), color: Color.ink)
                     .at(17, 1005)
 
                 FundPerformanceCard()
@@ -278,9 +274,7 @@ private struct OutlinedCard<Content: View>: View {
         ZStack(alignment: .topLeading) {
             Color.white
 
-            Text(title)
-                .font(FigmaFont.walsheim(17))
-                .foregroundStyle(Color.black.opacity(0.93))
+            SelectableText(title, .walsheim(17), color: Color.black.opacity(0.93))
                 .frame(height: 25)
                 .at(17, 15)
 
@@ -321,9 +315,7 @@ struct FundSummaryCard: View {
                 .frame(width: 45, height: 30)
                 .at(21, 76)
 
-            Text("High risk for your appetite")
-                .font(FigmaFont.walsheim(17))
-                .foregroundStyle(Color.black)
+            SelectableText("High risk for your appetite", .walsheim(17), color: Color.black)
                 .frame(height: 25)
                 .at(21 + 58, 76 + 2)
 
@@ -332,9 +324,7 @@ struct FundSummaryCard: View {
                 .frame(width: 43, height: 30)
                 .at(21, 137 + 8)
 
-            Text("Your goals stretch by 2 years with this fund")
-                .font(FigmaFont.walsheim(17))
-                .foregroundStyle(Color.black)
+            SelectableText("Your goals stretch by 2 years with this fund", .walsheim(17), color: Color.black)
                 .frame(width: 267, alignment: .leading)
                 .at(21 + 58, 137)
 
@@ -345,9 +335,7 @@ struct FundSummaryCard: View {
             .frame(width: 43, height: 24, alignment: .bottomLeading)
             .at(21, 218 + 1)
 
-            Text("Fund performance has gone down")
-                .font(FigmaFont.walsheim(17))
-                .foregroundStyle(Color.black)
+            SelectableText("Fund performance has gone down", .walsheim(17), color: Color.black)
                 .frame(height: 25)
                 .at(21 + 58, 218)
         }
@@ -357,9 +345,7 @@ struct FundSummaryCard: View {
 struct FundPerformanceCard: View {
     var body: some View {
         OutlinedCard(title: "Fund performance", height: 235) {
-            Text("Doing great")
-                .font(FigmaFont.walsheim(17))
-                .foregroundStyle(Color.black.opacity(0.93))
+            SelectableText("Doing great", .walsheim(17), color: Color.black.opacity(0.93))
                 .frame(width: 91, height: 25, alignment: .trailing)
                 .at(241, 15)
 
@@ -367,15 +353,11 @@ struct FundPerformanceCard: View {
                 .frame(width: 43, height: 36, alignment: .bottomLeading)
                 .at(21, 79)
 
-            Text("Steady growth over years")
-                .font(FigmaFont.walsheimMedium(17))
-                .foregroundStyle(Color.black)
+            SelectableText("Steady growth over years", .walsheimMedium(17), color: Color.black)
                 .frame(height: 25)
                 .at(79, 72)
 
-            Text("NAV re-invested")
-                .font(FigmaFont.walsheim(15))
-                .foregroundStyle(Color.black.opacity(0.43))
+            SelectableText("NAV re-invested", .walsheim(15), color: Color.black.opacity(0.43))
                 .frame(height: 23)
                 .at(79, 100)
         }

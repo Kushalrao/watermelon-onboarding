@@ -10,6 +10,7 @@
 		00D31676AF44B326EE07082B /* OnboardingResearchIntro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3259D7C083D4614EF0322C9C /* OnboardingResearchIntro.swift */; };
 		0341C5C2F741BD5852D689D3 /* OnboardingDecadeWelcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD3C67AE116B393EF7A5C5B /* OnboardingDecadeWelcome.swift */; };
 		051FA9EF2F568F6217D3D833 /* FixedDeposits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FFCE4B65EFCAF5355288FB /* FixedDeposits.swift */; };
+		0655CE11384AF85341897C8A /* SelectableText.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A49490A2FB49CCD36FEB6F /* SelectableText.swift */; };
 		0761955C32984B6273243408 /* BandWarp.metal in Sources */ = {isa = PBXBuildFile; fileRef = 35C1E9C9C6D5640F6AD337DF /* BandWarp.metal */; };
 		0B60BAA22CEFB46FE29C7EAA /* OnboardingAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60CB34EED9EDF90E33340FC /* OnboardingAnalysis.swift */; };
 		0F0A6EDFA08CE3CC604E504D /* TokenContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0FC638931B4840CAE7F7E5F /* TokenContractTests.swift */; };
@@ -190,6 +191,7 @@
 		E18DBABB52400FFD9F25F599 /* FixedDepositHeld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositHeld.swift; sourceTree = "<group>"; };
 		E60CB34EED9EDF90E33340FC /* OnboardingAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAnalysis.swift; sourceTree = "<group>"; };
 		E89842D9244C8CA992DEC32A /* watch_movement.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = watch_movement.mp4; sourceTree = "<group>"; };
+		E9A49490A2FB49CCD36FEB6F /* SelectableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableText.swift; sourceTree = "<group>"; };
 		F0FC638931B4840CAE7F7E5F /* TokenContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenContractTests.swift; sourceTree = "<group>"; };
 		F50B0885996CDFA7C8558BD7 /* GT-Super-Text-Medium-Trial.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GT-Super-Text-Medium-Trial.otf"; sourceTree = "<group>"; };
 		FABE71BAEDDA2FE57FEEEBB1 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
@@ -364,6 +366,7 @@
 				0E5B773165C094CD9AC46CE1 /* ParticleSphere.swift */,
 				8666537369AF62AE0D950F74 /* QuickSearch.swift */,
 				964936155125499D0D77D9D1 /* RevealBump.metal */,
+				E9A49490A2FB49CCD36FEB6F /* SelectableText.swift */,
 				7C9D0BE599C1B23DD4DB8891 /* Theme.swift */,
 				7359B7EA93ED2CD16CC46D85 /* WalkingHorse.swift */,
 				0E3945FE87893AC89A8F6C33 /* DesignSystem */,
@@ -580,6 +583,7 @@
 				21D8DC1BD2C169921C8D028E /* ParticleSphere.swift in Sources */,
 				B7EE2004868AF9082451B2FE /* QuickSearch.swift in Sources */,
 				ABC1F3350E453717180E2D85 /* RevealBump.metal in Sources */,
+				0655CE11384AF85341897C8A /* SelectableText.swift in Sources */,
 				A7DA7FBBC35EF787E3AFD00A /* ShadowPrimitives.swift in Sources */,
 				6ED19616B7ED08DD45C31D96 /* ShadowScale.swift in Sources */,
 				5180285ACF85A988857051FC /* SpacingPrimitives.swift in Sources */,

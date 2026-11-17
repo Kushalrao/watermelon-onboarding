@@ -6,11 +6,21 @@ import SwiftUI
 /// bars, and maps sectors as blocks that build and settle, then goes back to reading.
 struct ResearchLive: View {
     let started: Date
+    /// The first topic's research, step by step as it was done: category returns, what ₹10,000 became, whether
+    /// earlier winners stayed ahead, a fund review, and the week's market report
+    var equityYear = false
+    /// Going through the user's own funds, once they're connected: each holding, then against its market, then
+    /// which of them made the difference
+    var portfolio = false
     /// The card's height as it changes, so the chat can keep it in view
     var onHeight: (CGFloat) -> Void = { _ in }
 
     enum Phase: Equatable {
         case reading, capturing, comparing, scanning, mapping
+        /// The equity year's five steps
+        case categories, worth, winners, review, news
+        /// The user's own funds
+        case holdings, markets, difference
 
         /// What it's doing, and to what
         var status: (verb: String, object: String) {
@@ -20,6 +30,25 @@ struct ResearchLive: View {
             case .comparing: ("Comparing", "Returns")
             case .scanning: ("Scanning", "HDFC Mid Cap holdings")
             case .mapping: ("Mapping", "HDFC Mid Cap sectors")
+            case .categories: ("Comparing", "returns across equity fund categories")
+            case .worth: ("Calculating", "what ₹10,000 would have been worth")
+            case .winners: ("Checking", "whether earlier winners stayed ahead")
+            case .review: ("Opening", "Decade’s review of Tata Small Cap Fund")
+            case .news: ("Finding", "the report behind Friday’s market news")
+            case .holdings: ("Going through", "your mutual funds")
+            case .markets: ("Comparing", "each fund with its market")
+            case .difference: ("Finding", "which funds made the difference")
+            }
+        }
+
+        /// Where what it's showing comes from; nil for Morningstar, which has its own mark
+        var source: String? {
+            switch self {
+            case .winners: "Research by Decade, 24 August 2026"
+            case .review: "Review by Decade Advisor, 17 September 2026"
+            case .news: "Reported by Reuters, 13 November 2026"
+            case .holdings, .markets, .difference: "From your MFCentral statement"
+            default: nil
             }
         }
 
@@ -31,6 +60,7 @@ struct ResearchLive: View {
             case .comparing: 118
             case .scanning: 164
             case .mapping: 281
+            case .categories, .worth, .winners, .review, .news, .holdings, .markets, .difference: 118
             }
         }
     }
@@ -39,6 +69,17 @@ struct ResearchLive: View {
     static let timeline: [(at: Double, phase: Phase)] = [
         (0, .reading), (3, .capturing), (7, .comparing), (10, .scanning), (13, .mapping), (16, .reading),
     ]
+    /// and for the equity year: a moment's reading, then its five steps in the order they were done
+    static let equityTimeline: [(at: Double, phase: Phase)] = [
+        (0, .reading), (1.5, .categories), (6, .worth), (8.5, .winners), (12.5, .review), (14.8, .news),
+    ]
+
+    /// The user's funds: all four holdings, then the two comparisons
+    static let portfolioTimeline: [(at: Double, phase: Phase)] = [
+        (0, .holdings), (4.6, .markets), (6.9, .difference),
+    ]
+    /// How long going through the user's funds takes
+    static let portfolioDuration = 9.2
 
     @State private var phase = Phase.reading
     /// When the current phase began, for its own motion
@@ -62,13 +103,21 @@ struct ResearchLive: View {
                 VStack(alignment: .leading, spacing: 8) {
                     card
                     // Where the data comes from (286:16524)
-                    MorningstarMark().padding(.leading, 11)
+                    if let source = phase.source {
+                        Text(source)
+                            .font(FigmaFont.walsheim(13))
+                            .foregroundStyle(Color.black.opacity(0.35))
+                            .frame(height: 15)
+                            .padding(.leading, 11)
+                    } else {
+                        MorningstarMark().padding(.leading, 11)
+                    }
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.96, anchor: .top)))
             }
         }
         .task {
-            for (at, next) in Self.timeline {
+            for (at, next) in portfolio ? Self.portfolioTimeline : equityYear ? Self.equityTimeline : Self.timeline {
                 let wait = at - Date.now.timeIntervalSince(started)
                 if wait > 0 { try? await Task.sleep(for: .seconds(wait)) }
                 guard !Task.isCancelled else { return }
@@ -103,6 +152,7 @@ struct ResearchLive: View {
         case .comparing: ReturnsTable(t: t)
         case .scanning: HoldingBars(t: t)
         case .mapping: SectorBlocks(t: t)
+        case .categories, .worth, .winners, .review, .news, .holdings, .markets, .difference: ResearchFacts(phase: phase, t: t)
         case .reading: EmptyView()
         }
     }
@@ -132,6 +182,8 @@ struct ResearchLive: View {
                         .foregroundStyle(Color.black)
                     Text(phase.status.object)
                         .foregroundStyle(Color.black.opacity(0.35))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
             .font(FigmaFont.walsheim(15))
@@ -357,6 +409,117 @@ struct NAVLineChart: View {
     }
 }
 
+// MARK: The equity year's steps, each as the returns card is set (274:3300): what it's on, then its figures
+
+private struct ResearchFacts: View {
+    let phase: ResearchLive.Phase
+    let t: Double
+
+    /// One showing of the card: what it's about, an aside, and up to three figures; a figure's tint is green for
+    /// true, orange for false, black for nil
+    struct Fact {
+        let title: String, aside: String
+        let figures: [(label: String, value: String, up: Bool?)]
+    }
+
+    /// Morningstar category performance, one year to 15 November 2026: lowest, average and highest fund
+    private static let categories: [Fact] = [
+        ("Small company funds", "-7.92%", "9.66%", "26.58%"),
+        ("Mid-sized company funds", "-2.58%", "4.68%", "17.55%"),
+        ("Any size funds", "-16.35%", "3.73%", "24.12%"),
+        ("Large company funds", "-4.46%", "0.31%", "25.42%"),
+    ].map { Fact(title: $0.0, aside: "1 year",
+                 figures: [("Lowest", $0.1, false), ("Average", $0.2, true), ("Highest", $0.3, true)]) }
+
+    /// Decade's comparison of two three-year periods, 24 August 2026
+    private static let winners: [Fact] = [
+        ("Large company funds", "Told us little"),
+        ("Mid-sized company funds", "Told us little"),
+        ("Small company funds", "Tended to slip"),
+        ("Any size funds", "Some stayed ahead"),
+    ].map { Fact(title: $0.0, aside: "3 years on", figures: [("Earlier winners", $0.1, nil), ("", "", nil), ("Funds studied", "12 to 32", nil)]) }
+
+    /// The four funds the import brought in, with sample figures
+    private static let holdings: [Fact] = [
+        ("ICICI Pru Gold ETF FOF", "Regular", "₹60,000", "₹71,400", "19.0%", true),
+        ("Axis Ultra Short Term", "Direct", "₹1,20,000", "₹1,28,300", "6.9%", true),
+        ("HDFC Short Term", "Regular", "₹80,000", "₹85,900", "7.4%", true),
+        ("Kotak Large Cap", "Direct", "₹1,50,000", "₹1,48,200", "1.2%", false),
+    ].map { Fact(title: $0.0, aside: $0.1, figures: [("Invested", $0.2, nil), ("Value", $0.3, nil), ("1 year", $0.4, $0.5)]) }
+
+    private var facts: [Fact] {
+        switch phase {
+        case .holdings: Self.holdings
+        case .markets:
+            [Fact(title: "Your 4 funds", aside: "1 year",
+                  figures: [("Your funds", "₹23,800", true), ("Their markets", "₹21,100", true), ("Ahead by", "₹2,700", nil)])]
+        case .difference:
+            [Fact(title: "ICICI Pru Gold ETF FOF", aside: "Largest share",
+                  figures: [("Added", "₹11,400", true), ("Kotak Large Cap", "₹1,800", false), ("Others", "₹14,200", true)])]
+        case .categories: Self.categories
+        case .worth:
+            [Fact(title: "Small company funds", aside: "₹10,000",
+                  figures: [("Lowest", "₹9,208", false), ("Highest", "₹12,658", true), ("Between them", "₹3,450", nil)])]
+        case .winners: Self.winners
+        case .review:
+            [Fact(title: "Tata Small Cap Fund", aside: "Neutral",
+                  figures: [("Rating", "2.5 of 5", nil), ("Largest fall", "30.9%", false), ("₹10,000 fell to", "₹6,910", nil)])]
+        case .news:
+            [Fact(title: "Indian shares", aside: "This week",
+                  figures: [("Friday", "Fell", false), ("The week", "Higher", true), ("Concerns", "Oil, inflation", nil)])]
+        default: []
+        }
+    }
+
+    var body: some View {
+        let all = facts
+        // Each showing gets about a second, the last one staying
+        let index = min(all.count - 1, Int(t / 1.05))
+        let fact = all[max(0, index)]
+        ZStack(alignment: .topLeading) {
+            HStack(spacing: 6) {
+                Text(fact.title)
+                    .foregroundStyle(Color.black)
+                Text(fact.aside)
+                    .foregroundStyle(Color.black.opacity(0.35))
+            }
+            .font(FigmaFont.walsheim(17))
+            .frame(height: 21)
+            .at(13, 13)
+            Rectangle().fill(Color.black.opacity(0.12)).frame(width: 340, height: 0.7).at(0, 47)
+            ForEach(Array(fact.figures.enumerated()), id: \.offset) { i, figure in
+                let x = 13 + CGFloat(i) * 108
+                Text(figure.label)
+                    .font(FigmaFont.walsheim(15))
+                    .foregroundStyle(Color.black.opacity(0.57))
+                    .fixedSize()
+                    .frame(height: 19)
+                    .at(x, 56)
+                HStack(spacing: 2) {
+                    if let up = figure.up {
+                        Triangle()
+                            .fill(up ? Color(hex: 0x38C314) : Color(hex: 0xE3521B))
+                            .frame(width: 8.5, height: 4.6)
+                            .rotationEffect(.degrees(up ? 0 : 180))
+                            .frame(width: 15, height: 15)
+                    }
+                    Text(figure.value)
+                        .font(FigmaFont.walsheimMedium(15))
+                        .tracking(0.4)
+                        .foregroundStyle(figure.up.map { $0 ? Color(hex: 0x38C314) : Color(hex: 0xE3521B) } ?? Color.black)
+                        .fixedSize()
+                }
+                .frame(height: 21)
+                .at(x, 78)
+            }
+        }
+        // One showing to the next as a whole, so no figure is ever half one and half the other
+        .id(index)
+        .transition(.opacity)
+        .animation(.easeOut(duration: 0.25), value: index)
+    }
+}
+
 // MARK: Comparing: NAV and returns, fund by fund (274:3300)
 
 private struct ReturnsTable: View {
@@ -568,46 +731,6 @@ private struct SectorBlocks: View {
     }
 }
 
-/// What shows under "Creating analysis" while it works: one line at a time, in the research's style
-struct AnalysisLive: View {
-    let started: Date
-    let duration: Double
-
-    private static let steps: [(verb: String, object: String)] = [
-        ("Ranking", "funds in their category"),
-        ("Checking", "star ratings against returns"),
-        ("Tracing", "fund rank movements"),
-        ("Matching", "labels to holdings"),
-        ("Reviewing", "fund manager changes"),
-        ("Weighing", "risk and costs"),
-        ("Writing", "the analysis"),
-    ]
-
-    @State private var index = 0
-
-    var body: some View {
-        HStack(spacing: 6) {
-            Text(Self.steps[index].verb).foregroundStyle(Color.black)
-            Text(Self.steps[index].object).foregroundStyle(Color.black.opacity(0.35))
-        }
-        .font(FigmaFont.walsheim(15))
-        .frame(height: 21)
-        .id(index)
-        .transition(.asymmetric(insertion: .opacity.combined(with: .offset(y: 6)), removal: .opacity))
-        .task {
-            // The steps spread evenly over the analysis, however long it takes
-            let each = max(duration, 0.1) / Double(Self.steps.count)
-            index = min(Self.steps.count - 1, Int(Date.now.timeIntervalSince(started) / each))
-            while index < Self.steps.count - 1 {
-                let next = started.addingTimeInterval(each * Double(index + 1)).timeIntervalSinceNow
-                if next > 0 { try? await Task.sleep(for: .seconds(next)) }
-                guard !Task.isCancelled else { return }
-                withAnimation(.easeOut(duration: 0.35)) { index += 1 }
-            }
-        }
-    }
-}
-
 /// "Data from Morningstar" (286:16524): the wordmark and a grey line, wherever data's being fetched or shown
 struct MorningstarMark: View {
     var body: some View {
@@ -636,6 +759,8 @@ struct MorningstarMark: View {
 struct ReportPreparingCard: View {
     let title: String
     let subject: String
+    /// It's done: "Ready", and still
+    var ready = false
 
     static let size = CGSize(width: 295, height: 301)
 
@@ -678,10 +803,10 @@ struct ReportPreparingCard: View {
                 .at(15, 256)
 
             HStack(spacing: 7) {
-                Text("Preparing")
+                Text(ready ? "Ready" : "Preparing")
                     .foregroundStyle(ColorScale.contentSecondary)
                     .fixedSize()
-                    .shimmering(true)
+                    .shimmering(!ready)
                 Text(subject)
                     .foregroundStyle(ColorScale.contentDisabled)
                     .lineLimit(1)
