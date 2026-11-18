@@ -36,7 +36,7 @@ struct HomeV2View: View {
                         .buttonStyle(.plain)
                         .at(367 - 33, 69 - 10)
 
-                        Text("Hello Jojo")
+                        Text("Hello \(AppUser.name)")
                             .font(FigmaFont.reckless(43))
                             .foregroundStyle(Color.ink)
                             .at(17, Self.topSpace + 166)

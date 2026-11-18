@@ -170,27 +170,28 @@ struct MarchingChevrons: View {
     }()
 }
 
-/// MSFT card with the price chart (777:12974), 364 × 330
+/// Parag Parikh Flexi Cap card with the price chart (777:12974), 364 × 330
 struct MSFTChartCard: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             Color.white
 
             // Header row (777:12994)
-            Image("MetaIcon")
+            Image("FundPPFAS")
                 .resizable()
-                .frame(width: 36, height: 39)
                 .frame(width: 37, height: 37)
-                .clipped()
+                .clipShape(Circle())
                 .at(15, 17)
 
-            Text("MSFT")
+            Text("Parag Parikh Flexi Cap")
                 .font(FigmaFont.walsheimMedium(15))
-                .tracking(1.05)
                 .foregroundStyle(Color.black.opacity(0.83))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(width: 142, alignment: .leading)
                 .at(61, 17)
 
-            Text("NSE")
+            Text("Direct · Growth")
                 .font(FigmaFont.walsheim(14))
                 .foregroundStyle(Color.black.opacity(0.56))
                 .at(61, 37)
@@ -201,11 +202,11 @@ struct MSFTChartCard: View {
                 .at(208, 14)
 
             HStack(alignment: .top, spacing: 1) {
-                Text("21,202")
+                Text("₹92")
                     .font(FigmaFont.walsheimMedium(22))
                     .foregroundStyle(Color(hex: 0x01B405))
                     .frame(width: 67, alignment: .trailing)
-                Text(".02")
+                Text(".46")
                     .font(FigmaFont.walsheimMedium(17))
                     .foregroundStyle(Color.black.opacity(0.6))
                     .padding(.top, 4.8)
@@ -230,8 +231,8 @@ struct MSFTChartCard: View {
                 .frame(width: 254)
                 .at(47, 186)
 
-                price("¢900").at(319, 42)
-                price("¢100").at(321, 162)
+                price("₹95").at(319, 42)
+                price("₹80").at(321, 162)
 
                 PeriodSelector().at(13, 211)
             }

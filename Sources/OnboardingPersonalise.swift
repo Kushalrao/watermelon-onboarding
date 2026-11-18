@@ -98,19 +98,37 @@ struct OnboardingCongratsView: View {
     var text = "Congrats! you\nhave a proactive\npersonal advisor\nnow"
     var textTop: CGFloat = 344
     var label = "Congrats! you have a proactive personal advisor now"
+    /// The sea behind the words, which are set in white to stand on it
+    var water = false
     let onContinue: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.onboardingTop) private var top
     /// 0 before the words arrive, 1 while they're up, 2 once they've gone
     @State private var beat = 0
+    /// When the light began coming at the screen, at the end, on water
+    @State private var flareStart: Date?
 
     var body: some View {
         ZStack(alignment: .top) {
-            AdvisorDawnBackground()
+            if water {
+                UnderwaterBackground(flareStart: flareStart)
+            } else {
+                AdvisorDawnBackground()
+            }
 
-            // Gap: Reckless Medium 45/51 in #33302D has no text style or content token
-            GapText(text, family: .reckless, medium: true, size: 45, lineHeight: 51, color: Color(hex: 0x33302D))
+            Group {
+                if water {
+                    // The frame's Medium, 45/51, in white on the deep water
+                    Text(text)
+                        .font(.custom("RecklessStandardS-TRIAL-Medium", fixedSize: 45))
+                        .lineSpacing(51 - UIFont(name: "RecklessStandardS-TRIAL-Medium", size: 45)!.lineHeight)
+                        .foregroundStyle(Color.white)
+                } else {
+                    // Gap: Reckless Medium 45/51 in #33302D has no text style or content token
+                    GapText(text, family: .reckless, medium: true, size: 45, lineHeight: 51, color: Color(hex: 0x33302D))
+                }
+            }
                 .multilineTextAlignment(.center)
                 .frame(width: 352)
                 .padding(.top, textTop - 44 + top)
@@ -123,13 +141,82 @@ struct OnboardingCongratsView: View {
         .ignoresSafeArea()
         .task {
             try? await Task.sleep(for: .seconds(0.45))
-            withAnimation(.easeOut(duration: 0.7)) { beat = 1 }
-            try? await Task.sleep(for: .seconds(3.0))
+            // On water the words come in slowly
+            let arrive = water ? 1.4 : 0.7
+            withAnimation(.easeOut(duration: arrive)) { beat = 1 }
+            // Up, and read, for three seconds once it's fully in
+            try? await Task.sleep(for: .seconds(arrive + 3.0))
             withAnimation(.easeIn(duration: 0.5)) { beat = 2 }
-            try? await Task.sleep(for: .seconds(0.55))
+            if water && !reduceMotion {
+                // The shafts of light come at the screen until it's white, and the next screen arrives out of that
+                flareStart = Date()
+                try? await Task.sleep(for: .seconds(UnderwaterBackground.flareDuration))
+            } else {
+                try? await Task.sleep(for: .seconds(0.55))
+            }
             guard !Task.isCancelled else { return }
             onContinue()
         }
+    }
+}
+
+/// Under the sea, moving: the picture of the surface, the deep and the sand under `underwaterLight`
+/// (`WaterCaustics.metal`), which sways it and lays the glints, the shafts of sunlight and the net of light on it
+struct UnderwaterBackground: View {
+    /// Set at the end: from then the light comes at the screen, to white in `flareDuration`
+    var flareStart: Date?
+    static let flareDuration = 1.3
+    @State private var start = Date()
+
+    var body: some View {
+        GeometryReader { geo in
+            TimelineView(.animation) { context in
+                let t = context.date.timeIntervalSince(start)
+                let flare = flareStart.map { min(max(context.date.timeIntervalSince($0) / Self.flareDuration, 0), 1) } ?? 0
+                Image("WaterSea")
+                    .resizable()
+                    .interpolation(.high)
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .layerEffect(
+                        ShaderLibrary.underwaterLight(.float2(geo.size), .float(t), .float(flare)),
+                        maxSampleOffset: CGSize(width: 16, height: 16)
+                    )
+            }
+        }
+        .background(Color(hex: 0x0A3A7A))
+        .ignoresSafeArea()
+        .accessibilityHidden(true)
+    }
+}
+
+/// Water over rock, moving: the rock's picture under the caustics shader (`WaterCaustics.metal`), stretched to the
+/// screen as the design it came from stretches it
+struct WaterCausticsBackground: View {
+    @State private var start = Date.now
+
+    var body: some View {
+        GeometryReader { geo in
+            TimelineView(.animation) { context in
+                let t = context.date.timeIntervalSince(start)
+                // The rock's colours: a soft copy of the reference photograph, its light greens and blues lifted a
+                // little, cut to the screen's shape clear of its dark corner. It's drawn a little larger than the
+                // screen and drifts very slowly under the water, so its dark parts move too.
+                Image("WaterRock")
+                    .resizable()
+                    .interpolation(.high)
+                    .frame(width: geo.size.width * 1.14, height: geo.size.height * 1.14)
+                    .offset(x: geo.size.width * 0.06 * sin(t * 0.11), y: geo.size.height * 0.06 * cos(t * 0.08))
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+                    .layerEffect(
+                        ShaderLibrary.waterCaustics(.float2(geo.size), .float(t)),
+                        maxSampleOffset: CGSize(width: 8, height: 8)
+                    )
+            }
+        }
+        .background(Color(hex: 0x0B1420))
+        .ignoresSafeArea()
+        .accessibilityHidden(true)
     }
 }
 
@@ -153,6 +240,10 @@ struct OnboardingCommunicationsView: View {
     @State private var allowed: Set<Channel> = []
     /// How many of the notifications have come in
     @State private var arrived = 0
+    /// Her message has come in, on the permissions
+    @State private var bubbleShown = false
+    /// The card has come up, a second after she's finished saying it
+    @State private var cardUp = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.onboardingTop) private var top
 
@@ -172,13 +263,6 @@ struct OnboardingCommunicationsView: View {
                 .at(side + 9, 48 - 44 + top)
                 .opacity(meeting && shown ? 1 : 0)
 
-            // 973:17040: what she says, out of the avatar's corner
-            if !meeting {
-                AdvisorBubble(text: "Arindam, For the next few weeks the number will move around a bit, up and down. That’s normal and it")
-                    .at(side + 35, 104 - 44 + top)
-                    .transition(.scale(scale: 0.6, anchor: .topLeading).combined(with: .opacity))
-            }
-
             // 973:16266 → 973:16944: the portrait, and then the same picture small in the corner
             Image("MeetAdvisorPortrait")
                 .frame(width: 394, height: 400)
@@ -193,13 +277,26 @@ struct OnboardingCommunicationsView: View {
                 .opacity(shown ? 1 : 0)
                 .accessibilityLabel("Your advisor")
 
+            // 973:17040: what she says, over the foot of her picture; it arrives as the chat's bubbles do, once the
+            // picture has settled in its corner
+            if bubbleShown {
+                AdvisorBubble(
+                    text: "\(AppUser.name), I’ll reach out when something needs your attention. Choose where I can reach you.",
+                    typed: true,
+                    onTyped: bringCard
+                )
+                    .at(side + 35, 104 - 44 + top)
+                    .transition(.scale(scale: 0.9, anchor: .bottomLeading).combined(with: .opacity).combined(with: .offset(y: 12)))
+                    .zIndex(1)
+            }
+
             Group {
                 // 973:16327: 178 × 42, over the portrait's foot
                 HStack(spacing: 8) {
                     Image("OnboardingWave")
                         .resizable()
                         .frame(width: 18.198, height: 18.426)
-                    Text("Hello Arindam")
+                    Text("Hello \(AppUser.name)")
                         .font(FigmaFont.walsheimMedium(19.45))
                         .foregroundStyle(Color.black)
                         .fixedSize()
@@ -210,11 +307,11 @@ struct OnboardingCommunicationsView: View {
                 .at(side + 106, 283 - 44 + top)
 
                 // Gap: Reckless Medium 45/43 in #33302D has no text style or content token
-                GapText("Arindam, meet\nyour personal\nadvisor", family: .reckless, medium: true, size: 45, lineHeight: 43, color: Color(hex: 0x33302D))
+                GapText("\(AppUser.name), meet\nyour personal\nadvisor", family: .reckless, medium: true, size: 45, lineHeight: 43, color: Color(hex: 0x33302D))
                     .multilineTextAlignment(.center)
                     .frame(width: 352)
                     .at(side + 19, 362 - 44 + top)
-                    .accessibilityLabel("Arindam, meet your personal advisor")
+                    .accessibilityLabel("\(AppUser.name), meet your personal advisor")
 
                 GapText("We’ll now quickly guide you through the\nbasics to give you a head start.", family: .walsheim, medium: false, size: 17, lineHeight: 23, color: ColorScale.contentSecondary)
                     .multilineTextAlignment(.center)
@@ -226,7 +323,7 @@ struct OnboardingCommunicationsView: View {
             .accessibilityHidden(!meeting)
 
             // 973:16780: 364 × 494, 181 under the status bar
-            if !meeting {
+            if !meeting && cardUp {
                 card
                     .at(side + 13, 225 - 44 + top)
                     .transition(.offset(y: 60).combined(with: .opacity))
@@ -252,13 +349,31 @@ struct OnboardingCommunicationsView: View {
             }
             .buttonStyle(PressScaleStyle())
             .at(side + 23, 738 - 44 + top)
-            .opacity(shown ? 1 : 0)
+            // Away while she speaks, and back with the card
+            .opacity(shown && (meeting || cardUp) ? 1 : 0)
+            .allowsHitTesting(meeting || cardUp)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .ignoresSafeArea()
         .onAppear {
             if introduces { stage = .meeting }
             withAnimation(.spring(response: 0.55, dampingFraction: 0.86).delay(0.1)) { shown = true }
+        }
+        .task(id: stage) {
+            guard stage == .permissions, !bubbleShown else { return }
+            try? await Task.sleep(for: .seconds(0.7))
+            guard !Task.isCancelled else { return }
+            Haptics.thresholdCrossed()
+            withAnimation(.spring(response: 0.42, dampingFraction: 0.8)) { bubbleShown = true }
+        }
+    }
+
+    /// A second after her message is all there, the card comes up under it
+    private func bringCard() {
+        Task {
+            try? await Task.sleep(for: .seconds(1))
+            Haptics.tap()
+            withAnimation(Self.move) { cardUp = true }
         }
     }
 
@@ -459,9 +574,21 @@ private struct PermissionSwitchStyle: ToggleStyle {
 /// What the advisor says from her corner (973:17040): 318 × 94, white, its tail at the lower left
 struct AdvisorBubble: View {
     let text: String
+    /// Typed out a letter at a time once it's up, the bubble already at its full size; `onTyped` when the last is in
+    var typed = false
+    var onTyped: (() -> Void)? = nil
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var count = 0
+    /// 0 → 1 as the white washes across a new bubble
+    @State private var splash: CGFloat = 0
+    /// Letters a second
+    private static let pace: Double = 45
 
     var body: some View {
-        Text(text)
+        // The letters still to come are set but clear, so the lines never reflow as it types
+        (Text(typed ? String(text.prefix(count)) : text)
+            + Text(typed ? String(text.dropFirst(count)) : "").foregroundStyle(Color.clear))
             .font(FigmaFont.walsheim(17))
             .lineSpacing(21 - UIFont(name: "GTWalsheimTrial-Rg", size: 17)!.lineHeight)
             .foregroundStyle(ColorScale.contentPrimary)
@@ -469,7 +596,7 @@ struct AdvisorBubble: View {
             .padding(.leading, 15)
             .padding(.top, 15)
             .frame(width: 318, height: 94, alignment: .topLeading)
-            .background(Color.white)
+            .background(BubbleSplashFill(progress: typed && !reduceMotion ? splash : 1))
             .clipShape(RoundedRectangle(cornerRadius: 25, style: .continuous))
             .overlay(alignment: .bottomLeading) {
                 Image("BubbleTail")
@@ -481,7 +608,75 @@ struct AdvisorBubble: View {
                     .offset(x: 0.22, y: 8.45)
                     .accessibilityHidden(true)
             }
+            .modifier(BubbleRipple(progress: typed && !reduceMotion ? splash : 1))
             .shadow(color: Color.black.opacity(0.03), radius: 7.5, x: 0, y: 3)
+            .accessibilityLabel(text)
+            .onAppear {
+                guard typed, !reduceMotion else { return }
+                // A new line: white washes over the bubble from the left, with a small ripple at its front
+                withAnimation(.smooth(duration: 1.2).delay(0.1)) { splash = 1 }
+            }
+            .task {
+                guard typed, count == 0 else { return }
+                if reduceMotion {
+                    count = text.count
+                } else {
+                    // Once the bubble itself has landed
+                    try? await Task.sleep(for: .seconds(0.25))
+                    for shown in 1...max(text.count, 1) {
+                        guard !Task.isCancelled else { return }
+                        count = shown
+                        try? await Task.sleep(for: .seconds(1 / Self.pace))
+                    }
+                }
+                guard !Task.isCancelled else { return }
+                onTyped?()
+            }
+    }
+}
+
+/// The bubble's fill while white washes across it: a faint cool grey ahead of the front, white behind it
+private struct BubbleSplashFill: View, Animatable {
+    var progress: CGFloat
+    var animatableData: CGFloat {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    var body: some View {
+        // A long soft edge, as the system's own sheens have
+        let front = -0.2 + 1.55 * progress
+        let from = min(max(front - 0.35, 0), 1), to = min(max(front + 0.15, 0), 1)
+        ZStack {
+            Color.white
+            LinearGradient(
+                stops: [
+                    .init(color: Color(hex: 0xEDF0F3).opacity(0), location: from),
+                    .init(color: Color(hex: 0xEDF0F3), location: max(to, from)),
+                ],
+                startPoint: .leading, endPoint: .trailing
+            )
+        }
+    }
+}
+
+/// The ripple at the front of that wash (`BubbleRipple.metal`)
+private struct BubbleRipple: ViewModifier, Animatable {
+    var progress: CGFloat
+    var animatableData: CGFloat {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .visualEffect { view, proxy in
+                view.distortionEffect(
+                    ShaderLibrary.bubbleRipple(.float2(proxy.size), .float(progress)),
+                    maxSampleOffset: CGSize(width: 2, height: 2),
+                    isEnabled: progress > 0 && progress < 1
+                )
+            }
     }
 }
 

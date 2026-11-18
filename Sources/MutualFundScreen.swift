@@ -140,7 +140,7 @@ enum FundContext: Equatable {
         case .investments: "For investments"
         case .summary: "Fund summary for you"
         case .fundPerformance: "Fund performance"
-        case .msftChart: "MSFT price chart"
+        case .msftChart: "Parag Parikh price chart"
         case .deposit(let name), .fdCard(let name, _): "\(name) FD"
         case .bank(_, let section, _): section.title
         }
@@ -154,7 +154,7 @@ enum FundContext: Equatable {
         case .investments: "Minimum SIP, Fund size, Nav"
         case .summary: "Risk, goals, performance"
         case .fundPerformance: "Steady growth over years"
-        case .msftChart: "NSE · 3Y"
+        case .msftChart: "Flexi Cap · 3Y"
         case .deposit, .fdCard: deposit.map { "Up to \($0.rate) PA · \($0.ratingShort)" } ?? ""
         case .bank(let name, _, _): name
         }

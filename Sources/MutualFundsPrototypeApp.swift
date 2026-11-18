@@ -7,7 +7,7 @@ struct MutualFundsPrototypeApp: App {
     /// page, `-onboarding…` the onboarding
     static let opensOnFixedDeposits = ProcessInfo.processInfo.arguments.contains { $0.hasPrefix("-fd") }
 
-    /// No flag of ours given: the onboarding, from the start
+    /// No flag of ours given: the onboarding, opened on its congratulations screen (see `OnboardingFlow`)
     static let plainLaunch: Bool = {
         let args = ProcessInfo.processInfo.arguments
         if args.contains(where: { $0.hasPrefix("-fd") || $0.hasPrefix("-onboarding") || $0.hasPrefix("-welcome") }) { return false }

@@ -36,7 +36,7 @@ struct ResearchLive: View {
             case .review: ("Opening", "Decade’s review of Tata Small Cap Fund")
             case .news: ("Finding", "the report behind Friday’s market news")
             case .holdings: ("Going through", "your mutual funds")
-            case .markets: ("Comparing", "each fund with its market")
+            case .markets: ("Comparing", "each fund with similar funds")
             case .difference: ("Finding", "which funds made the difference")
             }
         }
@@ -439,12 +439,13 @@ private struct ResearchFacts: View {
         ("Any size funds", "Some stayed ahead"),
     ].map { Fact(title: $0.0, aside: "3 years on", figures: [("Earlier winners", $0.1, nil), ("", "", nil), ("Funds studied", "12 to 32", nil)]) }
 
-    /// The four funds the import brought in, with sample figures
+    /// The four funds the import brought in: an assumed ₹31 lakh portfolio, at their real one-year returns as on 16 Nov 2026 (the
+    /// same figures as the report that follows, `ReportContent.portfolio`)
     private static let holdings: [Fact] = [
-        ("ICICI Pru Gold ETF FOF", "Regular", "₹60,000", "₹71,400", "19.0%", true),
-        ("Axis Ultra Short Term", "Direct", "₹1,20,000", "₹1,28,300", "6.9%", true),
-        ("HDFC Short Term", "Regular", "₹80,000", "₹85,900", "7.4%", true),
-        ("Kotak Large Cap", "Direct", "₹1,50,000", "₹1,48,200", "1.2%", false),
+        ("ICICI Pru Gold ETF FOF", "Regular", "₹4,00,000", "₹4,23,080", "5.77%", true),
+        ("Axis Ultra Short Term", "Direct", "₹9,00,000", "₹9,60,300", "6.7%", true),
+        ("HDFC Short Term", "Regular", "₹6,00,000", "₹6,25,740", "4.29%", true),
+        ("Kotak Large Cap", "Direct", "₹11,00,000", "₹10,98,130", "0.17%", false),
     ].map { Fact(title: $0.0, aside: $0.1, figures: [("Invested", $0.2, nil), ("Value", $0.3, nil), ("1 year", $0.4, $0.5)]) }
 
     private var facts: [Fact] {
@@ -452,10 +453,10 @@ private struct ResearchFacts: View {
         case .holdings: Self.holdings
         case .markets:
             [Fact(title: "Your 4 funds", aside: "1 year",
-                  figures: [("Your funds", "₹23,800", true), ("Their markets", "₹21,100", true), ("Ahead by", "₹2,700", nil)])]
+                  figures: [("Your funds", "₹1,07,250", true), ("Similar funds", "₹1,16,460", true), ("Behind by", "₹9,210", nil)])]
         case .difference:
-            [Fact(title: "ICICI Pru Gold ETF FOF", aside: "Largest share",
-                  figures: [("Added", "₹11,400", true), ("Kotak Large Cap", "₹1,800", false), ("Others", "₹14,200", true)])]
+            [Fact(title: "Kotak Large Cap", aside: "Held you back",
+                  figures: [("Behind by", "₹12,430", false), ("Other three", "₹3,220", true), ("Most added", "Axis", nil)])]
         case .categories: Self.categories
         case .worth:
             [Fact(title: "Small company funds", aside: "₹10,000",
@@ -791,7 +792,7 @@ struct ReportPreparingCard: View {
                 .frame(width: 265, height: 31, alignment: .leading)
                 .at(15, 167)
 
-            Text("Arindam, For the next few weeks the number")
+            Text("\(AppUser.name), For the next few weeks the number")
                 .font(FigmaFont.walsheim(15))
                 .lineSpacing(21 - UIFont(name: "GTWalsheimTrial-Rg", size: 15)!.lineHeight)
                 .foregroundStyle(Color.black.opacity(0.7))

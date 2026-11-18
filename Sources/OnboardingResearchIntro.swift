@@ -124,8 +124,13 @@ struct ResearchIntroSheet: View {
 struct ResearchPreviewSheet: View {
     let onUnderstood: () -> Void
 
-    /// What each way of working is for (952:11969)
-    private static let detail = "Thoughtful wealth management for people who’ve outgrown generic advice."
+    /// The three things it runs on, each with a line saying what that means (952:11973). The third is still the
+    /// design's placeholder.
+    private static let points: [(title: String, detail: String)] = [
+        ("Data backed with Morningstar", "Fund data, ratings and returns come from Morningstar’s research."),
+        ("SEBI registered advisory team", "The advice is shaped and reviewed by advisors registered with SEBI."),
+        ("Advisory Decisioning", "Thoughtful wealth management for people who’ve outgrown generic advice."),
+    ]
 
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: 27, style: .continuous)
@@ -158,18 +163,18 @@ struct ResearchPreviewSheet: View {
                 .at(23, 100)
 
             // 952:11973: the three ways of working, 98 apart
-            ForEach(Array(OnboardingDecadeWelcomeView.rows.enumerated()), id: \.offset) { index, title in
+            ForEach(Array(Self.points.enumerated()), id: \.offset) { index, point in
                 ZStack(alignment: .topLeading) {
                     Image("OnboardingWayCheck")
                         .frame(width: 33, height: 33)
                         .accessibilityHidden(true)
-                    Text(title)
+                    Text(point.title)
                         .font(FigmaFont.walsheim(17))
                         .foregroundStyle(ColorScale.contentPrimary)
                         .fixedSize()
                         .frame(height: 25)
                         .at(44, 1)
-                    Text(Self.detail)
+                    Text(point.detail)
                         .font(FigmaFont.walsheim(13))
                         .lineSpacing(21 - UIFont(name: "GTWalsheimTrial-Rg", size: 13)!.lineHeight)
                         .foregroundStyle(ColorScale.contentSecondary)
@@ -206,6 +211,6 @@ struct ResearchPreviewSheet: View {
 #Preview {
     VStack {
         ResearchIntroSheet(onUnderstood: {})
-        ResearchIntroSheet(content: .advisor(name: "Jojo"), onUnderstood: {})
+        ResearchIntroSheet(content: .advisor(name: AppUser.name), onUnderstood: {})
     }
 }

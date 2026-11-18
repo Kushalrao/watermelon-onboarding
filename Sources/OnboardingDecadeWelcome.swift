@@ -134,6 +134,8 @@ struct OnboardingDecadeWelcomeView: View {
     /// With the funds in, a second report is prepared, as a card under the connected one, and then opens
     @State private var portfolioReportShown = false
     /// Back from connecting: the agent types, thanks for it, and goes through the funds before the report
+    /// The first report has been scrolled 100pt: its suggestion comes out from under the sheet
+    @State private var suggestionPopped = false
     @State private var thanksTyping = false
     @State private var thanksShown = false
     @State private var portfolioThinking: Date?
@@ -316,7 +318,13 @@ struct OnboardingDecadeWelcomeView: View {
     /// The analysis's sheet is black once it's done, and 40pt taller, 20 of it upward
     /// The finished analysis is a taller sheet, standing 20pt higher
     private var analysisTall: Bool { activeSheet == .analysis && analysisDone }
-    private var sheetHeight: CGFloat { analysisTall ? AnalysisSheet.blackHeight : 612 }
+    private var sheetHeight: CGFloat { analysisTall ? AnalysisSheet.blackHeight - (suggestionOut ? Self.suggestionRoom : 0) : 612 }
+    /// The first report is open and being read: its suggested question has come out under the sheet, which gives
+    /// up this much height for it (the chip's 53 and 12 between them)
+    private var suggestionOut: Bool {
+        suggestionPopped && sheetUp && !sheetClosing && analysisTall && !portfolioReportReady && !analysisStored
+    }
+    private static let suggestionRoom: CGFloat = 65
     /// The card is shorter by this much once compact (736 → 652, the photo 316 → 220)
     private var lift: CGFloat { compact ? 92 : 0 }
 
@@ -371,7 +379,7 @@ struct OnboardingDecadeWelcomeView: View {
 
             // What the advisor will do with the funds (243:14078); Continue goes on to asking for them
             if advisorUp {
-                ResearchIntroSheet(content: .advisor(name: "Jojo"), onUnderstood: advisorContinue)
+                ResearchIntroSheet(content: .advisor(name: AppUser.name), onUnderstood: advisorContinue)
                     .padding(.top, 109)
                     .transition(.move(edge: .bottom).combined(with: .opacity.animation(.easeOut(duration: 0.2))))
                     .zIndex(3)
@@ -398,6 +406,15 @@ struct OnboardingDecadeWelcomeView: View {
                 sheet
                     .padding(.top, 127)
                     .transition(.move(edge: .bottom).combined(with: .opacity.animation(.easeOut(duration: 0.2))))
+                    .zIndex(2)
+            }
+
+            // What's suggested next, out from under the report at its right edge, the sheet shorter to make room
+            if suggestionOut {
+                PortfolioAskChip(action: askPortfolio)
+                    .frame(width: 368, alignment: .trailing)
+                    .padding(.top, 127 - 20 + sheetHeight + 12)
+                    .transition(.offset(y: 90).combined(with: .opacity))
                     .zIndex(2)
             }
         }
@@ -747,7 +764,7 @@ struct OnboardingDecadeWelcomeView: View {
         closeSheet()
     }
 
-    /// "How this affects my portfolio?" at the report's foot: asked in the chat, the first time
+    /// The suggested question, from under the report or from the chat: asked in the chat, the first time
     private func askPortfolio() {
         if analysisDone && !analysisStored {
             Task { await storeAnalysis() }
@@ -833,7 +850,13 @@ struct OnboardingDecadeWelcomeView: View {
                     AnalysisSheet(started: analysisStarted ?? .now, done: analysisDone, answer: $mythAnswer, animatesIn: !analysisSeen,
                                   onClose: doneWithAnalysis, portfolio: portfolioReportReady,
                                   // On the second report, Understood ends the chat: on to the congratulations
-                                  onUnderstood: portfolioReportReady ? { Haptics.tap(); onContinue() } : askPortfolio)
+                                  onUnderstood: portfolioReportReady ? { Haptics.tap(); onContinue() } : askPortfolio,
+                                  doneHeight: sheetHeight,
+                                  onRead: {
+                                      guard !suggestionPopped else { return }
+                                      Haptics.revealGrain(intensity: 0.45)
+                                      withAnimation(.spring(response: 0.5, dampingFraction: 0.82)) { suggestionPopped = true }
+                                  })
                 }
             }
             .scaleEffect(sheetClosing ? 0.85 : 1)
@@ -988,7 +1011,7 @@ struct OnboardingDecadeWelcomeView: View {
             HStack(spacing: 10) {
                 Image("OnboardingWave")
                     .frame(width: 25.261, height: 25.577)
-                DsText("Hello Arindam", variant: .h3)
+                DsText("Hello \(AppUser.name)", variant: .h3)
                     .fixedSize()
             }
             .frame(width: 364, height: 39)
@@ -1389,8 +1412,14 @@ struct OnboardingDecadeWelcomeView: View {
             }
             // What was asked from the report, and what follows, as the chat's own bubbles and cards
             VStack(alignment: .leading, spacing: 18) {
+                // With the report closed and nothing asked yet, the same suggestion waits here, at the right
+                if analysisDone, !analysisStored, !(sheetUp && activeSheet == .analysis) {
+                    PortfolioAskChip(action: askPortfolio)
+                        .frame(width: cardWidth - 11, alignment: .trailing)
+                        .transition(.scale(scale: 0.9, anchor: .bottomTrailing).combined(with: .opacity))
+                }
                 if analysisStored {
-                    ChatBubble(message: ChatMessage(text: "How this affects my portfolio?", fromAgent: false), showsRead: false, timestamp: Self.sentAt)
+                    ChatBubble(message: ChatMessage(text: PortfolioAskChip.question, fromAgent: false), showsRead: false, timestamp: Self.sentAt)
                         .frame(width: cardWidth)
                         .offset(x: 4)
                         .transition(.scale(scale: 0.9, anchor: .bottomTrailing).combined(with: .opacity).combined(with: .offset(y: 12)))

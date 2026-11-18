@@ -238,7 +238,7 @@ struct MFImportView: View {
 
             // 1027:12342: the advisor's read, ready to open
             advisorRow(
-                title: "How Iran war effected", detail: "This is our read on We will notify you when ready", titleLeft: 53
+                title: "How my equity funds performed", detail: "This is our read on We will notify you when ready", titleLeft: 53
             ) {
                 Image("ImportReadCheck")
                     .frame(width: 39, height: 39)
@@ -336,8 +336,10 @@ struct MFImportView: View {
             Text(title)
                 .font(FigmaFont.walsheim(17))
                 .foregroundStyle(ColorScale.contentPrimary)
-                .fixedSize()
-                .frame(height: 23)
+                // A longer title than the frame's is set a little smaller, to stay clear of what's at the row's end
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .frame(width: titleLeft == 53 ? 188 : 208, height: 23, alignment: .leading)
                 .at(15 + titleLeft, 13)
             Text(detail)
                 .font(FigmaFont.walsheim(13))

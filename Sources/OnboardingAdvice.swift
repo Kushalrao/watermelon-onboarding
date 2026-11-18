@@ -3,7 +3,7 @@ import SwiftUI
 /// The analysis, kept in the chat once it's done (148:5911), 299 × 275: a wash of colour with "Analysed" over the
 /// Decade wordmark, a line from the agent, and a way back into it
 struct AnalysedCard: View {
-    var name = "Jojo"
+    var name = AppUser.name
     let onView: () -> Void
 
     var body: some View {

@@ -150,27 +150,28 @@ struct BlinkingCircle: View {
     }
 }
 
-/// Research card (771:12688), 364 × 330: MSFT header row + Total worth / XIRR / Expense ratio
+/// Research card (771:12688), 364 × 330: fund header row + Total worth / XIRR / Expense ratio
 struct ResearchCard: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             Color.white
 
             // Header row (771:12708)
-            Image("MetaIcon")
+            Image("FundPPFAS")
                 .resizable()
-                .frame(width: 36, height: 39)
                 .frame(width: 37, height: 37)
-                .clipped()
+                .clipShape(Circle())
                 .at(15, 17)
 
-            Text("MSFT")
+            Text("Parag Parikh Flexi Cap")
                 .font(FigmaFont.walsheimMedium(15))
-                .tracking(1.05)
                 .foregroundStyle(Color.black.opacity(0.83))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(width: 142, alignment: .leading)
                 .at(61, 17)
 
-            Text("NSE")
+            Text("Direct · Growth")
                 .font(FigmaFont.walsheim(14))
                 .foregroundStyle(Color.black.opacity(0.56))
                 .at(61, 37)
@@ -181,11 +182,11 @@ struct ResearchCard: View {
                 .at(208, 14)
 
             HStack(alignment: .top, spacing: 1) {
-                Text("21,202")
+                Text("₹92")
                     .font(FigmaFont.walsheimMedium(22))
                     .foregroundStyle(Color(hex: 0x01B405))
                     .frame(width: 67, alignment: .trailing)
-                Text(".02")
+                Text(".46")
                     .font(FigmaFont.walsheimMedium(17))
                     .foregroundStyle(Color.black.opacity(0.6))
                     .padding(.top, 4.8)

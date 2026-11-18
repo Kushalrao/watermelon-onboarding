@@ -21,12 +21,14 @@
 		1C9E954DCDED34AE0F25F14E /* ContainerTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C51897D87B5AFF7254EBB6 /* ContainerTokens.swift */; };
 		1ED72D3BD4D3B2C982D637F8 /* Hologram.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64E3A581EA31AD74677209D /* Hologram.swift */; };
 		1FA6AC57F6D629C310FEC80C /* DsText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1782E778D8036E4106D116A1 /* DsText.swift */; };
+		20B34BED9ADC296945C4367D /* WaterCaustics.metal in Sources */ = {isa = PBXBuildFile; fileRef = 5CF8AF61721EBCABB0477187 /* WaterCaustics.metal */; };
 		21D8DC1BD2C169921C8D028E /* ParticleSphere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5B773165C094CD9AC46CE1 /* ParticleSphere.swift */; };
 		233A203931C53AAB49BE992B /* hsbc_midcap_nav.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F5D23A8585AEC04626177E9 /* hsbc_midcap_nav.json */; };
 		2613832F3D88E67E9F6A0415 /* RecklessStandardS-TRIAL-RegularItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0B4E0B8365D3CAD219CE01E5 /* RecklessStandardS-TRIAL-RegularItalic.otf */; };
 		28C758469B8769420BCCC60C /* MutualFundScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDEF03A6301197E88CE72D8 /* MutualFundScreen.swift */; };
 		2A1295A8D6FDCC5B4B6AEE83 /* HomeV4View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7357B2BFCB5B2CFB4E7D5CC9 /* HomeV4View.swift */; };
 		3035B2D08D918D105B2ACEB0 /* Composer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342921007836A09A10668B81 /* Composer.swift */; };
+		3680DB47597E6DD219D8E8B7 /* AppUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD112315CB72E3071AED59B /* AppUser.swift */; };
 		40D569D797EE2D968716C8F9 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13611B3A2B8C0EC5588245FF /* Onboarding.swift */; };
 		430D3C12E0830D055C502212 /* OnboardingSwipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF19B5B5CC54602344E1DD2B /* OnboardingSwipe.swift */; };
 		44AACEF34318F453DEA71152 /* OnboardingCurveGuess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 813007FA0378B80310F6619D /* OnboardingCurveGuess.swift */; };
@@ -73,6 +75,7 @@
 		BBB0B8FC3A66A14A5979F181 /* GT-Walsheim-Regular-Trial.otf in Resources */ = {isa = PBXBuildFile; fileRef = 58107783B7588FE3B9FFAF14 /* GT-Walsheim-Regular-Trial.otf */; };
 		BFC1BD2DBC96A300F2044E0F /* HeldWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5022775BEE4179BDD6E6DC5A /* HeldWidget.swift */; };
 		C192556CC1F6D90D6C6990A6 /* ColorPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A912E78837659BDA956E9EA /* ColorPrimitives.swift */; };
+		C2663511F9884E036B35A8A6 /* BubbleRipple.metal in Sources */ = {isa = PBXBuildFile; fileRef = E0290F1D96A791F2616B3019 /* BubbleRipple.metal */; };
 		C78261403520EA753F182F79 /* OnboardingTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A530D6C57A47D34A5C92B /* OnboardingTerms.swift */; };
 		C919A142A64A317BB9F32D48 /* OnboardingHold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 286B272FFC314EE872A4963D /* OnboardingHold.swift */; };
 		CF444B9D737DA514A53C484C /* GearWormPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3017FF5D1A7EEC715D3ECA /* GearWormPattern.swift */; };
@@ -144,6 +147,7 @@
 		5022775BEE4179BDD6E6DC5A /* HeldWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeldWidget.swift; sourceTree = "<group>"; };
 		56F2EA3C4A8F2D0B586F26B7 /* BorderLightSweep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderLightSweep.swift; sourceTree = "<group>"; };
 		58107783B7588FE3B9FFAF14 /* GT-Walsheim-Regular-Trial.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GT-Walsheim-Regular-Trial.otf"; sourceTree = "<group>"; };
+		5CF8AF61721EBCABB0477187 /* WaterCaustics.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = WaterCaustics.metal; sourceTree = "<group>"; };
 		5EFAA82280173BC040FAFB10 /* SpacingPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacingPrimitives.swift; sourceTree = "<group>"; };
 		6391215D0C659F193FBABF7D /* OnboardingIntro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingIntro.swift; sourceTree = "<group>"; };
 		67EE2A6607A856821B88ECF0 /* OnboardingResearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingResearch.swift; sourceTree = "<group>"; };
@@ -188,6 +192,7 @@
 		D5E9A9E0C86CE12AE7EA967C /* FixedDepositsYours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositsYours.swift; sourceTree = "<group>"; };
 		D90A530D6C57A47D34A5C92B /* OnboardingTerms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTerms.swift; sourceTree = "<group>"; };
 		DC3BDC74C8CD1B45996CBBB8 /* TypographyScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypographyScale.swift; sourceTree = "<group>"; };
+		E0290F1D96A791F2616B3019 /* BubbleRipple.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BubbleRipple.metal; sourceTree = "<group>"; };
 		E18DBABB52400FFD9F25F599 /* FixedDepositHeld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositHeld.swift; sourceTree = "<group>"; };
 		E60CB34EED9EDF90E33340FC /* OnboardingAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAnalysis.swift; sourceTree = "<group>"; };
 		E89842D9244C8CA992DEC32A /* watch_movement.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = watch_movement.mp4; sourceTree = "<group>"; };
@@ -195,6 +200,7 @@
 		F0FC638931B4840CAE7F7E5F /* TokenContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenContractTests.swift; sourceTree = "<group>"; };
 		F50B0885996CDFA7C8558BD7 /* GT-Super-Text-Medium-Trial.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GT-Super-Text-Medium-Trial.otf"; sourceTree = "<group>"; };
 		FABE71BAEDDA2FE57FEEEBB1 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		FAD112315CB72E3071AED59B /* AppUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUser.swift; sourceTree = "<group>"; };
 		FD6C2832BEDA5FAACE813174 /* fund_curves.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fund_curves.json; sourceTree = "<group>"; };
 		FE5C767C9C134BD5E609DAB6 /* GT-Walsheim-Medium-Trial.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GT-Walsheim-Medium-Trial.otf"; sourceTree = "<group>"; };
 		FFCD3FFD872432085BAE8160 /* watch_movement_black.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = watch_movement_black.mp4; sourceTree = "<group>"; };
@@ -316,8 +322,10 @@
 			isa = PBXGroup;
 			children = (
 				A95CACFCA18A48950C43DEEA /* AdvisorBar.swift */,
+				FAD112315CB72E3071AED59B /* AppUser.swift */,
 				35C1E9C9C6D5640F6AD337DF /* BandWarp.metal */,
 				56F2EA3C4A8F2D0B586F26B7 /* BorderLightSweep.swift */,
+				E0290F1D96A791F2616B3019 /* BubbleRipple.metal */,
 				75A0FD62A9BEC1C173AEBBD2 /* ChatExperience.swift */,
 				827BCB10B8CE20D351194C62 /* ChatZoomTransition.swift */,
 				342921007836A09A10668B81 /* Composer.swift */,
@@ -369,6 +377,7 @@
 				E9A49490A2FB49CCD36FEB6F /* SelectableText.swift */,
 				7C9D0BE599C1B23DD4DB8891 /* Theme.swift */,
 				7359B7EA93ED2CD16CC46D85 /* WalkingHorse.swift */,
+				5CF8AF61721EBCABB0477187 /* WaterCaustics.metal */,
 				0E3945FE87893AC89A8F6C33 /* DesignSystem */,
 			);
 			path = Sources;
@@ -526,8 +535,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				868B21A67867E704C4CB09E2 /* AdvisorBar.swift in Sources */,
+				3680DB47597E6DD219D8E8B7 /* AppUser.swift in Sources */,
 				0761955C32984B6273243408 /* BandWarp.metal in Sources */,
 				85D4ABDBB6D55AEECE7D7794 /* BorderLightSweep.swift in Sources */,
+				C2663511F9884E036B35A8A6 /* BubbleRipple.metal in Sources */,
 				767A5DC5730C18A40E47F52A /* ChatExperience.swift in Sources */,
 				CFF305172B5A29502695708B /* ChatZoomTransition.swift in Sources */,
 				C192556CC1F6D90D6C6990A6 /* ColorPrimitives.swift in Sources */,
@@ -593,6 +604,7 @@
 				6F9AF9A4C96F7BBAA8F2ECA9 /* Theme.swift in Sources */,
 				77CD1AD2C20145FE33DA032C /* TypographyScale.swift in Sources */,
 				AAA9FB43FC972AC54169EC58 /* WalkingHorse.swift in Sources */,
+				20B34BED9ADC296945C4367D /* WaterCaustics.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

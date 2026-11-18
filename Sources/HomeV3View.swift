@@ -13,7 +13,7 @@ struct HomeV3View: View {
                     ZStack(alignment: .topLeading) {
                         HomeV3Blobs()
 
-                        Text("Hello Jojo")
+                        Text("Hello \(AppUser.name)")
                             .font(FigmaFont.reckless(31))
                             .foregroundStyle(Color.ink)
                             .frame(height: 39)

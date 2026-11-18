@@ -5,13 +5,17 @@ import SwiftUI
 /// this, at `inGuideCard(_:_:top:)` in the card's measure.
 private struct OnboardingGuideChrome: View {
     let heading: String
+    /// What she says about this guide's widget
+    let said: String
     var confirmEnabled = true
+    /// Set a second after she's finished saying her piece: the card, what's on it and Continue come up then
+    @Binding var cardUp: Bool
     let onConfirm: () -> Void
 
     @Environment(\.onboardingTop) private var top
+    /// Her message has come in
+    @State private var saidShown = false
 
-    /// The same line on all three frames
-    static let said = "Great, now you understanding what i say is important. Select what feels right to you"
     private static var side: CGFloat { (UIScreen.main.bounds.width - 390) / 2 }
 
     /// Where the card's corner is, for content laid over it
@@ -25,10 +29,24 @@ private struct OnboardingGuideChrome: View {
         ZStack(alignment: .topLeading) {
             AdvisorDawnBackground()
 
-            AdvisorBubble(text: Self.said)
-                .at(Self.side + 35, 104 - 44 + top)
             AdvisorAvatar()
                 .at(Self.side + 15, 61 - 44 + top)
+            // Over the foot of her picture, arriving as the chat's bubbles do
+            if saidShown {
+                AdvisorBubble(text: said, typed: true) {
+                    // Only her first line brings the card; what she says after that finds it there
+                    guard !cardUp else { return }
+                    Task {
+                        try? await Task.sleep(for: .seconds(1))
+                        Haptics.tap()
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.84)) { cardUp = true }
+                    }
+                }
+                    .at(Self.side + 35, 104 - 44 + top)
+                    .transition(.scale(scale: 0.9, anchor: .bottomLeading).combined(with: .opacity).combined(with: .offset(y: 12)))
+                    // A new line is a new bubble: the last one goes and this one comes up and types
+                    .id(said)
+            }
 
             ZStack(alignment: .topLeading) {
                 Color.white
@@ -41,16 +59,31 @@ private struct OnboardingGuideChrome: View {
             }
             .frame(width: 364, height: 494, alignment: .topLeading)
             .at(Self.cardOrigin(top: top).x, Self.cardOrigin(top: top).y)
+            .guideCardArrival(cardUp)
 
             OnboardingConfirmButton(enabled: confirmEnabled, action: onConfirm)
                 .frame(maxWidth: .infinity)
                 .padding(.top, Self.confirmTop(top: top))
+                .opacity(cardUp ? 1 : 0)
+                .allowsHitTesting(cardUp)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .task {
+            guard !saidShown else { return }
+            try? await Task.sleep(for: .seconds(0.5))
+            guard !Task.isCancelled else { return }
+            Haptics.thresholdCrossed()
+            withAnimation(.spring(response: 0.42, dampingFraction: 0.8)) { saidShown = true }
+        }
     }
 }
 
 private extension View {
+    /// The card and what's on it come up from below together
+    func guideCardArrival(_ up: Bool) -> some View {
+        offset(y: up ? 0 : 60).opacity(up ? 1 : 0).allowsHitTesting(up)
+    }
+
     /// Placed in the guides' card, in the card's own measure
     func inGuideCard(_ x: CGFloat, _ y: CGFloat, top: CGFloat) -> some View {
         let origin = OnboardingGuideChrome.cardOrigin(top: top)
@@ -89,6 +122,12 @@ struct OnboardingHoldGuideView: View {
 
     @Environment(\.onboardingTop) private var top
 
+    @State private var cardUp = false
+    /// What she's saying: how it's done, then well done, then her answer to a question tapped
+    @State private var said = OnboardingHoldGuideView.asks
+    private static let asks = "Curious about something you see? Tap and hold a widget and I’ll suggest what to ask."
+    private static let congrats = "Congrats, you’ve learnt it! These are questions I’d suggest for this widget."
+    private static let later = "I’ll definitely answer this later. For now, let’s continue to the next one."
     @State private var heldFrame: CGRect?
     @State private var cardFrame: CGRect = .zero
     @State private var pressing = false
@@ -125,7 +164,7 @@ struct OnboardingHoldGuideView: View {
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            OnboardingGuideChrome(heading: "Tap & hold the widget\nto get a suggestion", confirmEnabled: done, onConfirm: onContinue)
+            OnboardingGuideChrome(heading: "Tap & hold the widget\nto get a suggestion", said: said, confirmEnabled: done, cardUp: $cardUp, onConfirm: onContinue)
 
             Group {
                 ZStack(alignment: .topLeading) {
@@ -217,13 +256,19 @@ struct OnboardingHoldGuideView: View {
                 }
                 .inGuideCard(17.5, 102, top: top)
             }
+            .guideCardArrival(cardUp)
 
             HeldWidgetLayer(
                 frame: heldFrame,
                 questions: Self.questions,
                 progress: holdProgress,
                 chipsOut: chipsOut,
-                onDismiss: release
+                onDismiss: release,
+                onQuestion: { _ in
+                    guard said != Self.later else { return }
+                    Haptics.tap()
+                    withAnimation(.spring(response: 0.42, dampingFraction: 0.8)) { said = Self.later }
+                }
             ) { widget }
 
             // Above the held layer, so it can be tapped while the widget's lifted
@@ -238,10 +283,13 @@ struct OnboardingHoldGuideView: View {
         }
         .ignoresSafeArea()
         .task(id: hintRun) { await demonstrate() }
+        // The wait before the demonstration starts once the card is there
+        .onChange(of: cardUp) { hintRun += 1 }
     }
 
     /// Shows how it's done, over and over, for as long as the widget is left alone
     private func demonstrate() async {
+        guard cardUp else { return }
         do {
             try await Task.sleep(for: .seconds(3))
             while !done, !pressing, heldFrame == nil {
@@ -290,6 +338,10 @@ struct OnboardingHoldGuideView: View {
             confettiBurst += 1
             Haptics.tap()
             withAnimation { done = true }
+            // and she says so, in a new bubble
+            if said == Self.asks {
+                withAnimation(.spring(response: 0.42, dampingFraction: 0.8)) { said = Self.congrats }
+            }
         }
     }
 }
@@ -303,6 +355,7 @@ struct OnboardingSwipeGuideView: View {
 
     @Environment(\.onboardingTop) private var top
 
+    @State private var cardUp = false
     @State private var done = false
     @State private var isComposing = false
     @State private var composeProgress: CGFloat = 0
@@ -337,7 +390,7 @@ struct OnboardingSwipeGuideView: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .topLeading) {
-                OnboardingGuideChrome(heading: "Swipe the widget\nto ask your advisor", confirmEnabled: done, onConfirm: onContinue)
+                OnboardingGuideChrome(heading: "Swipe the widget\nto ask your advisor", said: "Have a question of your own? Swipe a widget to the right and ask me about it.", confirmEnabled: done, cardUp: $cardUp, onConfirm: onContinue)
 
                 Group {
                     ZStack(alignment: .topLeading) {
@@ -374,6 +427,7 @@ struct OnboardingSwipeGuideView: View {
                     )
                     .inGuideCard(18, 102, top: top)
                 }
+                .guideCardArrival(cardUp)
 
                 ComposerLayer(
                     isFocused: $focused,
@@ -399,10 +453,13 @@ struct OnboardingSwipeGuideView: View {
         }
         .ignoresSafeArea()
         .task(id: hintRun) { await demonstrate() }
+        // The wait before the demonstration starts once the card is there
+        .onChange(of: cardUp) { hintRun += 1 }
     }
 
     /// Shows how it's done, over and over, for as long as the widget is left alone
     private func demonstrate() async {
+        guard cardUp else { return }
         do {
             try await Task.sleep(for: .seconds(3))
             while !done, !dragging, !isComposing {
@@ -480,13 +537,15 @@ struct OnboardingComplexityGuideView: View {
 
     @State private var position: CGFloat = 0
     @State private var level: ComplexityLevel = .simply
+    @State private var cardUp = false
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            OnboardingGuideChrome(heading: "What feels comfortable\nto read?", onConfirm: onContinue)
+            OnboardingGuideChrome(heading: "What feels comfortable\nto read?", said: "It matters that you understand what I say. Pick the way of reading that feels right.", cardUp: $cardUp, onConfirm: onContinue)
 
             ComplexityCard(level: level, soft: true)
                 .inGuideCard(19, 94, top: top)
+                .guideCardArrival(cardUp)
 
             ComplexitySlider(position: $position, soft: true) { newLevel in
                 guard newLevel != level else { return }
@@ -494,6 +553,7 @@ struct OnboardingComplexityGuideView: View {
                 level = newLevel
             }
             .inGuideCard(20, 406, top: top)
+            .guideCardArrival(cardUp)
         }
         .ignoresSafeArea()
     }

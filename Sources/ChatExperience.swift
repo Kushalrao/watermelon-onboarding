@@ -243,7 +243,7 @@ struct ChatMessage: Identifiable, Equatable {
     ]
 
     /// How the agent opens a new conversation
-    static let opening = "Morning Jojo. Markets opened a little shaky today, but your portfolio is holding steady. Want me to walk you through what moved?"
+    static let opening = "Morning \(AppUser.name). Markets opened a little shaky today, but your portfolio is holding steady. Want me to walk you through what moved?"
 
     /// Placeholder agent answers, cycled in order
     static let agentReplies: [String] = [

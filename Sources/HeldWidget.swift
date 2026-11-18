@@ -17,6 +17,8 @@ struct HeldWidgetLayer<Widget: View>: View {
     /// Chips animate out of the widget's corner when this turns true, one after another
     let chipsOut: Bool
     let onDismiss: () -> Void
+    /// Given where a tap on a question does something
+    var onQuestion: ((String) -> Void)? = nil
     @ViewBuilder let widget: () -> Widget
 
     private let chipGap: CGFloat = 16      // 254 - 238
@@ -58,6 +60,8 @@ struct HeldWidgetLayer<Widget: View>: View {
                     let timing = Stagger.arrival(index, first: 0.5)
 
                     QuestionChip(title: question)
+                        .onTapGesture { onQuestion?(question) }
+                        .accessibilityAddTraits(onQuestion == nil ? [] : .isButton)
                         .scaleEffect(chipsOut ? 1 : 0.3, anchor: .topLeading)
                         .opacity(chipsOut ? 1 : 0)
                         .offset(y: chipsOut ? 0 : frame.maxY - 24 - restingY)

@@ -45,6 +45,27 @@ struct OnboardingIntroView: View {
             }
             .preferredColorScheme(.light)
             .background(background.ignoresSafeArea())
+            // The whole code in: it's shown as right, the button turns to a loader, and the flow moves on by itself
+            .onChange(of: stage.code) { _, code in
+                guard code.count == 6 else {
+                    stage.codeCorrect = false
+                    stage.verifying = false
+                    return
+                }
+                guard stage.otp, !stage.identity else { return }
+                guard !stage.codeCorrect else { return }
+                Haptics.thresholdCrossed()
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) { stage.codeCorrect = true }
+                Task {
+                    try? await Task.sleep(for: .seconds(0.7))
+                    guard stage.codeCorrect, !stage.identity else { return }
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.86)) { stage.verifying = true }
+                    try? await Task.sleep(for: .seconds(1.2))
+                    guard stage.verifying else { return }
+                    stage.verifying = false
+                    if !stage.identity { verify() }
+                }
+            }
             // The number pad rises over the empty lower half; the card stays put
             .ignoresSafeArea(.keyboard)
     }
@@ -334,10 +355,18 @@ struct OnboardingIntroView: View {
             ZStack(alignment: .topLeading) {
                 OneTimeCodeField(code: $stage.code)
                     .frame(width: 318, height: 67)
-                Self.codeText(stage.code)
+                Self.codeText(stage.code, correct: stage.codeCorrect)
                     .frame(width: 318, height: 48)
                     .at(0, 11)
                     .allowsHitTesting(false)
+                // 930:10095: the code's right
+                if stage.codeCorrect {
+                    Image("OtpCheck")
+                        .frame(width: 27, height: 27)
+                        .at(277, 19.5)
+                        .transition(.scale(scale: 0.4).combined(with: .opacity))
+                        .accessibilityLabel("Code is correct")
+                }
                 Rectangle()
                     .fill(Color(hex: 0xEBEBEB))
                     .frame(width: 316, height: 1)
@@ -606,14 +635,16 @@ struct OnboardingIntroView: View {
     }
 
     /// "000-000" (31:1213): typed digits fill in from the left in ink, the rest stay as pale zeros
-    private static func codeText(_ code: String) -> some View {
+    private static func codeText(_ code: String, correct: Bool = false) -> some View {
         let digits = Array(code)
+        // 930:10007: all of it green once it's right
+        let green = Color(hex: 0x00A800)
         var text = Text("")
         for i in 0..<6 {
-            if i == 3 { text = text + Text("-").foregroundColor(Color(hex: 0x212121).opacity(0.35)) }
+            if i == 3 { text = text + Text("-").foregroundColor(correct ? green : Color(hex: 0x212121).opacity(0.35)) }
             let typed = i < digits.count
             text = text + Text(typed ? String(digits[i]) : "0")
-                .foregroundColor(Color(hex: 0x212121).opacity(typed ? 0.85 : 0.35))
+                .foregroundColor(correct ? green : Color(hex: 0x212121).opacity(typed ? 0.85 : 0.35))
         }
         return text
             .font(FigmaFont.walsheimMedium(35))
@@ -725,24 +756,38 @@ struct OnboardingIntroView: View {
     /// Verify: 344 × 45 under the phone card (679:23205) and at the foot of the KYC step (802:5552), where it turns
     /// into Confirm; 93 × 45 under the OTP card's right edge (31:906)
     private var verifyButton: some View {
-        Button(action: verify) {
+        // While the code is being checked it's a round loader, at the pill's right end
+        let loading = stage.verifying && !verifyWide
+        return Button(action: verify) {
             ZStack {
                 Text(stage.idCard ? "Confirm" : "Verify")
                     .font(FigmaFont.walsheimMedium(17))
                     .foregroundStyle(Color.white)
+                    .fixedSize()
                     .offset(x: verifyWide ? -0.5 : -9)
+                    .opacity(loading ? 0 : 1)
                 Image("VerifyChevron")
                     .frame(width: 23, height: 23)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.trailing, 5)
+                    .opacity(loading ? 0 : 1)
+                if loading {
+                    ProgressView()
+                        .tint(Color.white)
+                        .transition(.opacity)
+                }
             }
-            .frame(width: verifyWide ? 344 : 93, height: 45)
+            .frame(width: loading ? 45 : verifyWide ? 344 : 93, height: 45)
             // Gap: Figma #1F1513 fill, 2 pt black 5% border and 0 3 30 +8 3% shadow; none are tokens
             .background(Capsule().fill(Color(hex: 0x1F1513)))
             .overlay(Capsule().stroke(Color.black.opacity(0.05), lineWidth: 2))
             .shadow(color: Color.black.opacity(0.03), radius: 15, x: 0, y: 3)
         }
         .buttonStyle(PressScaleStyle())
+        .allowsHitTesting(!loading)
+        .accessibilityLabel(loading ? "Verifying" : stage.idCard ? "Confirm" : "Verify")
+        // keeps its right edge where the pill's was
+        .frame(width: verifyWide ? 344 : 93, alignment: .trailing)
     }
 }
 
@@ -769,6 +814,9 @@ struct OnboardingIntroView: View {
     var showsTerms = args.contains("-onboardingTerms")
     /// The sphere card has turned into the PAN card. `-onboardingPAN` opens on it.
     var idCard = args.contains("-onboardingPAN")
+    /// The whole code is in and shown as right; then it's being checked, the button a loader
+    var codeCorrect = false
+    var verifying = false
     /// The gender picked on the KYC card, and whether its choices are up
     var gender: String?
     var genderOpen = false

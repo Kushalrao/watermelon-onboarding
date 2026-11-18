@@ -127,11 +127,10 @@ struct ComplexityCard: View {
     @ViewBuilder
     private func content(_ level: ComplexityLevel) -> some View {
         ZStack(alignment: .topLeading) {
-            Image("MetaIcon")
+            Image("FundPPFAS")
                 .resizable()
-                .frame(width: 36, height: 39)
                 .frame(width: 37, height: 37)
-                .clipped()
+                .clipShape(Circle())
                 .at(13, 17)
 
             switch level {
@@ -146,7 +145,7 @@ struct ComplexityCard: View {
     // 792:13209 — plain language
     private var simply: some View {
         ZStack(alignment: .topLeading) {
-            header("Mircosoft", "via New york stock exchange")
+            header("Parag Parikh Flexi Cap", "A mutual fund from PPFAS")
             label("Worth today").at(14, 77)
             amount("Rs1,42,300").at(128, 77)
             label("Growth").at(14, 116)
@@ -163,7 +162,7 @@ struct ComplexityCard: View {
     // 792:13236 — "any"
     private var any: some View {
         ZStack(alignment: .topLeading) {
-            header("MSFT", "NYSE")
+            header("Parag Parikh Flexi Cap", "Direct · Growth")
             label("Total worth").at(14, 77)
             amount("Rs1,42,300").at(128, 77)
             gain.at(251, 77)
@@ -179,7 +178,7 @@ struct ComplexityCard: View {
     // Shortest form: terms only, no explanations
     private var terms: some View {
         ZStack(alignment: .topLeading) {
-            header("MSFT", "NYSE")
+            header("Parag Parikh Flexi Cap", "Direct · Growth")
             label("Total worth").at(14, 77)
             amount("Rs1,42,300").at(128, 77)
             gain.at(251, 77)

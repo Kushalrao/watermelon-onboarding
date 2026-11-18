@@ -10,10 +10,13 @@ struct OnboardingFlow: View {
     /// The status bar's height, for the screens that place themselves under it
     @State private var top: CGFloat = 62
 
-    /// Launch argument `-onboardingStep N` starts the flow at step N
+    /// Launch argument `-onboardingStep N` starts the flow at step N. With no flag of ours at all the app opens on
+    /// the congratulations over water (step 10), the screen being worked on; `-onboarding` starts from the top.
     private static var debugStartStep: Int {
         let args = ProcessInfo.processInfo.arguments
-        guard let i = args.firstIndex(of: "-onboardingStep"), i + 1 < args.count, let n = Int(args[i + 1]) else { return 0 }
+        guard let i = args.firstIndex(of: "-onboardingStep"), i + 1 < args.count, let n = Int(args[i + 1]) else {
+            return MutualFundsPrototypeApp.plainLaunch ? 10 : 0
+        }
         return n
     }
 
@@ -56,7 +59,7 @@ struct OnboardingFlow: View {
             case 10:
                 // After the second report's Understood: "Congrats! you have a proactive personal advisor now"
                 // (1027:11565), its ground coming in over the chat
-                OnboardingCongratsView(onContinue: advance)
+                OnboardingCongratsView(water: true, onContinue: advance)
                     .transition(.opacity)
                     .zIndex(3)
             case 15:
@@ -143,7 +146,7 @@ struct OnboardingWelcomeView: View {
         ZStack(alignment: .topLeading) {
             LinearGradient(colors: [Color.white, Color(hex: 0xF7F7F7)], startPoint: .top, endPoint: .bottom)
 
-            Text("Hi Jojo")
+            Text("Hi \(AppUser.name)")
                 .font(FigmaFont.recklessRegular(47))
                 .foregroundStyle(Color.ink)
                 .frame(width: 348, alignment: .leading)
