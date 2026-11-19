@@ -556,5 +556,14 @@ struct OnboardingComplexityGuideView: View {
             .guideCardArrival(cardUp)
         }
         .ignoresSafeArea()
+        .onAppear {
+            // `-complexity any|terms`: start at that level (for screenshots)
+            let args = ProcessInfo.processInfo.arguments
+            if let i = args.firstIndex(of: "-complexity"), i + 1 < args.count,
+               let l = ComplexityLevel(rawValue: args[i + 1]) {
+                level = l
+                position = l.stop
+            }
+        }
     }
 }

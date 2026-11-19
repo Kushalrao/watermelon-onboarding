@@ -46,7 +46,7 @@ struct OnboardingDecadeWelcomeView: View {
     /// The agent's offer to help (225:11830), then the topics to start on, one by one: the label, then each
     @State private var topicsShown = 0
     /// The topic the user started on
-    @State private var topic: Topic? = OnboardingDecadeWelcomeView.startsInChat ? Topic.all[0] : nil
+    @State private var topic: Topic? = OnboardingDecadeWelcomeView.startsInChat ? Topic.equityYear : nil
     /// The avatar goes as soon as a topic's sent; the topic is pinned over the card 1.7s later, the card making room
     /// The chat has Decade pinned over it from the start (316:17768), no avatar in the card
     @State private var avatarGone = OnboardingDecadeWelcomeView.startsInChat
@@ -62,10 +62,17 @@ struct OnboardingDecadeWelcomeView: View {
         /// The line over the question on its card (1080:14025)
         var label = "Mutual funds"
 
+        /// The one the research and its report are written for
+        static let equityYear = Topic(
+            title: "How have equity mutual funds done over the last year and what does that tell us about the future?",
+            reply: "Good place to start. I’ll compare a year of returns across equity fund categories, see which held up and which slipped, and what that tells us.",
+            plan: "Equity mutual funds, the last year", short: "Mutual funds performance")
+
         static let all = [
-            Topic(title: "How have equity mutual funds done over the last year and what does that tell us about the future?",
-                  reply: "Good place to start. I’ll compare a year of returns across equity fund categories, see which held up and which slipped, and what that tells us.",
-                  plan: "Equity mutual funds, the last year", short: "Mutual funds performance"),
+            Topic(title: "Build me a mutual fund portfolio",
+                  reply: "Happy to. I’ll look at how each kind of fund has done, what it costs and how far it can fall, and work out a mix of funds that holds together.",
+                  plan: "Building a mutual fund portfolio", short: "A mutual fund portfolio"),
+            equityYear,
             Topic(title: "Can mutual funds still make me wealthy?",
                   reply: "A fair question. I’ll set long-run fund returns against inflation, fixed deposits and the index, and see what steady investing has really added up to.",
                   plan: "Mutual funds and building wealth", short: "Wealth from mutual funds"),
@@ -182,7 +189,9 @@ struct OnboardingDecadeWelcomeView: View {
     private static let startsDone = startsInAnalysis || ProcessInfo.processInfo.arguments.contains("-welcomeDone")
     /// `-welcomeAnalysis` opens with the analysis up, `-analysisDone` with it finished
     private static let startsInAnalysis = startsAnalysisDone || ProcessInfo.processInfo.arguments.contains("-welcomeAnalysis")
-    private static let startsAnalysisDone = startsAdvice || ProcessInfo.processInfo.arguments.contains("-analysisDone")
+    private static let startsAnalysisDone = startsAdvice || startsOwnReport || ProcessInfo.processInfo.arguments.contains("-analysisDone")
+    /// `-portfolioReport` opens straight on the report on the user's own funds
+    private static let startsOwnReport = ProcessInfo.processInfo.arguments.contains("-portfolioReport")
 
     /// `-welcomeAdvice` opens with the analysis stored and the connect sheet up
     private static let startsAdvice = ProcessInfo.processInfo.arguments.contains("-welcomeAdvice")
@@ -318,13 +327,19 @@ struct OnboardingDecadeWelcomeView: View {
     /// The analysis's sheet is black once it's done, and 40pt taller, 20 of it upward
     /// The finished analysis is a taller sheet, standing 20pt higher
     private var analysisTall: Bool { activeSheet == .analysis && analysisDone }
-    private var sheetHeight: CGFloat { analysisTall ? AnalysisSheet.blackHeight - (suggestionOut ? Self.suggestionRoom : 0) : 612 }
+    private var sheetHeight: CGFloat {
+        analysisTall ? AnalysisSheet.reportHeight - (suggestionOut ? Self.suggestionRoom : 0) : 612
+    }
+    /// How far up a finished report stands: 751 tall (1182:16908), it comes up to just under the status bar,
+    /// which leaves the same 45 under it as the frame
+    private var sheetRise: CGFloat { analysisTall ? 111 : 0 }
     /// The first report is open and being read: its suggested question has come out under the sheet, which gives
-    /// up this much height for it (the chip's 53 and 12 between them)
+    /// up this much height for it (the chip, 5 roomier on every side here, and 12 between them)
     private var suggestionOut: Bool {
         suggestionPopped && sheetUp && !sheetClosing && analysisTall && !portfolioReportReady && !analysisStored
     }
-    private static let suggestionRoom: CGFloat = 65
+    private static let suggestionPadding: CGFloat = 5
+    private static let suggestionRoom: CGFloat = PortfolioAskChip.height + suggestionPadding * 2 + 12
     /// The card is shorter by this much once compact (736 → 652, the photo 316 → 220)
     private var lift: CGFloat { compact ? 92 : 0 }
 
@@ -405,15 +420,18 @@ struct OnboardingDecadeWelcomeView: View {
             if sheetUp {
                 sheet
                     .padding(.top, 127)
+                    // Its place is counted as no taller than the page, so a tall report isn't pulled up to centre what
+                    // would overflow; it hangs from the top whatever its height
+                    .frame(height: 760, alignment: .top)
                     .transition(.move(edge: .bottom).combined(with: .opacity.animation(.easeOut(duration: 0.2))))
                     .zIndex(2)
             }
 
             // What's suggested next, out from under the report at its right edge, the sheet shorter to make room
             if suggestionOut {
-                PortfolioAskChip(action: askPortfolio)
+                PortfolioAskChip(room: Self.suggestionPadding, action: askPortfolio)
                     .frame(width: 368, alignment: .trailing)
-                    .padding(.top, 127 - 20 + sheetHeight + 12)
+                    .padding(.top, 127 - sheetRise + sheetHeight + 12)
                     .transition(.offset(y: 90).combined(with: .opacity))
                     .zIndex(2)
             }
@@ -464,6 +482,7 @@ struct OnboardingDecadeWelcomeView: View {
                                 personalPrompt = 0
                             }
                         } else {
+                            portfolioReportReady = Self.startsOwnReport
                             sheetUp = true
                             startAnalysis()
                         }
@@ -879,7 +898,7 @@ struct OnboardingDecadeWelcomeView: View {
                 .shadow(color: Color.black.opacity(sheetClosing ? 0.03 : Self.cardShadow), radius: sheetClosing ? 30 : Self.cardShadowRadius, x: 0, y: 4)
         )
         // The black sheet stands 20pt higher (146:4908)
-        .offset(sheetClosing ? chipOffset : CGSize(width: 0, height: analysisTall ? -20 : 0))
+        .offset(sheetClosing ? chipOffset : CGSize(width: 0, height: -sheetRise))
         .allowsHitTesting(!sheetClosing)
     }
 
@@ -1129,7 +1148,7 @@ struct OnboardingDecadeWelcomeView: View {
             topics
             // While the research runs, what it's doing, and now and then the data it's going over (270:16266)
             if let researchStarted, !researchDone, planShown {
-                ResearchLive(started: researchStarted, equityYear: topic == Topic.all[0]) { height in
+                ResearchLive(started: researchStarted, equityYear: topic == Topic.equityYear) { height in
                     keepInView(researchFoot(height))
                 }
                 .frame(width: ResearchLive.cardWidth, alignment: .leading)

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -158,7 +158,7 @@
 		7357B2BFCB5B2CFB4E7D5CC9 /* HomeV4View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeV4View.swift; sourceTree = "<group>"; };
 		7359B7EA93ED2CD16CC46D85 /* WalkingHorse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkingHorse.swift; sourceTree = "<group>"; };
 		74CB77CD82F51F0153726B70 /* MoodDial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodDial.swift; sourceTree = "<group>"; };
-		757D37E4B04D269C7ADA2C8E /* MutualFundsPrototype.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MutualFundsPrototype.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		757D37E4B04D269C7ADA2C8E /* MutualFundsPrototype.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MutualFundsPrototype.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		75A0FD62A9BEC1C173AEBBD2 /* ChatExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExperience.swift; sourceTree = "<group>"; };
 		7A1821E9B8DB68FB3FE760E2 /* DecadeBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecadeBackdrop.swift; sourceTree = "<group>"; };
 		7C9D0BE599C1B23DD4DB8891 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -195,7 +195,7 @@
 		E0290F1D96A791F2616B3019 /* BubbleRipple.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BubbleRipple.metal; sourceTree = "<group>"; };
 		E18DBABB52400FFD9F25F599 /* FixedDepositHeld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositHeld.swift; sourceTree = "<group>"; };
 		E60CB34EED9EDF90E33340FC /* OnboardingAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAnalysis.swift; sourceTree = "<group>"; };
-		E89842D9244C8CA992DEC32A /* watch_movement.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = watch_movement.mp4; sourceTree = "<group>"; };
+		E89842D9244C8CA992DEC32A /* watch_movement.mp4 */ = {isa = PBXFileReference; path = watch_movement.mp4; sourceTree = "<group>"; };
 		E9A49490A2FB49CCD36FEB6F /* SelectableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableText.swift; sourceTree = "<group>"; };
 		F0FC638931B4840CAE7F7E5F /* TokenContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenContractTests.swift; sourceTree = "<group>"; };
 		F50B0885996CDFA7C8558BD7 /* GT-Super-Text-Medium-Trial.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GT-Super-Text-Medium-Trial.otf"; sourceTree = "<group>"; };
@@ -203,7 +203,7 @@
 		FAD112315CB72E3071AED59B /* AppUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUser.swift; sourceTree = "<group>"; };
 		FD6C2832BEDA5FAACE813174 /* fund_curves.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fund_curves.json; sourceTree = "<group>"; };
 		FE5C767C9C134BD5E609DAB6 /* GT-Walsheim-Medium-Trial.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GT-Walsheim-Medium-Trial.otf"; sourceTree = "<group>"; };
-		FFCD3FFD872432085BAE8160 /* watch_movement_black.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = watch_movement_black.mp4; sourceTree = "<group>"; };
+		FFCD3FFD872432085BAE8160 /* watch_movement_black.mp4 */ = {isa = PBXFileReference; path = watch_movement_black.mp4; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -465,6 +465,7 @@
 			);
 			mainGroup = B0519802EB8D34F31ECD13AD;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -718,7 +719,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = D76GU59P59;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -810,7 +810,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = D76GU59P59;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -633,7 +633,7 @@ struct MFImportView: View {
     }
 }
 
-/// The fund houses' nine tiles (952:14376 onwards), in a 368 × 220 band. They rest where the frames scatter them
+/// The fund houses' nine tiles (952:14376 onwards, with the houses' own logos), in a 368 × 220 band. They rest where the frames scatter them
 /// and turn slowly as one, as if set on a tilted disc: round the back they shrink a little and slip behind, at
 /// the front they come forward, each breathing on its own beat. The loader over the MFCentral screens.
 struct MFHouseTiles: View {
@@ -644,9 +644,10 @@ struct MFHouseTiles: View {
 
     /// Each house's tile: its mark, where its centre sits across the card, and its top
     private static let houses: [(logo: String, centre: CGFloat, top: CGFloat)] = [
-        ("ImportHouse1", 80.5, 28), ("ImportHouse2", 180.5, 21), ("ImportHouse3", 264.5, 21),
-        ("ImportHouse4", 80.5, 110), ("ImportHouse5", 150.5, 86), ("ImportHouse6", 220.5, 86),
-        ("ImportHouse7", 286.5, 92), ("ImportHouse8", 158.5, 158), ("ImportHouse9", 246.5, 158),
+        // The fund houses themselves: HDFC, PPFAS, ICICI Prudential, SBI, Kotak, Axis, Quant, Nippon India, HSBC
+        ("ImportFund3", 80.5, 28), ("FundPPFAS", 180.5, 21), ("ImportFund1", 264.5, 21),
+        ("FDGrowthSBI", 80.5, 110), ("ImportFund4", 150.5, 86), ("ImportFund2", 220.5, 86),
+        ("FundQuant", 286.5, 92), ("FundNippon", 158.5, 158), ("ImportHouseHSBC", 246.5, 158),
     ]
     /// The cluster's middle, which they turn about
     private static let middle = CGPoint(x: 184, y: 115)
@@ -683,24 +684,13 @@ struct MFHouseTiles: View {
     /// A 51 tile (952:14376): white, hairline border, the mark 37 across inside
     private func houseTile(_ logo: String) -> some View {
         let shape = RoundedRectangle(cornerRadius: 15, style: .continuous)
-        return Group {
-            if logo == "ImportHouse5" {
-                // The frame crops this one out of a larger picture
-                Image(logo)
-                    .resizable()
-                    .frame(width: 51.714, height: 51.714)
-                    .offset(x: -7.776 + 0.5, y: -5.971 - 1)
-                    .frame(width: 37, height: 37, alignment: .topLeading)
-                    .clipped()
-            } else {
-                Image(logo)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 37, height: 37)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-            }
-        }
-        .frame(width: 51, height: 51)
+        // Whole, whatever its shape: some marks are square, some wide
+        return Image(logo)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 37, height: 37)
+            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .frame(width: 51, height: 51)
         .background(Color.white)
         .clipShape(shape)
         .overlay(shape.strokeBorder(Color(hex: 0xEBE9E8), lineWidth: 0.7))

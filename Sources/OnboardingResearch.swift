@@ -46,8 +46,8 @@ struct ResearchSheet: View {
     /// How long the research takes
     /// `-researchSeconds N` shortens it, and the analysis, for working on what comes after
     static let researchDuration: TimeInterval = override ?? 17
-    /// How long the analysis takes
-    static let analysisDuration: TimeInterval = override ?? 27
+    /// How long the analysis takes: the first report is ready in three seconds
+    static let analysisDuration: TimeInterval = override ?? 3
     private static let override: TimeInterval? = {
         let args = ProcessInfo.processInfo.arguments
         if let i = args.firstIndex(of: "-researchSeconds"), i + 1 < args.count, let n = Double(args[i + 1]) { return n }

@@ -597,7 +597,7 @@ final class GestureTests: XCTestCase {
         app.buttons["Confirm"].tap()
         sleep(4)
         XCTAssertTrue(app.staticTexts["Welcome to Decade Wealth Advisory"].exists)
-        XCTAssertTrue(app.staticTexts["Hello Venkat"].exists)
+        XCTAssertTrue(app.staticTexts["Hello Ambika"].exists)
     }
 
     func testFixedDeposits() {
@@ -651,7 +651,7 @@ final class GestureTests: XCTestCase {
         app.launchArguments = ["-onboardingStep", "1", "-welcomeAnalysis", "-researchSeconds", "2"]
         app.launch()
         // The finished report scrolls down to the question that leads on
-        XCTAssertTrue(app.staticTexts["Equity mutual funds performance 26"].waitForExistence(timeout: 12))
+        XCTAssertTrue(app.staticTexts["Equity mutual funds 2026"].waitForExistence(timeout: 12))
         XCTAssertFalse(app.buttons["Understood"].exists)
         sleep(2)
         let dirR = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
@@ -696,7 +696,7 @@ final class GestureTests: XCTestCase {
         sleep(1)
         XCTAssertFalse(app.staticTexts["We will import mutual funds via MFCentral"].exists)
         app.buttons["View analysis"].tap()
-        XCTAssertTrue(app.staticTexts["Equity mutual funds performance 26"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Equity mutual funds 2026"].waitForExistence(timeout: 3))
     }
 
     func testImportFlow() {
@@ -760,7 +760,7 @@ final class GestureTests: XCTestCase {
         let understood = app.buttons["Understood"]
         XCTAssertTrue(understood.waitForExistence(timeout: 16))
         sleep(2)
-        XCTAssertTrue(app.staticTexts["Your mutual funds performance 26"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Your equity funds 2026"].waitForExistence(timeout: 3))
         for page in 0..<6 {
             shot("own-\(page)")
             app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.7))
@@ -773,7 +773,7 @@ final class GestureTests: XCTestCase {
         shot("congrats")
         let meet = app.buttons["Great!"]
         XCTAssertTrue(meet.waitForExistence(timeout: 8))
-        XCTAssertTrue(app.staticTexts["Venkat, meet your personal advisor"].exists)
+        XCTAssertTrue(app.staticTexts["Ambika, meet your personal advisor"].exists)
         sleep(1)
         shot("meet-advisor")
         meet.tap()
@@ -920,11 +920,37 @@ final class GestureTests: XCTestCase {
         XCTAssertGreaterThan(app.staticTexts["you’re interested in?"].frame.minY, 150)
     }
 
+    func testReportQuestions() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-onboardingStep", "1", "-analysisDone"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["Equity mutual funds 2026"].waitForExistence(timeout: 8))
+        sleep(2)
+        // A question in the report opens to its answer where it is, and closes again
+        let question = app.buttons["Why did it beat the previous six months?"]
+        for _ in 0..<4 where !question.isHittable {
+            let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.6))
+            from.press(forDuration: 0.02, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.45)), withVelocity: .fast, thenHoldForDuration: 0)
+            sleep(2)
+        }
+        XCTAssertTrue(question.isHittable)
+        let answer = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "The six months before were a falling market")).firstMatch
+        XCTAssertFalse(answer.exists)
+        question.tap()
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "The six months before were a falling market")).firstMatch.waitForExistence(timeout: 2))
+        sleep(1)
+        let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/question-open.png"))
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Why did it beat the previous six months?")).firstMatch.tap()
+        sleep(1)
+        XCTAssertFalse(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "The six months before were a falling market")).firstMatch.exists)
+    }
+
     func testReportRead() {
         let app = XCUIApplication()
         app.launchArguments = ["-onboardingStep", "1", "-analysisDone"]
         app.launch()
-        XCTAssertTrue(app.staticTexts["Equity mutual funds performance 26"].waitForExistence(timeout: 8))
+        XCTAssertTrue(app.staticTexts["Equity mutual funds 2026"].waitForExistence(timeout: 8))
         sleep(2)
         // Down at its foot, the read on the year: three questions, the second crediting the research
         for _ in 0..<14 { app.swipeUp(velocity: .fast) }
@@ -975,11 +1001,13 @@ final class GestureTests: XCTestCase {
         XCTAssertFalse(app.buttons["Creating analysis"].exists)
         sleep(1)
         preparing.tap()
-        XCTAssertTrue(app.staticTexts["While it happens"].waitForExistence(timeout: 4))
+        XCTAssertTrue(app.staticTexts["Mutual funds analysis"].waitForExistence(timeout: 4))
+        XCTAssertFalse(app.staticTexts["While it happens"].exists)
+        sleep(3)
         let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
         try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/a-preparing.png"))
         // When its time is up the analysis opens by itself
-        XCTAssertTrue(app.staticTexts["Equity mutual funds performance 26"].waitForExistence(timeout: 14))
+        XCTAssertTrue(app.staticTexts["Equity mutual funds 2026"].waitForExistence(timeout: 14))
         try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/a-open.png"))
     }
 
@@ -1025,8 +1053,11 @@ final class GestureTests: XCTestCase {
         XCTAssertTrue(topic.waitForExistence(timeout: 6))
         sleep(2)
         try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dirW + "/w-topics.png"))
-        // Its frame takes in the whole two-row rail, so aim at the first card, top left
-        topic.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.2)).tap()
+        // "Build me a mutual fund portfolio" is suggested first, ahead of it
+        XCTAssertTrue(app.buttons["Build me a mutual fund portfolio"].exists)
+        // Its frame takes in the whole two-row rail, so aim at the second card of the top row (the cards are 186
+        // wide, 17 apart, 19 in from the rail's edge)
+        topic.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: 19 + 186 + 17 + 70, dy: 90)).tap()
         // The topic goes in as the message, then a reply and the plan it's preparing
         XCTAssertTrue(app.staticTexts["How have equity mutual funds done over the last year and what does that tell us about the future?"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["Mutual funds research plan"].waitForExistence(timeout: 6))
