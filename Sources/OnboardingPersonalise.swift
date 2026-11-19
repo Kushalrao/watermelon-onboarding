@@ -98,7 +98,7 @@ struct OnboardingCongratsView: View {
     var text = "Congrats! you\nhave a proactive\npersonal advisor\nnow"
     var textTop: CGFloat = 344
     var label = "Congrats! you have a proactive personal advisor now"
-    /// The sea behind the words, which are set in white to stand on it
+    /// Water over rock behind the words, which are set in white to stand on it
     var water = false
     let onContinue: () -> Void
 
@@ -106,23 +106,41 @@ struct OnboardingCongratsView: View {
     @Environment(\.onboardingTop) private var top
     /// 0 before the words arrive, 1 while they're up, 2 once they've gone
     @State private var beat = 0
-    /// When the light began coming at the screen, at the end, on water
-    @State private var flareStart: Date?
+    /// On water, at the end: the blur under the words has spread out to the whole screen
+    @State private var spread = false
 
     var body: some View {
         ZStack(alignment: .top) {
             if water {
-                UnderwaterBackground(flareStart: flareStart)
+                WaterCausticsBackground()
+                // The water goes out of focus where the words sit, the blur fading out at a soft edge, so the white
+                // letters read without a shadow of their own; at the end it springs out from there to take the screen
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .mask {
+                        RoundedRectangle(cornerRadius: 90)
+                            .frame(width: 370, height: 230)
+                            .blur(radius: 32)
+                            // 6× carries its soft edge clear of every side of the screen
+                            .scaleEffect(spread ? 6 : 1)
+                            .padding(.top, textTop - 44 + top + 102 - 115)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    }
+                    // It comes with the words, and stays once it has spread
+                    .opacity(beat == 0 ? 0 : 1)
+                    .allowsHitTesting(false)
             } else {
                 AdvisorDawnBackground()
             }
 
             Group {
                 if water {
-                    // The frame's Medium, 45/51, in white on the deep water
+                    // Regular, 45/51, in white over the blur
                     Text(text)
-                        .font(.custom("RecklessStandardS-TRIAL-Medium", fixedSize: 45))
-                        .lineSpacing(51 - UIFont(name: "RecklessStandardS-TRIAL-Medium", size: 45)!.lineHeight)
+                        .font(.custom("RecklessStandardS-TRIAL-Regular", fixedSize: 45))
+                        .lineSpacing(51 - UIFont(name: "RecklessStandardS-TRIAL-Regular", size: 45)!.lineHeight)
                         .foregroundStyle(Color.white)
                 } else {
                     // Gap: Reckless Medium 45/51 in #33302D has no text style or content token
@@ -141,17 +159,19 @@ struct OnboardingCongratsView: View {
         .ignoresSafeArea()
         .task {
             try? await Task.sleep(for: .seconds(0.45))
-            // On water the words come in slowly
+            // On water the words and the blur under them come in slowly together
             let arrive = water ? 1.4 : 0.7
             withAnimation(.easeOut(duration: arrive)) { beat = 1 }
             // Up, and read, for three seconds once it's fully in
             try? await Task.sleep(for: .seconds(arrive + 3.0))
-            withAnimation(.easeIn(duration: 0.5)) { beat = 2 }
-            if water && !reduceMotion {
-                // The shafts of light come at the screen until it's white, and the next screen arrives out of that
-                flareStart = Date()
-                try? await Task.sleep(for: .seconds(UnderwaterBackground.flareDuration))
+            if water {
+                // As it's about to go, the blur under the words springs slowly out over the screen. Nothing waits
+                // for it: the words leave as it sets off, and the next screen is revealed while it's still spreading
+                withAnimation(reduceMotion ? nil : .spring(response: 2.2, dampingFraction: 0.92)) { spread = true }
+                withAnimation(.easeIn(duration: 0.45)) { beat = 2 }
+                try? await Task.sleep(for: .seconds(0.4))
             } else {
+                withAnimation(.easeIn(duration: 0.5)) { beat = 2 }
                 try? await Task.sleep(for: .seconds(0.55))
             }
             guard !Task.isCancelled else { return }
@@ -161,7 +181,8 @@ struct OnboardingCongratsView: View {
 }
 
 /// Under the sea, moving: the picture of the surface, the deep and the sand under `underwaterLight`
-/// (`WaterCaustics.metal`), which sways it and lays the glints, the shafts of sunlight and the net of light on it
+/// (`WaterCaustics.metal`), which sways it and lays the glints, the shafts of sunlight and the net of light on it.
+/// Not on any screen now: the congratulations went back to the water over rock.
 struct UnderwaterBackground: View {
     /// Set at the end: from then the light comes at the screen, to white in `flareDuration`
     var flareStart: Date?

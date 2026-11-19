@@ -85,7 +85,7 @@ struct ComplexityCard: View {
         switch level {
         case .simply: 269
         case .any: 234
-        case .terms: 192
+        case .terms: 134
         }
     }
 
@@ -175,17 +175,37 @@ struct ComplexityCard: View {
         }
     }
 
-    // Shortest form: terms only, no explanations
+    // Shortest form: no rows and no explanations. The worth is rounded into the header and the rest is a strip of
+    // figures under their abbreviations, so it reads as a different widget from the one before it, not that one
+    // with its captions taken out.
     private var terms: some View {
         ZStack(alignment: .topLeading) {
             header("Parag Parikh Flexi Cap", "Direct · Growth")
-            label("Total worth").at(14, 77)
-            amount("Rs1,42,300").at(128, 77)
-            gain.at(251, 77)
-            label("XIRR").at(14, 117)
-            value("12.4%").at(128, 117)
-            label("Exp. ratio", strong: true).at(14, 152)
-            value("0.63%").at(128, 152)
+            Text("Rs1.42L")
+                .font(FigmaFont.walsheimMedium(19.23))
+                .foregroundStyle(Color.black)
+                .frame(width: Self.width - 14, alignment: .trailing)
+                .at(0, 24)
+            Rectangle()
+                .fill(Color.black.opacity(0.07))
+                .frame(width: Self.width - 28, height: 1)
+                .at(14, 70)
+            figure("RETURN", "+42.3%", color: Color.gain).at(14, 83)
+            figure("XIRR", "12.4%").at(122, 83)
+            figure("TER", "0.63%").at(230, 83)
+        }
+    }
+
+    /// One figure of the shortest form: its abbreviation in small capitals over it
+    private func figure(_ name: String, _ figure: String, color: Color = Color.ink) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(name)
+                .font(FigmaFont.walsheim(11))
+                .tracking(0.99)
+                .foregroundStyle(Color.black.opacity(0.5))
+            Text(figure)
+                .font(FigmaFont.walsheimMedium(17))
+                .foregroundStyle(color)
         }
     }
 

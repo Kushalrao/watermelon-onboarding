@@ -10,12 +10,12 @@ struct OnboardingFlow: View {
     /// The status bar's height, for the screens that place themselves under it
     @State private var top: CGFloat = 62
 
-    /// Launch argument `-onboardingStep N` starts the flow at step N. With no flag of ours at all the app opens on
-    /// the congratulations over water (step 10), the screen being worked on; `-onboarding` starts from the top.
+    /// Launch argument `-onboardingStep N` starts the flow at step N. With no flag of ours at all, as with
+    /// `-onboarding`, it starts from the top.
     private static var debugStartStep: Int {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "-onboardingStep"), i + 1 < args.count, let n = Int(args[i + 1]) else {
-            return MutualFundsPrototypeApp.plainLaunch ? 10 : 0
+            return 0
         }
         return n
     }
@@ -119,7 +119,8 @@ struct OnboardingFlow: View {
         // earlier flow, reached only with `-onboardingStep`
         case 1: withAnimation(animation) { step = 10 }
         // The congratulations, then the advisor and her permissions, then the guides
-        case 10: withAnimation(.easeInOut(duration: 0.3)) { step = 15 }
+        // the advisor is revealed through the blur as it spreads over the water, so a longer fade than the rest
+        case 10: withAnimation(.easeInOut(duration: 0.7)) { step = 15 }
         case 15, 11: withAnimation(.easeInOut(duration: 0.35)) { step = 12 }
         case 12, 13: withAnimation(.easeInOut(duration: 0.35)) { step += 1 }
         // After the last guide, the farewell; when its words have gone the onboarding ends

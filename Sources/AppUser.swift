@@ -6,6 +6,6 @@ enum AppUser {
     static let name: String = {
         let args = ProcessInfo.processInfo.arguments
         if let i = args.firstIndex(of: "-userName"), i + 1 < args.count { return args[i + 1] }
-        return "Venkat"
+        return "Ambika"
     }()
 }
