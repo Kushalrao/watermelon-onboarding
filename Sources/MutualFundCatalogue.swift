@@ -160,19 +160,32 @@ enum MutualFundCatalogue {
         funds.first { $0.id == code }
     }
 
-    /// The image sets the app has for fund houses, by the house's listed name: 32 of the list's 54
+    /// The image sets the app has for fund houses (Figma 8:2540, "AMC Logos"), by the house's listed name: every one
+    /// of the list's 54. The frame has two more, for houses the list has no fund from: `MFHomeAngelOne` and
+    /// `MFHomeILFS`.
     static let logos: [String: String] = [
-        "360 ONE Mutual Fund": "MFHomeThreeSixtyOne", "Aditya Birla Sun Life Mutual Fund": "MFHomeAdityaBirla",
-        "Axis Mutual Fund": "MFHomeAxis", "Bajaj Finserv Mutual Fund": "MFHomeBajaj", "Bandhan Mutual Fund": "MFHomeBandhan",
-        "Baroda BNP Paribas Mutual Fund": "MFHomeBaroda", "Canara Robeco Mutual Fund": "MFHomeCanara", "DSP Mutual Fund": "MFHomeDSP",
-        "Edelweiss Mutual Fund": "MFHomeEdelweiss", "Franklin Templeton Mutual Fund": "MFHomeFranklin", "Groww Mutual Fund": "MFHomeGroww",
-        "HDFC Mutual Fund": "MFHomeHDFC", "HSBC Mutual Fund": "MFHomeHSBC", "ICICI Prudential Mutual Fund": "MFHomeICICI",
-        "Invesco Mutual Fund": "MFHomeInvesco", "JM Financial Mutual Fund": "MFHomeJM", "Kotak Mahindra Mutual Fund": "MFHomeKotak",
-        "LIC Mutual Fund": "MFHomeLIC", "Mahindra Manulife Mutual Fund": "MFHomeMahindra", "Mirae Asset Mutual Fund": "MFHomeMirae",
-        "Motilal Oswal Mutual Fund": "MFHomeMotilal", "Navi Mutual Fund": "MFHomeNavi", "Nippon India Mutual Fund": "MFHomeNippon",
-        "PGIM India Mutual Fund": "MFHomePGIM", "PPFAS Mutual Fund": "MFHomePPFAS", "SBI Mutual Fund": "MFHomeSBI",
-        "Sundaram Mutual Fund": "MFHomeSundaram", "Tata Mutual Fund": "MFHomeTata", "UTI Mutual Fund": "MFHomeUTI",
-        "Union Mutual Fund": "MFHomeUnion", "WhiteOak Capital Mutual Fund": "MFHomeWhiteOak", "quant Mutual Fund": "MFHomeQuant",
+        "360 ONE Mutual Fund": "MFHomeThreeSixtyOne", "Abakkus Mutual Fund": "MFHomeAbakkus",
+        "Aditya Birla Sun Life Mutual Fund": "MFHomeAdityaBirla", "AlphaGrep Mutual Fund": "MFHomeAlphaGrep",
+        "ASK MUTUAL FUND": "MFHomeASK", "Axis Mutual Fund": "MFHomeAxis", "Bajaj Finserv Mutual Fund": "MFHomeBajaj",
+        "Bandhan Mutual Fund": "MFHomeBandhan", "Bank of India Mutual Fund": "MFHomeBankOfIndia",
+        "Baroda BNP Paribas Mutual Fund": "MFHomeBaroda", "Canara Robeco Mutual Fund": "MFHomeCanara",
+        "Capitalmind Mutual Fund": "MFHomeCapitalmind", "Carnelian Mutual Fund": "MFHomeCarnelian",
+        "Choice Mutual Fund": "MFHomeChoice", "DSP Mutual Fund": "MFHomeDSP", "Edelweiss Mutual Fund": "MFHomeEdelweiss",
+        "Franklin Templeton Mutual Fund": "MFHomeFranklin", "Groww Mutual Fund": "MFHomeGroww",
+        "HDFC Mutual Fund": "MFHomeHDFC", "Helios Mutual Fund": "MFHomeHelios", "HSBC Mutual Fund": "MFHomeHSBC",
+        "ICICI Prudential Mutual Fund": "MFHomeICICI", "Invesco Mutual Fund": "MFHomeInvesco", "ITI Mutual Fund": "MFHomeITI",
+        "Jio BlackRock Mutual Fund": "MFHomeJioBlackRock", "JM Financial Mutual Fund": "MFHomeJM",
+        "Kotak Mahindra Mutual Fund": "MFHomeKotak", "Lakshya Mutual Fund": "MFHomeLakshya", "LIC Mutual Fund": "MFHomeLIC",
+        "Mahindra Manulife Mutual Fund": "MFHomeMahindra", "Mirae Asset Mutual Fund": "MFHomeMirae",
+        "Monarch Mutual Fund": "MFHomeMonarch", "Motilal Oswal Mutual Fund": "MFHomeMotilal", "Navi Mutual Fund": "MFHomeNavi",
+        "Nippon India Mutual Fund": "MFHomeNippon", "NJ Mutual Fund": "MFHomeNJ", "Old Bridge Mutual Fund": "MFHomeOldBridge",
+        "PGIM India Mutual Fund": "MFHomePGIM", "PPFAS Mutual Fund": "MFHomePPFAS", "quant Mutual Fund": "MFHomeQuant",
+        "Quantum Mutual Fund": "MFHomeQuantum", "Samco Mutual Fund": "MFHomeSamco", "SBI Mutual Fund": "MFHomeSBI",
+        "Shriram Mutual Fund": "MFHomeShriram", "Sundaram Mutual Fund": "MFHomeSundaram", "Tata Mutual Fund": "MFHomeTata",
+        "Taurus Mutual Fund": "MFHomeTaurus", "The Wealth Company Mutual Fund": "MFHomeWealthCompany",
+        "Trust Mutual Fund": "MFHomeTrust", "Unifi Mutual Fund": "MFHomeUnifi", "Union Mutual Fund": "MFHomeUnion",
+        "UTI Mutual Fund": "MFHomeUTI", "WhiteOak Capital Mutual Fund": "MFHomeWhiteOak",
+        "Zerodha CASE Mutual Fund": "MFHomeZerodha",
     ]
 
     /// The values, each once, the commonest first; ties in A to Z order

@@ -177,5 +177,12 @@ final class MutualFundCatalogueTests: XCTestCase {
             XCTAssertTrue(MutualFundCatalogue.amcs.contains(amc), "\(amc) is not a fund house in the list")
             XCTAssertNotNil(UIImage(named: logo), "\(logo) is not an image set")
         }
+        // Every house in the list has one, and so do the frame's two that the list has no fund from
+        for amc in MutualFundCatalogue.amcs {
+            XCTAssertNotNil(MutualFundCatalogue.logos[amc], "\(amc) has no logo")
+        }
+        for extra in ["MFHomeAngelOne", "MFHomeILFS"] {
+            XCTAssertNotNil(UIImage(named: extra), "\(extra) is not an image set")
+        }
     }
 }
