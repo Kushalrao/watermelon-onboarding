@@ -2,12 +2,22 @@ import SwiftUI
 
 @main
 struct MutualFundsPrototypeApp: App {
-    /// With no flag the app opens on the onboarding, from its first screen. `-fd` (or any `-fd…` flag)
-    /// opens the fixed deposits page, `-fund` the fund page, `-home` (or a flag that names a home version) the home
-    /// page, `-onboarding…` the onboarding
+    /// With no flag the app opens on the mutual funds homepage (`MutualFundsHomeV2View`); `-mf` opens it too, and
+    /// `-mfHomeV1` opens its first version (`MutualFundsHomeView`).
+    /// `-onboarding` (or any `-onboarding…` flag) opens the onboarding: the second one (`OnboardingFlowV2`), or the
+    /// first with `-onboardingV1`. `-fd` (or any `-fd…` flag) opens the fixed deposits page, `-fund` the fund page,
+    /// `-home` (or a flag that names a home version) the home page
     static let opensOnFixedDeposits = ProcessInfo.processInfo.arguments.contains { $0.hasPrefix("-fd") }
 
-    /// No flag of ours given: the onboarding, from its first screen (see `OnboardingFlow`)
+    /// `-mf`, or no flag of ours at all: the mutual funds homepage. A flag that only picks a version inside the
+    /// onboarding (`-reportSimple`, `-researchGather`) still opens the onboarding, as it did
+    static let opensOnMutualFunds: Bool = {
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains("-mf") { return true }
+        return plainLaunch && !args.contains { ["-reportSimple", "-researchGather"].contains($0) }
+    }()
+
+    /// No flag of ours given
     static let plainLaunch: Bool = {
         let args = ProcessInfo.processInfo.arguments
         if args.contains(where: { $0.hasPrefix("-fd") || $0.hasPrefix("-onboarding") || $0.hasPrefix("-welcome") }) { return false }
@@ -26,6 +36,13 @@ struct MutualFundsPrototypeApp: App {
                 } else {
                     FixedDepositsHomeView()
                 }
+            } else if Self.opensOnMutualFunds {
+                // The second homepage by default; `-mfHomeV1` keeps the first, with the fund houses' map
+                if ProcessInfo.processInfo.arguments.contains("-mfHomeV1") {
+                    MutualFundsHomeView()
+                } else {
+                    MutualFundsHomeV2View()
+                }
             } else {
                 // Nothing in the onboarding moves for the keyboard; each screen places itself around it
                 RootView()
@@ -36,7 +53,7 @@ struct MutualFundsPrototypeApp: App {
 }
 
 /// Opens on the home page (the v5 living-pattern widgets by default; `-homeV1` for the Chats grid, `-homeV2` for the greeting, `-homeV3` for the pinned widgets, `-homeV4` for the plastic widgets); its Investments entries
-/// and chats push the fund page. With no flag the app opens on the onboarding; launch with `-fund` for the fund page (pushed over the home page), `-home` for the
+/// and chats push the fund page. With no flag the app opens on the mutual funds homepage instead; launch with `-fund` for the fund page (pushed over the home page), `-home` for the
 /// home page, `-onboarding` for the onboarding flow (`-onboardingStep N` starts it at step N), `-fd` for fixed deposits.
 struct RootView: View {
     @State private var onboarded = {
@@ -105,8 +122,14 @@ struct RootView: View {
                         .zIndex(3)
                 }
             } else {
-                OnboardingFlow { withAnimation(.easeInOut(duration: 0.35)) { onboarded = true } }
-                    .transition(.opacity)
+                // The second onboarding unless the first is asked for (`-onboardingV1`)
+                Group {
+                    switch OnboardingVersion.current {
+                    case .v1: OnboardingFlow { withAnimation(.easeInOut(duration: 0.35)) { onboarded = true } }
+                    case .v2: OnboardingFlowV2 { withAnimation(.easeInOut(duration: 0.35)) { onboarded = true } }
+                    }
+                }
+                .transition(.opacity)
             }
         }
     }

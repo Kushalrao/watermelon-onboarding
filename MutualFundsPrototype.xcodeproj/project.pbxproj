@@ -16,12 +16,14 @@
 		0F0A6EDFA08CE3CC604E504D /* TokenContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0FC638931B4840CAE7F7E5F /* TokenContractTests.swift */; };
 		13585C4FE2CC307CB8A79968 /* OnboardingComplexity.swift in Sources */ = {isa = PBXBuildFile; fileRef = C25DAB2D73D46956C45AADA0 /* OnboardingComplexity.swift */; };
 		137F8386215FBECBA4FD80AC /* FixedDepositHeld.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18DBABB52400FFD9F25F599 /* FixedDepositHeld.swift */; };
+		15F47C199FCC9A3C37A4D894 /* OnboardingV2Intro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A15D391BD2522379368082A /* OnboardingV2Intro.swift */; };
 		178898E59940FB05475B2981 /* FundExperienceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3EEA42DC05AD98BBCB5985 /* FundExperienceView.swift */; };
 		17DBD69DA81B64E8787B2420 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 451B861C43AC353D133C5649 /* Assets.xcassets */; };
 		1C9E954DCDED34AE0F25F14E /* ContainerTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C51897D87B5AFF7254EBB6 /* ContainerTokens.swift */; };
 		1ED72D3BD4D3B2C982D637F8 /* Hologram.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64E3A581EA31AD74677209D /* Hologram.swift */; };
 		1FA6AC57F6D629C310FEC80C /* DsText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1782E778D8036E4106D116A1 /* DsText.swift */; };
 		20B34BED9ADC296945C4367D /* WaterCaustics.metal in Sources */ = {isa = PBXBuildFile; fileRef = 5CF8AF61721EBCABB0477187 /* WaterCaustics.metal */; };
+		20F97C5B0CEB86D830F5CF8A /* MutualFundsHomeV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37279BAB7D52F48B8AFFF3A6 /* MutualFundsHomeV2.swift */; };
 		21D8DC1BD2C169921C8D028E /* ParticleSphere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5B773165C094CD9AC46CE1 /* ParticleSphere.swift */; };
 		233A203931C53AAB49BE992B /* hsbc_midcap_nav.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F5D23A8585AEC04626177E9 /* hsbc_midcap_nav.json */; };
 		2613832F3D88E67E9F6A0415 /* RecklessStandardS-TRIAL-RegularItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0B4E0B8365D3CAD219CE01E5 /* RecklessStandardS-TRIAL-RegularItalic.otf */; };
@@ -38,6 +40,7 @@
 		5041CFC6DCA14B87673848A4 /* MovementWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC9109F06A2C38E1DCBA7F6 /* MovementWatch.swift */; };
 		5180285ACF85A988857051FC /* SpacingPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EFAA82280173BC040FAFB10 /* SpacingPrimitives.swift */; };
 		538F5F781BFCFB40CFDA976A /* GestureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06934B535ABBC1308E73FE27 /* GestureTests.swift */; };
+		583115748F7BB579CFE4194D /* MutualFundData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA3E8F92FD189EB650E00F0 /* MutualFundData.swift */; };
 		5B3513A1AFBE0079910B09F0 /* OnboardingAdvice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96009E3BB6F0CF592F4202D4 /* OnboardingAdvice.swift */; };
 		5C7699FF61EFC69AF50EC217 /* Surface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 336D74AB1533798904BF4EBD /* Surface.swift */; };
 		5F1693AB2A71609DB1188B30 /* OnboardingResearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67EE2A6607A856821B88ECF0 /* OnboardingResearch.swift */; };
@@ -56,6 +59,8 @@
 		8A9BCA88DD3A9D4C3B863A3D /* HomeV3View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B19625AA88AADF91AC70DF /* HomeV3View.swift */; };
 		8AE51B31DB18770E2D63C933 /* OnboardingGuides.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33FC65FBD7A1293060752AB3 /* OnboardingGuides.swift */; };
 		8B84CE549A5FAA926B28711A /* FixedDepositBank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9184857403AD230A8264C4 /* FixedDepositBank.swift */; };
+		8E019234DBB23D1A47D07A1C /* OnboardingV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAB9D379C9FD12EB077501A /* OnboardingV2.swift */; };
+		9615534BA7A87F48BF346A80 /* MutualFundsHouseMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20784FC33806B130EF74331 /* MutualFundsHouseMap.swift */; };
 		989A6D2A0862DB64254B22CE /* OnboardingAdvisory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695C74C0E2633C118F2462BC /* OnboardingAdvisory.swift */; };
 		9E8E0050E1F98A32783C1E71 /* fund_curves.json in Resources */ = {isa = PBXBuildFile; fileRef = FD6C2832BEDA5FAACE813174 /* fund_curves.json */; };
 		9F60C7C89810ECFAACBAF80D /* FixedDepositsYours.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E9A9E0C86CE12AE7EA967C /* FixedDepositsYours.swift */; };
@@ -76,18 +81,22 @@
 		BFC1BD2DBC96A300F2044E0F /* HeldWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5022775BEE4179BDD6E6DC5A /* HeldWidget.swift */; };
 		C192556CC1F6D90D6C6990A6 /* ColorPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A912E78837659BDA956E9EA /* ColorPrimitives.swift */; };
 		C2663511F9884E036B35A8A6 /* BubbleRipple.metal in Sources */ = {isa = PBXBuildFile; fileRef = E0290F1D96A791F2616B3019 /* BubbleRipple.metal */; };
+		C3D6C17D87E8649A8569819B /* MutualFundsHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D8646799F69FDF30CCCE06 /* MutualFundsHome.swift */; };
 		C78261403520EA753F182F79 /* OnboardingTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A530D6C57A47D34A5C92B /* OnboardingTerms.swift */; };
 		C919A142A64A317BB9F32D48 /* OnboardingHold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 286B272FFC314EE872A4963D /* OnboardingHold.swift */; };
+		CB3679778A869BD6C6D42CD6 /* OnboardingV2Guides.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A74471C70A06D10EF1AD69 /* OnboardingV2Guides.swift */; };
 		CF444B9D737DA514A53C484C /* GearWormPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3017FF5D1A7EEC715D3ECA /* GearWormPattern.swift */; };
 		CFF305172B5A29502695708B /* ChatZoomTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827BCB10B8CE20D351194C62 /* ChatZoomTransition.swift */; };
 		D2CB72A07F7A1943E87731F5 /* MoodDial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74CB77CD82F51F0153726B70 /* MoodDial.swift */; };
 		D3DFC4B6371904A04D33BF31 /* SpacingScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69E55D6CF28CECFFAEAB461 /* SpacingScale.swift */; };
 		DDC385EE75605E76D771BBA5 /* OnboardingResearchLive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A70B1766BB61E60DC60590 /* OnboardingResearchLive.swift */; };
 		DF529094FC4612FDBB0E9205 /* RecklessStandardS-TRIAL-MediumItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = BE863854DA84A66D7535FC10 /* RecklessStandardS-TRIAL-MediumItalic.otf */; };
+		DFA9B0841436C4211E53A6FF /* OnboardingV2Welcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = C141E037CD1D13396162002C /* OnboardingV2Welcome.swift */; };
 		E3B81DA46551334A1D03658C /* HomeV5View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D39E0469B178A31E7D290B7 /* HomeV5View.swift */; };
 		E4AF3D0384BDC398B1CA9183 /* FixedDepositBankV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3860D4ED1FD3AE699E8C581D /* FixedDepositBankV2.swift */; };
 		E8DC5B6FFE213FF13A8E4669 /* FixedDepositsHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4ABD2919B9F933EFB1EDA87 /* FixedDepositsHome.swift */; };
 		F0A219A5E099223BFCF17E88 /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2360A34DCA70C56EF5B0C6C3 /* Stack.swift */; };
+		F4AB2ABA529DF1B81E8B051D /* MutualFundDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = F400A7CE193375E7DCA4DF0B /* MutualFundDetail.swift */; };
 		F5F088C7B73225144BC99576 /* OnboardingIntro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6391215D0C659F193FBABF7D /* OnboardingIntro.swift */; };
 		F7553E168E70FE12262D2150 /* ForYouScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278FEBA3945BB8CC06C218C9 /* ForYouScreen.swift */; };
 		F9DEF30470F7779A087DAEC5 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA40A550DD4B3704C9ABA6A6 /* HomeView.swift */; };
@@ -124,6 +133,7 @@
 		13611B3A2B8C0EC5588245FF /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
 		1782E778D8036E4106D116A1 /* DsText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsText.swift; sourceTree = "<group>"; };
 		17B19625AA88AADF91AC70DF /* HomeV3View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeV3View.swift; sourceTree = "<group>"; };
+		1DA3E8F92FD189EB650E00F0 /* MutualFundData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundData.swift; sourceTree = "<group>"; };
 		1FAC210D6EEF325DD871B878 /* MutualFundsPrototypeUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = MutualFundsPrototypeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2360A34DCA70C56EF5B0C6C3 /* Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stack.swift; sourceTree = "<group>"; };
 		2367204F2136F6B98C162986 /* FoundationTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationTokens.swift; sourceTree = "<group>"; };
@@ -138,10 +148,12 @@
 		3556CF44D92E8E38EB97A81E /* OnboardingPersonalise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPersonalise.swift; sourceTree = "<group>"; };
 		35C1E9C9C6D5640F6AD337DF /* BandWarp.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BandWarp.metal; sourceTree = "<group>"; };
 		36C4580E9EDC267EC4485020 /* RecklessStandardS-TRIAL-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RecklessStandardS-TRIAL-Regular.otf"; sourceTree = "<group>"; };
+		37279BAB7D52F48B8AFFF3A6 /* MutualFundsHomeV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundsHomeV2.swift; sourceTree = "<group>"; };
 		3860D4ED1FD3AE699E8C581D /* FixedDepositBankV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositBankV2.swift; sourceTree = "<group>"; };
 		43BD9A9F918A7C671514D487 /* ColorScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorScale.swift; sourceTree = "<group>"; };
 		451B861C43AC353D133C5649 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4A912E78837659BDA956E9EA /* ColorPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPrimitives.swift; sourceTree = "<group>"; };
+		4BAB9D379C9FD12EB077501A /* OnboardingV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingV2.swift; sourceTree = "<group>"; };
 		4D6184CF36E5BC95CEC2CB3D /* OnboardingImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingImport.swift; sourceTree = "<group>"; };
 		4EC9109F06A2C38E1DCBA7F6 /* MovementWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementWatch.swift; sourceTree = "<group>"; };
 		5022775BEE4179BDD6E6DC5A /* HeldWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeldWidget.swift; sourceTree = "<group>"; };
@@ -152,6 +164,7 @@
 		6391215D0C659F193FBABF7D /* OnboardingIntro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingIntro.swift; sourceTree = "<group>"; };
 		67EE2A6607A856821B88ECF0 /* OnboardingResearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingResearch.swift; sourceTree = "<group>"; };
 		695C74C0E2633C118F2462BC /* OnboardingAdvisory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAdvisory.swift; sourceTree = "<group>"; };
+		6A15D391BD2522379368082A /* OnboardingV2Intro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingV2Intro.swift; sourceTree = "<group>"; };
 		6CD2BA32733950AA322506E9 /* RecklessStandardS-TRIAL-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RecklessStandardS-TRIAL-SemiBold.otf"; sourceTree = "<group>"; };
 		6D39E0469B178A31E7D290B7 /* HomeV5View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeV5View.swift; sourceTree = "<group>"; };
 		6EDB613F01BDD9F3898AE0E9 /* HomeV2View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeV2View.swift; sourceTree = "<group>"; };
@@ -176,6 +189,7 @@
 		A3A05FD6E07436123C14F5BB /* ShadowPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowPrimitives.swift; sourceTree = "<group>"; };
 		A4F7D7572D9AB1F5B261DF8D /* FundChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FundChart.swift; sourceTree = "<group>"; };
 		A66EEA31E663B7F2F6057A4A /* RecklessStandardS-TRIAL-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RecklessStandardS-TRIAL-Medium.otf"; sourceTree = "<group>"; };
+		A6D8646799F69FDF30CCCE06 /* MutualFundsHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundsHome.swift; sourceTree = "<group>"; };
 		A77D3E96BF44F0AD3985F5C6 /* DSPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSPlatform.swift; sourceTree = "<group>"; };
 		A95CACFCA18A48950C43DEEA /* AdvisorBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvisorBar.swift; sourceTree = "<group>"; };
 		AA40A550DD4B3704C9ABA6A6 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -185,6 +199,8 @@
 		B69E55D6CF28CECFFAEAB461 /* SpacingScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacingScale.swift; sourceTree = "<group>"; };
 		BB3EEA42DC05AD98BBCB5985 /* FundExperienceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FundExperienceView.swift; sourceTree = "<group>"; };
 		BE863854DA84A66D7535FC10 /* RecklessStandardS-TRIAL-MediumItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RecklessStandardS-TRIAL-MediumItalic.otf"; sourceTree = "<group>"; };
+		C141E037CD1D13396162002C /* OnboardingV2Welcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingV2Welcome.swift; sourceTree = "<group>"; };
+		C20784FC33806B130EF74331 /* MutualFundsHouseMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundsHouseMap.swift; sourceTree = "<group>"; };
 		C25DAB2D73D46956C45AADA0 /* OnboardingComplexity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingComplexity.swift; sourceTree = "<group>"; };
 		C64E3A581EA31AD74677209D /* Hologram.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hologram.swift; sourceTree = "<group>"; };
 		CC3017FF5D1A7EEC715D3ECA /* GearWormPattern.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearWormPattern.swift; sourceTree = "<group>"; };
@@ -198,6 +214,8 @@
 		E89842D9244C8CA992DEC32A /* watch_movement.mp4 */ = {isa = PBXFileReference; path = watch_movement.mp4; sourceTree = "<group>"; };
 		E9A49490A2FB49CCD36FEB6F /* SelectableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableText.swift; sourceTree = "<group>"; };
 		F0FC638931B4840CAE7F7E5F /* TokenContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenContractTests.swift; sourceTree = "<group>"; };
+		F1A74471C70A06D10EF1AD69 /* OnboardingV2Guides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingV2Guides.swift; sourceTree = "<group>"; };
+		F400A7CE193375E7DCA4DF0B /* MutualFundDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundDetail.swift; sourceTree = "<group>"; };
 		F50B0885996CDFA7C8558BD7 /* GT-Super-Text-Medium-Trial.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GT-Super-Text-Medium-Trial.otf"; sourceTree = "<group>"; };
 		FABE71BAEDDA2FE57FEEEBB1 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		FAD112315CB72E3071AED59B /* AppUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUser.swift; sourceTree = "<group>"; };
@@ -352,7 +370,12 @@
 				AA40A550DD4B3704C9ABA6A6 /* HomeView.swift */,
 				74CB77CD82F51F0153726B70 /* MoodDial.swift */,
 				4EC9109F06A2C38E1DCBA7F6 /* MovementWatch.swift */,
+				1DA3E8F92FD189EB650E00F0 /* MutualFundData.swift */,
+				F400A7CE193375E7DCA4DF0B /* MutualFundDetail.swift */,
 				CCDEF03A6301197E88CE72D8 /* MutualFundScreen.swift */,
+				A6D8646799F69FDF30CCCE06 /* MutualFundsHome.swift */,
+				37279BAB7D52F48B8AFFF3A6 /* MutualFundsHomeV2.swift */,
+				C20784FC33806B130EF74331 /* MutualFundsHouseMap.swift */,
 				0C570918A6C39BC217169D4B /* MutualFundsPrototypeApp.swift */,
 				13611B3A2B8C0EC5588245FF /* Onboarding.swift */,
 				96009E3BB6F0CF592F4202D4 /* OnboardingAdvice.swift */,
@@ -371,6 +394,10 @@
 				94A70B1766BB61E60DC60590 /* OnboardingResearchLive.swift */,
 				AF19B5B5CC54602344E1DD2B /* OnboardingSwipe.swift */,
 				D90A530D6C57A47D34A5C92B /* OnboardingTerms.swift */,
+				4BAB9D379C9FD12EB077501A /* OnboardingV2.swift */,
+				F1A74471C70A06D10EF1AD69 /* OnboardingV2Guides.swift */,
+				6A15D391BD2522379368082A /* OnboardingV2Intro.swift */,
+				C141E037CD1D13396162002C /* OnboardingV2Welcome.swift */,
 				0E5B773165C094CD9AC46CE1 /* ParticleSphere.swift */,
 				8666537369AF62AE0D950F74 /* QuickSearch.swift */,
 				964936155125499D0D77D9D1 /* RevealBump.metal */,
@@ -573,7 +600,12 @@
 				F9DEF30470F7779A087DAEC5 /* HomeView.swift in Sources */,
 				D2CB72A07F7A1943E87731F5 /* MoodDial.swift in Sources */,
 				5041CFC6DCA14B87673848A4 /* MovementWatch.swift in Sources */,
+				583115748F7BB579CFE4194D /* MutualFundData.swift in Sources */,
+				F4AB2ABA529DF1B81E8B051D /* MutualFundDetail.swift in Sources */,
 				28C758469B8769420BCCC60C /* MutualFundScreen.swift in Sources */,
+				C3D6C17D87E8649A8569819B /* MutualFundsHome.swift in Sources */,
+				20F97C5B0CEB86D830F5CF8A /* MutualFundsHomeV2.swift in Sources */,
+				9615534BA7A87F48BF346A80 /* MutualFundsHouseMap.swift in Sources */,
 				471A739A9F17C9BC6DB3DB92 /* MutualFundsPrototypeApp.swift in Sources */,
 				40D569D797EE2D968716C8F9 /* Onboarding.swift in Sources */,
 				5B3513A1AFBE0079910B09F0 /* OnboardingAdvice.swift in Sources */,
@@ -592,6 +624,10 @@
 				DDC385EE75605E76D771BBA5 /* OnboardingResearchLive.swift in Sources */,
 				430D3C12E0830D055C502212 /* OnboardingSwipe.swift in Sources */,
 				C78261403520EA753F182F79 /* OnboardingTerms.swift in Sources */,
+				8E019234DBB23D1A47D07A1C /* OnboardingV2.swift in Sources */,
+				CB3679778A869BD6C6D42CD6 /* OnboardingV2Guides.swift in Sources */,
+				15F47C199FCC9A3C37A4D894 /* OnboardingV2Intro.swift in Sources */,
+				DFA9B0841436C4211E53A6FF /* OnboardingV2Welcome.swift in Sources */,
 				21D8DC1BD2C169921C8D028E /* ParticleSphere.swift in Sources */,
 				B7EE2004868AF9082451B2FE /* QuickSearch.swift in Sources */,
 				ABC1F3350E453717180E2D85 /* RevealBump.metal in Sources */,
