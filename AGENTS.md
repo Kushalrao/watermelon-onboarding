@@ -11,8 +11,10 @@ this file does not repeat it.
 
 - SwiftUI iOS prototype, iOS 18, generated with XcodeGen from `project.yml`. Bundle id
   `com.kushal.prototype.MutualFundsPrototype`.
-- Git: branch `demo`, remote `origin`, with PR #1 open. As of 2026-11-23 everything is committed and pushed:
-  `59a5a67` is the second onboarding, `61ac286` the mutual funds work. Commit and push only when the owner asks.
+- Git: remote `origin`. `main` has the two onboardings (up to `59a5a67`, the second onboarding). The mutual funds
+  work is on the branch `mutual-funds`, which sits on top of `main` and has its own pull request into it. The
+  branch was called `demo` until 2026-11-23; PR #1, the onboarding's, was closed when it was renamed, with its
+  commits already on `main`. Commit and push only when the owner asks.
 - A plain launch (no flags) opens the mutual funds homepage, second version (`Sources/MutualFundsHomeV2.swift`,
   Figma `sub7vIn6sMBlHb4SIWHyek` node 101:17619, which took the place of 47:6749: a back button and search field at the top, three tabs, "FUND / 3Y RETURNS" over each list, and a card for each kind of fund at the end, which opens the kind's page). Search is built in place (`Sources/MutualFundSearch.swift`): the explore page's field searches all 1,150 funds over the page, and a category page's field narrows its own list; no frame draws search in use. The first version (`Sources/MutualFundsHome.swift`, node 10:4545
   with sections 15:6246, 15:6247 and 15:6248 and the fund houses' map 15:6337 in
