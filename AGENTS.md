@@ -13,10 +13,12 @@ this file does not repeat it.
   `com.kushal.prototype.MutualFundsPrototype`.
 - Git: branch `demo`, remote `origin`, with PR #1 open. As of 2026-11-23 everything is committed and pushed:
   `59a5a67` is the second onboarding, `61ac286` the mutual funds work. Commit and push only when the owner asks.
-- A plain launch (no flags) opens the mutual funds homepage (`Sources/MutualFundsHome.swift`, added 2026-11-22
-  from Figma `sub7vIn6sMBlHb4SIWHyek` node 10:4545, with sections 15:6246, 15:6247 and 15:6248 added under its
-  runs, and the fund houses' map 15:6337 (`Sources/MutualFundsHouseMap.swift`, with its own appear transition)
-  before the title). The second onboarding now needs `-onboarding`.
+- A plain launch (no flags) opens the mutual funds homepage, second version (`Sources/MutualFundsHomeV2.swift`,
+  Figma `sub7vIn6sMBlHb4SIWHyek` node 47:6749). The first version (`Sources/MutualFundsHome.swift`, node 10:4545
+  with sections 15:6246, 15:6247 and 15:6248 and the fund houses' map 15:6337 in
+  `Sources/MutualFundsHouseMap.swift`) is behind `-mfHomeV1`. A fund opens `Sources/MutualFundDetail.swift`
+  (node 37:3821), with its content from `Sources/MutualFundData.swift`. The second onboarding needs `-onboarding`.
+- The mutual funds screens were checked on the simulator and on a device; they have no UI tests yet.
 - Last verified: `testOnboardingV2ReportCompare` passed after the most recent change (the side blur on the
   compare frame), and the lint is clean. The full walk-through, `testOnboardingV2Welcome`, has **not** been
   re-run since two later changes (the default report version flipping back, and the side blur). Run it before
