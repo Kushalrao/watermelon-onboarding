@@ -79,7 +79,11 @@ struct ComplexityCard: View {
     @State private var sweep: CGFloat = 1
     @State private var cardHeight: CGFloat = 269
 
-    private static let width: CGFloat = 326
+    /// 326 across as the frames have it; narrower where it's shown on something smaller (its words fit in 292)
+    var width: CGFloat = 326
+    /// The second onboarding's: a change of level is across the card in half a second, not three, and the glass
+    /// band that takes it across is fainter and bends what's under it less
+    var quick = false
 
     private func height(_ level: ComplexityLevel) -> CGFloat {
         switch level {
@@ -93,14 +97,15 @@ struct ComplexityCard: View {
         HeatSweep(
             sweep: sweep,
             forward: toLevel.stop >= fromLevel.stop,
-            width: Self.width,
-            height: cardHeight
+            width: width,
+            height: cardHeight,
+            glass: quick ? 0.45 : 1
         ) {
             content(fromLevel)
         } after: {
             content(toLevel)
         }
-        .frame(width: Self.width, height: cardHeight, alignment: .topLeading)
+        .frame(width: width, height: cardHeight, alignment: .topLeading)
         .background(soft ? ColorScale.surfaceBase : Color(hex: 0xF2F2F2))
         .clipShape(RoundedRectangle(cornerRadius: soft ? 23 : 0, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: soft ? 23 : 0, style: .continuous).stroke(Color.black.opacity(0.05), lineWidth: 1))
@@ -117,9 +122,11 @@ struct ComplexityCard: View {
                 sweep = 0
             }
             DispatchQueue.main.async {
-                withAnimation(.easeInOut(duration: 3.0)) { sweep = 1 }
+                // (quick: off at once and slowing, so it answers the slider as it's moved)
+                let across = quick ? Animation.easeOut(duration: 0.5) : .easeInOut(duration: 3.0)
+                withAnimation(across) { sweep = 1 }
                 // The card resizes along with the sweep
-                withAnimation(.easeInOut(duration: 3.0)) { cardHeight = height(new) }
+                withAnimation(across) { cardHeight = height(new) }
             }
         }
     }
@@ -139,7 +146,7 @@ struct ComplexityCard: View {
             case .terms: terms
             }
         }
-        .frame(width: Self.width, height: 269, alignment: .topLeading)
+        .frame(width: width, height: 269, alignment: .topLeading)
     }
 
     // 792:13209 — plain language
@@ -184,11 +191,11 @@ struct ComplexityCard: View {
             Text("Rs1.42L")
                 .font(FigmaFont.walsheimMedium(19.23))
                 .foregroundStyle(Color.black)
-                .frame(width: Self.width - 14, alignment: .trailing)
+                .frame(width: width - 14, alignment: .trailing)
                 .at(0, 24)
             Rectangle()
                 .fill(Color.black.opacity(0.07))
-                .frame(width: Self.width - 28, height: 1)
+                .frame(width: width - 28, height: 1)
                 .at(14, 70)
             figure("RETURN", "+42.3%", color: Color.gain).at(14, 83)
             figure("XIRR", "12.4%").at(122, 83)
@@ -270,6 +277,8 @@ struct HeatSweep<Before: View, After: View>: View, Animatable {
     let height: CGFloat
     /// The tallest the content gets, which the band travels and the masks cover
     var contentHeight: CGFloat = 269
+    /// How strong the glass is, of what it is as first made: the band's light, and how far it bends what's under it
+    var glass: CGFloat = 1
     @ViewBuilder let before: () -> Before
     @ViewBuilder let after: () -> After
 
@@ -288,7 +297,7 @@ struct HeatSweep<Before: View, After: View>: View, Animatable {
         let bandY = -bandHeight + travel * p           // centre of the band
         let active = sweep > 0 && sweep < 1
         // Warp is strongest mid-sweep, zero at either end
-        let strength = active ? sin(.pi * sweep) : 0
+        let strength = active ? sin(.pi * sweep) * glass : 0
 
         ZStack(alignment: .topLeading) {
             // Old content ahead of the band, new content behind it
@@ -350,7 +359,7 @@ struct HeatSweep<Before: View, After: View>: View, Animatable {
             .mask(feather)
             .frame(width: width + 40, height: bandHeight)
             .offset(x: -20, y: bandY - bandHeight / 2)
-            .opacity(active ? 1 : 0)
+            .opacity(active ? glass : 0)
             .allowsHitTesting(false)
         }
         .frame(width: width, height: height, alignment: .topLeading)

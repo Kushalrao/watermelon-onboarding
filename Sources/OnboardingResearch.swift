@@ -42,6 +42,8 @@ struct ResearchSheet: View {
     var style: Style = .advisory
     /// When the research began; with one, a progress timer (148:6544) runs under the title
     var researchStarted: Date? = nil
+    /// How long that timer runs
+    var duration: TimeInterval = ResearchSheet.researchDuration
 
     /// How long the research takes
     /// `-researchSeconds N` shortens it, and the analysis, for working on what comes after
@@ -93,7 +95,7 @@ struct ResearchSheet: View {
                 VStack(alignment: .leading, spacing: 10) {
                     title
                     if let researchStarted {
-                        ResearchTimer(started: researchStarted, duration: Self.researchDuration)
+                        ResearchTimer(started: researchStarted, duration: duration)
                             .padding(.bottom, 23 - (style.titleGap - 7))
                     }
                 }

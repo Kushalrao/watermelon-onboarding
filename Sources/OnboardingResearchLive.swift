@@ -12,6 +12,8 @@ struct ResearchLive: View {
     /// Going through the user's own funds, once they're connected: each holding, then against its market, then
     /// which of them made the difference
     var portfolio = false
+    /// How many times faster than written it runs: its steps, the sweep between them, and each one's own motion
+    var pace: Double = 1
     /// The card's height as it changes, so the chat can keep it in view
     var onHeight: (CGFloat) -> Void = { _ in }
 
@@ -118,7 +120,7 @@ struct ResearchLive: View {
         }
         .task {
             for (at, next) in portfolio ? Self.portfolioTimeline : equityYear ? Self.equityTimeline : Self.timeline {
-                let wait = at - Date.now.timeIntervalSince(started)
+                let wait = at / pace - Date.now.timeIntervalSince(started)
                 if wait > 0 { try? await Task.sleep(for: .seconds(wait)) }
                 guard !Task.isCancelled else { return }
                 if next != phase || at == 0 {
@@ -132,7 +134,7 @@ struct ResearchLive: View {
                             phase = next
                             phaseStarted = .now
                         }
-                        withAnimation(.easeInOut(duration: Self.sweepTime)) { cardHeight = next.cardHeight }
+                        withAnimation(.easeInOut(duration: Self.sweepTime / pace)) { cardHeight = next.cardHeight }
                     } else {
                         withAnimation(.spring(response: 0.5, dampingFraction: 0.88)) {
                             phase = next
@@ -199,16 +201,16 @@ struct ResearchLive: View {
         return ZStack(alignment: .topLeading) {
             Color(hex: 0xFEFEFE)
             TimelineView(.animation) { context in
-                let raw = min(1, max(0, context.date.timeIntervalSince(sweepStarted) / Self.sweepTime))
+                let raw = min(1, max(0, context.date.timeIntervalSince(sweepStarted) / (Self.sweepTime / pace)))
                 // eased in and out, as the slider's sweep is
                 let sweep = CGFloat(raw * raw * (3 - 2 * raw))
                 HeatSweep(sweep: sweep, forward: true, width: Self.cardWidth, height: cardHeight,
                           contentHeight: max(phase.cardHeight, leaving?.phase.cardHeight ?? 0)) {
                     if let leaving, sweep < 1 {
-                        visual(leaving.phase, t: context.date.timeIntervalSince(leaving.started))
+                        visual(leaving.phase, t: context.date.timeIntervalSince(leaving.started) * pace)
                     }
                 } after: {
-                    visual(phase, t: context.date.timeIntervalSince(phaseStarted))
+                    visual(phase, t: context.date.timeIntervalSince(phaseStarted) * pace)
                 }
             }
         }

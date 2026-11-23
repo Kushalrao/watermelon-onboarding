@@ -569,7 +569,7 @@ struct OnboardingCommunicationsView: View {
 }
 
 /// The permissions' switch (973:17981): 39 × 23 on surface/sunken-1 with a hairline, a 19 knob, green once it's on
-private struct PermissionSwitchStyle: ToggleStyle {
+struct PermissionSwitchStyle: ToggleStyle {
     func makeBody(configuration: Configuration) -> some View {
         Button {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) { configuration.isOn.toggle() }

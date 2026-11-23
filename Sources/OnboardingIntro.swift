@@ -883,7 +883,7 @@ private struct OTPResendStatus: View {
 
 /// The big mobile-number entry (679:23200): digits only, at most 10, with the number pad up as soon as
 /// it appears. A UIKit field so its first-responder work stays out of the morphing card's SwiftUI updates.
-private struct PhoneNumberField: UIViewRepresentable {
+struct PhoneNumberField: UIViewRepresentable {
     @Binding var number: String
 
     private static let font = UIFont(name: "GTWalsheimTrial-Rg", size: 35) ?? .systemFont(ofSize: 35)
@@ -930,7 +930,7 @@ private struct PhoneNumberField: UIViewRepresentable {
 
 /// Takes the one-time code from the number pad (or the "From Messages" suggestion): an invisible field, up to six
 /// digits, drawn by the card's "000-000" instead
-private struct OneTimeCodeField: UIViewRepresentable {
+struct OneTimeCodeField: UIViewRepresentable {
     @Binding var code: String
 
     func makeUIView(context: Context) -> UITextField {

@@ -539,7 +539,7 @@ final class GestureTests: XCTestCase {
 
     func testOnboardingHold() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "4"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "4"]
         app.launch()
         sleep(2)
         func point(_ x: CGFloat, _ y: CGFloat) -> XCUICoordinate {
@@ -560,7 +560,7 @@ final class GestureTests: XCTestCase {
 
     func testOnboardingSwipe() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "5"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "5"]
         app.launch()
         sleep(2)
         func point(_ x: CGFloat, _ y: CGFloat) -> XCUICoordinate {
@@ -574,7 +574,7 @@ final class GestureTests: XCTestCase {
 
     func testOnboardingComplexity() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "6"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "6"]
         app.launch()
         sleep(2)
         func point(_ x: CGFloat, _ y: CGFloat) -> XCUICoordinate {
@@ -589,9 +589,236 @@ final class GestureTests: XCTestCase {
         sleep(1)
     }
 
+    /// The second onboarding, which is what opens without `-onboardingV1`: its opening comes right after the PAN and
+    /// runs from its welcome to the swipe, where it ends
+    func testOnboardingV2Welcome() {
+        let app = XCUIApplication()
+        // (with the version in which the simple report is all that's shown once a topic's picked, `-reportSimple`;
+        // the one that runs without it has its own test, `testOnboardingV2ReportCompare`)
+        app.launchArguments = ["-onboarding", "-reportSimple"]
+        app.launch()
+        // Its own way in: the welcome, the number, the code, and the details that come up over the code, with no
+        // PAN looked up on the way
+        XCTAssertTrue(app.staticTexts["Personal wealth advisor for life decisions"].waitForExistence(timeout: 6))
+        XCTAssertTrue(app.buttons["Read the terms and conditions"].exists)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: (ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()) + "/v2-intro-welcome.png"))
+        app.buttons["Agree & Continue"].tap()
+        XCTAssertTrue(app.staticTexts["Add your mobile number"].firstMatch.waitForExistence(timeout: 4))
+        XCTAssertFalse(app.buttons["Continue"].isEnabled)
+        app.textFields["Mobile number"].typeText("9871156837")
+        XCTAssertTrue(app.buttons["Continue"].isEnabled)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: (ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()) + "/v2-intro-mobile.png"))
+        app.buttons["Continue"].tap()
+        XCTAssertTrue(app.staticTexts["Enter one time password"].waitForExistence(timeout: 4))
+        XCTAssertTrue(app.staticTexts["9871156837"].exists)
+        XCTAssertTrue(app.buttons["Change number"].exists)
+        XCTAssertFalse(app.buttons["Continue"].isEnabled)
+        sleep(1)
+        app.textFields["One time password"].typeText("889302")
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: (ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()) + "/v2-intro-otp.png"))
+        app.buttons["Continue"].tap()
+        XCTAssertTrue(app.staticTexts["Verify your KYC details"].waitForExistence(timeout: 4))
+        XCTAssertTrue(app.staticTexts["ABCDE8283D"].exists || app.descendants(matching: .any)["PAN, ABCDE8283D"].exists)
+        XCTAssertFalse(app.staticTexts["Confirm kyc"].exists)
+        sleep(1)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: (ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()) + "/v2-intro-kyc.png"))
+        // Continue confirms them: a tick where the heading was for a second (too short a time to be asked after
+        // here; the picture taken straight away has it), and on
+        app.buttons["Continue"].tap()
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: (ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()) + "/v2-intro-kyc-done.png"))
+        XCTAssertTrue(app.staticTexts["Welcome to new standard of wealth advisory"].waitForExistence(timeout: 6))
+        XCTAssertTrue(app.staticTexts["Hello Ambika"].exists)
+        let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        sleep(1)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-welcome-arriving.png"))
+        sleep(4)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-welcome.png"))
+        // All four cards are on the screen, and a pull sideways doesn't move them
+        let lastCard = app.staticTexts["Recommendations from SEBI-registered advisors"].firstMatch
+        XCTAssertTrue(lastCard.exists)
+        XCTAssertLessThanOrEqual(lastCard.frame.maxX, app.frame.maxX)
+        let cardAt = lastCard.frame.minX
+        app.swipeLeft()
+        sleep(1)
+        XCTAssertEqual(lastCard.frame.minX, cardAt, accuracy: 0.5)
+        // Continue changes the words over and brings the phone up, twice, and then goes on
+        app.buttons["Continue"].tap()
+        XCTAssertTrue(app.staticTexts["Proactive, so you don’t miss"].waitForExistence(timeout: 4))
+        XCTAssertFalse(app.staticTexts["Hello Ambika"].exists)
+        sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-simplest.png"))
+        app.buttons["Continue"].tap()
+        XCTAssertTrue(app.staticTexts["Analysis backed by research"].waitForExistence(timeout: 4))
+        sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-research.png"))
+        // The report on the phone reads itself out; a finger on it holds it, and lifted it carries on
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.62)).press(forDuration: 3)
+        sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-research-later.png"))
+        // then the advisor: met, with her pill at the foot of the page to try, which goes on to the prompts by
+        // itself (what there is to ask about goes by first, and she comes in over it)
+        app.buttons["Continue"].tap()
+        XCTAssertTrue(app.staticTexts["Meet your personal advisor"].waitForExistence(timeout: 14))
+        XCTAssertTrue(app.staticTexts["Hello Ambika"].exists)
+        XCTAssertTrue(app.staticTexts["Tap to try!"].waitForExistence(timeout: 4))
+        XCTAssertFalse(app.buttons["Continue"].exists)
+        XCTAssertFalse(app.buttons["Say Hi"].exists)
+        sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-meet.png"))
+        // Tried, a tick stands where the heading was, over the pill and a keyboard
+        app.buttons["Ask your advisor"].tap()
+        XCTAssertTrue(app.images["Done"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["Access your advisor anytime"].exists)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-typing.png"))
+        XCTAssertTrue(app.staticTexts["Tell your advisor to research on a topic"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Select any topic"].waitForExistence(timeout: 4))
+        sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-topics.png"))
+        // Picking a prompt: a tick where the heading was, at once, and on the phone the documents the report is
+        // made from, gathered; they draw together as the phone rises, and what's there is the simple report alone
+        app.buttons["How mutual funds performed in the last 6 months?"].firstMatch.tap()
+        XCTAssertTrue(app.images["Done"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["Tell your advisor to research on a topic"].exists)
+        XCTAssertFalse(app.staticTexts["Equity funds did +7.1% returns"].exists)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-making.png"))
+        XCTAssertTrue(app.staticTexts["Wealth simplified for you"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Equity funds did +7.1% returns"].waitForExistence(timeout: 4))
+        // No report beside it, no line between, and nothing to switch; Continue comes up by itself
+        XCTAssertTrue(app.buttons["Continue"].waitForExistence(timeout: 6))
+        XCTAssertFalse(app.descendants(matching: .any)["Between the report and its simple version"].exists)
+        XCTAssertFalse(app.staticTexts["Equity mutual funds 2026"].exists)
+        XCTAssertEqual(app.switches.count, 0)
+        sleep(1)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-simple.png"))
+        // and it scrolls
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.6))
+            .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4)))
+        sleep(1)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-simple-scrolled.png"))
+        XCTAssertTrue(app.staticTexts["Wealth simplified for you"].exists)
+        // Continue goes on to the two gestures, each on a widget on the phone. Neither has a Continue: done, each
+        // shows what it brings up, and a tick where the heading was, for a moment and goes on by itself
+        app.buttons["Continue"].tap()
+        // (first a page that only says what's next, which comes and goes by itself)
+        XCTAssertTrue(app.staticTexts["Lets see how to use the app"].waitForExistence(timeout: 4))
+        XCTAssertFalse(app.buttons["Continue"].exists)
+        XCTAssertTrue(app.staticTexts["Hold any widget to get curious"].waitForExistence(timeout: 6))
+        XCTAssertFalse(app.staticTexts["Lets see how to use the app"].exists)
+        sleep(2)
+        XCTAssertFalse(app.buttons["Continue"].exists)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-hold.png"))
+        let widget = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 570.0 / 874))
+        widget.press(forDuration: 1.6)
+        XCTAssertTrue(app.staticTexts["Swipe and get specific"].waitForExistence(timeout: 6))
+        XCTAssertFalse(app.buttons["Continue"].exists)
+        sleep(2)
+        XCTAssertFalse(app.buttons["Continue"].exists)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-swipe.png"))
+        app.coordinate(withNormalizedOffset: CGVector(dx: 100.0 / 402, dy: 570.0 / 874))
+            .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 330.0 / 402, dy: 570.0 / 874)),
+                   withVelocity: .slow, thenHoldForDuration: 0.2)
+        // After the swipe, the reading levels, on the phone the same way: this one waits for its Continue
+        XCTAssertTrue(app.staticTexts["Adjust to what feels comfortable"].waitForExistence(timeout: 6))
+        XCTAssertTrue(app.buttons["Continue"].waitForExistence(timeout: 4))
+        sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-levels.png"))
+        // its slider is dragged across, and the card is rewritten
+        app.coordinate(withNormalizedOffset: CGVector(dx: 75.0 / 402, dy: 694.0 / 874))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 330.0 / 402, dy: 694.0 / 874)),
+                   withVelocity: .slow, thenHoldForDuration: 0.2)
+        sleep(4)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-levels-pro.png"))
+        XCTAssertFalse(app.staticTexts["All set! Connect your portfolio & get insights"].exists)
+        app.buttons["Continue"].tap()
+        // Last, the funds are asked for: the button brings up how they come in through MFCentral
+        XCTAssertTrue(app.staticTexts["All set! Connect your portfolio & get insights"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Which of my funds are holding me back?"].waitForExistence(timeout: 4))
+        XCTAssertFalse(app.buttons["Continue"].exists)
+        sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-connect.png"))
+        app.buttons["Connect mutual funds"].tap()
+        XCTAssertTrue(app.staticTexts["We will import mutual funds via MFCentral"].waitForExistence(timeout: 4))
+        sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-mfcentral.png"))
+        // and going on from that the onboarding is done: none of the first one's later screens, straight to the app
+        app.buttons["Lets connect"].tap()
+        XCTAssertTrue(app.buttons["Ask your advisor"].waitForExistence(timeout: 6) || app.staticTexts["Hello Ambika"].waitForExistence(timeout: 2))
+        XCTAssertFalse(app.staticTexts["All set! Connect your portfolio & get insights"].exists)
+        XCTAssertFalse(app.staticTexts["Congrats! you have a proactive personal advisor now"].exists)
+    }
+
+    /// What the second onboarding shows once a topic is picked, as it runs: what the advisor goes through, her
+    /// report, and the line between that and the simple one
+    func testOnboardingV2ReportCompare() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-onboardingStep", "20", "-onboardingV2Stage", "6"]
+        app.launch()
+        let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
+        XCTAssertTrue(app.staticTexts["Select any topic"].waitForExistence(timeout: 8))
+        sleep(2)
+        // Picking a prompt: a tick where the heading was, at once, and on the phone what the advisor goes through
+        // for it, clearing from the top a step at a time, its sites then moving up for three seconds; then the
+        // report it made
+        app.buttons["How mutual funds performed in the last 6 months?"].firstMatch.tap()
+        XCTAssertTrue(app.images["Done"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["Tell your advisor to research on a topic"].exists)
+        let researching = app.descendants(matching: .any)["Researching it"]
+        XCTAssertTrue(researching.exists)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-chat-research.png"))
+        // which goes when it's done, and the report is there
+        let gone = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: researching)
+        wait(for: [gone], timeout: 12)
+        XCTAssertTrue(app.staticTexts["Equity mutual funds 2026"].exists)
+        // With the report up the phone rises, and a line comes in across it: the report to its left, the same
+        // thing put simply to its right
+        XCTAssertTrue(app.staticTexts["Wealth simplified for you"].waitForExistence(timeout: 8))
+        // It goes across and back twice and comes to rest with three quarters of the screen simple; Continue
+        // comes up once it has. Nothing's said of making it simple, and there's no switch for it
+        let line = app.descendants(matching: .any)["Between the report and its simple version"]
+        XCTAssertTrue(line.waitForExistence(timeout: 8))
+        usleep(900_000)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-simple-swaying.png"))
+        XCTAssertTrue(app.buttons["Continue"].waitForExistence(timeout: 8))
+        XCTAssertTrue(app.staticTexts["Equity funds did +7.1% returns"].exists)
+        XCTAssertFalse(app.staticTexts["Make it simple"].exists)
+        XCTAssertEqual(app.switches.count, 0)
+        sleep(1)
+        XCTAssertEqual(line.value as? String, "75 percent simple")
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-simple-split.png"))
+        // The line is dragged by hand: out to the right and back, and it's where the finger left it
+        let rest = 126.25 / 402
+        app.coordinate(withNormalizedOffset: CGVector(dx: rest, dy: 0.5))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 300.0 / 402, dy: 0.5)),
+                   withVelocity: .slow, thenHoldForDuration: 0.2)
+        sleep(1)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-simple-dragged.png"))
+        app.coordinate(withNormalizedOffset: CGVector(dx: 300.0 / 402, dy: 0.5))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: rest, dy: 0.5)),
+                   withVelocity: .slow, thenHoldForDuration: 0.2)
+        sleep(1)
+        XCTAssertEqual(line.value as? String, "75 percent simple")
+        // The report still scrolls on its side
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.6))
+            .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.35)))
+        sleep(2)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-simple-scrolled.png"))
+        // Dragged all the way left it's nothing but the simple version, and the heading says what that is
+        XCTAssertTrue(app.staticTexts["Wealth simplified for you"].exists)
+        app.coordinate(withNormalizedOffset: CGVector(dx: rest, dy: 0.5))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 20.0 / 402, dy: 0.5)),
+                   withVelocity: .slow, thenHoldForDuration: 0.2)
+        XCTAssertTrue(app.staticTexts["Decades of research, simplified for you"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["Wealth simplified for you"].exists)
+        XCTAssertEqual(line.value as? String, "100 percent simple")
+        sleep(1)
+        try? XCUIScreen.main.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: dir + "/v2-simple-on.png"))
+        // and nothing is suggested from the report
+        XCTAssertFalse(app.buttons["How did my equity funds do this year?"].exists)
+    }
+
     func testDecadeWelcomeArrives() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingPAN"]
+        app.launchArguments = ["-onboardingV1", "-onboardingPAN"]
         app.launch()
         sleep(2)
         app.buttons["Confirm"].tap()
@@ -648,7 +875,7 @@ final class GestureTests: XCTestCase {
 
     func testAdvice() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "1", "-welcomeAnalysis", "-researchSeconds", "2"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "1", "-welcomeAnalysis", "-researchSeconds", "2"]
         app.launch()
         // The finished report scrolls down to the question that leads on
         XCTAssertTrue(app.staticTexts["Equity mutual funds 2026"].waitForExistence(timeout: 12))
@@ -701,7 +928,7 @@ final class GestureTests: XCTestCase {
 
     func testImportFlow() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "1", "-welcomeDone", "-welcomeAnalysis", "-welcomeAdvice", "-importFlow"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "1", "-welcomeDone", "-welcomeAnalysis", "-welcomeAdvice", "-importFlow"]
         app.launch()
         let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
         func shot(_ name: String) {
@@ -804,7 +1031,7 @@ final class GestureTests: XCTestCase {
     /// The three guides after the permissions: reading level, hold, swipe; the last Continue ends the onboarding
     func testGuides() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "12"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "12"]
         app.launch()
         // She types her line, and the card comes up a second after
         sleep(7)
@@ -860,7 +1087,7 @@ final class GestureTests: XCTestCase {
 
     func testChangeNumber() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingOTP"]
+        app.launchArguments = ["-onboardingV1", "-onboardingOTP"]
         app.launch()
         // On the OTP step, the number card behind offers to change it
         let change = app.buttons["Change number"]
@@ -876,7 +1103,7 @@ final class GestureTests: XCTestCase {
 
     func testCodeMovesOn() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingOTP"]
+        app.launchArguments = ["-onboardingV1", "-onboardingOTP"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Enter the one-time password sent to your mobile"].waitForExistence(timeout: 5))
         sleep(1)
@@ -891,7 +1118,7 @@ final class GestureTests: XCTestCase {
 
     func testChatScrollsBack() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "1", "-welcomeDone", "-welcomeAnalysis", "-welcomeAdvice"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "1", "-welcomeDone", "-welcomeAnalysis", "-welcomeAdvice"]
         app.launch()
         XCTAssertTrue(app.buttons["View analysis"].waitForExistence(timeout: 4))
         sleep(1)
@@ -922,7 +1149,7 @@ final class GestureTests: XCTestCase {
 
     func testReportQuestions() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "1", "-analysisDone"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "1", "-analysisDone"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Equity mutual funds 2026"].waitForExistence(timeout: 8))
         sleep(2)
@@ -948,7 +1175,7 @@ final class GestureTests: XCTestCase {
 
     func testReportRead() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "1", "-analysisDone"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "1", "-analysisDone"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Equity mutual funds 2026"].waitForExistence(timeout: 8))
         sleep(2)
@@ -967,7 +1194,7 @@ final class GestureTests: XCTestCase {
 
     func testGender() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingPAN"]
+        app.launchArguments = ["-onboardingV1", "-onboardingPAN"]
         app.launch()
         let dir = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
         let field = app.buttons["Gender"]
@@ -993,7 +1220,7 @@ final class GestureTests: XCTestCase {
 
     func testAnalysis() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "1", "-welcomeDone", "-researchSeconds", "9"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "1", "-welcomeDone", "-researchSeconds", "9"]
         app.launch()
         // With the results in, the agent starts the analysis by itself: the report's card, preparing, which opens it
         let preparing = app.buttons["Preparing report"]
@@ -1013,7 +1240,7 @@ final class GestureTests: XCTestCase {
 
     func testResearchDone() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "1", "-welcomeChat", "-researchSeconds", "4"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "1", "-welcomeChat", "-researchSeconds", "4"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Research plan created"].waitForExistence(timeout: 3))
         // When the time is up the plan folds away, the results come in, and the agent goes on to the analysis
@@ -1027,7 +1254,7 @@ final class GestureTests: XCTestCase {
     func testWelcomeChat() {
         let app = XCUIApplication()
         // A long research, so it's still running through every step that looks at it
-        app.launchArguments = ["-onboardingStep", "1", "-researchSeconds", "90"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "1", "-researchSeconds", "90"]
         app.launch()
         // Continue forms under the card and sends the message
         let next = app.buttons["Lets get started"]
@@ -1103,7 +1330,7 @@ final class GestureTests: XCTestCase {
 
     func testAdvisoryChat() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboardingStep", "2"]
+        app.launchArguments = ["-onboardingV1", "-onboardingStep", "2"]
         app.launch()
         let suggestion = app.buttons["Lets start with Research"]
         XCTAssertTrue(suggestion.waitForExistence(timeout: 6))
@@ -1125,7 +1352,7 @@ final class GestureTests: XCTestCase {
 
     func testOnboardingIntro() {
         let app = XCUIApplication()
-        app.launchArguments = ["-onboarding"]
+        app.launchArguments = ["-onboardingV1", "-onboarding"]
         app.launch()
         sleep(4)
         // The terms open as a sheet that scrolls, and Understood puts it away

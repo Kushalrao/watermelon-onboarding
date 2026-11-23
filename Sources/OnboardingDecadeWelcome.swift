@@ -25,6 +25,37 @@ import SwiftUI
 /// Decisioning", and a sheet rises asking to connect the user's mutual funds (148:6020).
 struct OnboardingDecadeWelcomeView: View {
     let onContinue: () -> Void
+    /// Set by the second onboarding, which runs the chat inside the phone it draws (1251:12043); nil here
+    var embedded: Embedding? = nil
+
+    /// The chat on its own, in a given room: it opens already asked `topic`, with no welcome, no pinned pill and no
+    /// sheet before it, researches it `pace` times faster, and stops once its report is up (nothing is suggested
+    /// from the report, so nothing follows it)
+    struct Embedding {
+        let topic: Topic
+        /// The room it has, in its own points; the card is 368 across in the middle of it and as tall as it
+        let size: CGSize
+        /// How many times faster it all goes: the waits between its messages, the research and the report's making
+        var pace: Double = 1
+        /// Told when its report has come up
+        var onReport: () -> Void = {}
+    }
+
+    init(onContinue: @escaping () -> Void, embedded: Embedding? = nil) {
+        self.onContinue = onContinue
+        self.embedded = embedded
+        guard let embedded else { return }
+        // Already the chat, its ground and its question there; the card sits at the top of the room (it's hung 11
+        // under the status bar, so the bar is counted as 11 above the room) and runs to its foot, 19 short as ever
+        _flow = State(initialValue: 1)
+        _shown = State(initialValue: true)
+        _rowsShown = State(initialValue: 3)
+        _compact = State(initialValue: true)
+        _chatting = State(initialValue: true)
+        _avatarGone = State(initialValue: true)
+        _headingShown = State(initialValue: true)
+        _insets = State(initialValue: (embedded.size.height + 8, -11, 0))
+    }
 
     /// How far up the screen the background has flowed, 0…1
     @State private var flow: CGFloat = 0
@@ -158,7 +189,7 @@ struct OnboardingDecadeWelcomeView: View {
     @State private var insets: (height: CGFloat, top: CGFloat, bottom: CGFloat) = (874, 62, 34)
     @State private var screenWidth: CGFloat = 402
     /// The card: 364 wide as the welcome; as the chat, 93% of the screen's width
-    private var cardWidth: CGFloat { chatting ? (screenWidth * 0.93).rounded() : 364 }
+    private var cardWidth: CGFloat { chatting ? (embedded == nil ? (screenWidth * 0.93).rounded() : 368) : 364 }
     /// Where things sit in the insights chat, in the card, before it scrolls
     private enum AdviceY {
         static let card: CGFloat = 384
@@ -286,7 +317,8 @@ struct OnboardingDecadeWelcomeView: View {
     private var autoScroll: CGFloat { scroll }
     /// The pull, held between the latest and the first message, giving a little at either end
     /// Once a topic's picked the avatar goes, and the chat rises into its place (269:3110)
-    private var headerLift: CGFloat { avatarGone ? 86 : 0 }
+    /// (in the phone, 38 short of it: the band the chat scrolls up under covers the phone's island)
+    private var headerLift: CGFloat { avatarGone ? (embedded == nil ? 86 : 48) : 0 }
     /// The pull, less the avatar's room once it's gone: what every layer of the chat moves by
     private var drift: CGFloat { back - headerLift }
     /// The topic, pinned over the card once it's picked, and the room it takes there
@@ -328,15 +360,19 @@ struct OnboardingDecadeWelcomeView: View {
     /// The finished analysis is a taller sheet, standing 20pt higher
     private var analysisTall: Bool { activeSheet == .analysis && analysisDone }
     private var sheetHeight: CGFloat {
-        analysisTall ? AnalysisSheet.reportHeight - (suggestionOut ? Self.suggestionRoom : 0) : 612
+        // In the phone the report has the room's height to fit in, from 56 under its top (clear of the phone's
+        // island) to 8 over its foot
+        if analysisTall, let embedded { return min(AnalysisSheet.reportHeight, embedded.size.height - 64) }
+        return analysisTall ? AnalysisSheet.reportHeight - (suggestionOut ? Self.suggestionRoom : 0) : 612
     }
     /// How far up a finished report stands: 751 tall (1182:16908), it comes up to just under the status bar,
     /// which leaves the same 45 under it as the frame
-    private var sheetRise: CGFloat { analysisTall ? 111 : 0 }
+    private var sheetRise: CGFloat { analysisTall ? (embedded == nil ? 111 : 60) : 0 }
     /// The first report is open and being read: its suggested question has come out under the sheet, which gives
     /// up this much height for it (the chip, 5 roomier on every side here, and 12 between them)
     private var suggestionOut: Bool {
         suggestionPopped && sheetUp && !sheetClosing && analysisTall && !portfolioReportReady && !analysisStored
+            && embedded == nil
     }
     private static let suggestionPadding: CGFloat = 5
     private static let suggestionRoom: CGFloat = PortfolioAskChip.height + suggestionPadding * 2 + 12
@@ -450,6 +486,8 @@ struct OnboardingDecadeWelcomeView: View {
             }
         }
         .onAppear {
+            // In the phone its room is given, not the window's
+            guard embedded == nil else { return }
             let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
             if let window = scene?.windows.first {
                 insets = (window.bounds.height, window.safeAreaInsets.top, window.safeAreaInsets.bottom)
@@ -460,6 +498,8 @@ struct OnboardingDecadeWelcomeView: View {
         // The import's answer field brings the keyboard up; nothing here should move for it
         .ignoresSafeArea(.keyboard)
         .task {
+            // In the phone: asked straight away, as if its topic had been tapped
+            if let embedded { return start(embedded.topic) }
             guard !chatting else {
                 // Opened straight on the chat, with the plan up
                 (flow, shown, rowsShown, compact, sent, headingShown, replyShown, planShown, typingAt, scroll)
@@ -600,6 +640,12 @@ struct OnboardingDecadeWelcomeView: View {
         }
     }
 
+    /// A wait between one thing and the next in the conversation. In the second onboarding's phone they're all
+    /// shortened by its pace, as the research is; here they're as written.
+    private func pause(_ seconds: Double) async {
+        try? await Task.sleep(for: .seconds(seconds / (embedded?.pace ?? 1)))
+    }
+
     /// A topic tapped: it goes in as the user's message, and the agent answers and plans the research around it
     private func start(_ chosen: Topic) {
         guard topic == nil else { return }
@@ -610,16 +656,16 @@ struct OnboardingDecadeWelcomeView: View {
         }
         // and as it goes, the pin over the chat flips from Decade to the topic
         Task {
-            try? await Task.sleep(for: .seconds(0.5))
+            await pause(0.5)
             withAnimation(.spring(response: 0.7, dampingFraction: 0.8)) { topicFlipped = true }
         }
         Task {
-            try? await Task.sleep(for: .seconds(0.3))
+            await pause(0.3)
             withAnimation(.spring(response: 0.42, dampingFraction: 0.8)) { sent = true }
-            try? await Task.sleep(for: .seconds(0.45))
+            await pause(0.45)
             keepInView(ChatY.replyDots + 40)
             withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { typingAt = ChatY.replyDots }
-            try? await Task.sleep(for: .seconds(1.8))
+            await pause(1.8)
             withAnimation(.spring(response: 0.42, dampingFraction: 0.8)) {
                 typingAt = nil
                 replyShown = true
@@ -629,12 +675,12 @@ struct OnboardingDecadeWelcomeView: View {
             Haptics.thresholdCrossed()
             // Then it types once more, over the research plan it's putting together, the chat moving up only as
             // far as it needs to
-            try? await Task.sleep(for: .seconds(0.9))
+            await pause(0.9)
             // room for the dots only, then for the chip as it arrives
             keepInView(ChatY.lastDots + 40)
-            try? await Task.sleep(for: .seconds(0.25))
+            await pause(0.25)
             withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { typingAt = ChatY.lastDots }
-            try? await Task.sleep(for: .seconds(0.35))
+            await pause(0.35)
             withAnimation(.spring(response: 0.5, dampingFraction: 0.82)) {
                 planShown = true
                 typingAt = nil
@@ -659,7 +705,7 @@ struct OnboardingDecadeWelcomeView: View {
         guard researchStarted == nil else { return }
         researchStarted = .now
         Task {
-            try? await Task.sleep(for: .seconds(ResearchSheet.researchDuration))
+            try? await Task.sleep(for: .seconds(ResearchSheet.researchDuration / (embedded?.pace ?? 1)))
             await finishResearch()
         }
     }
@@ -676,14 +722,14 @@ struct OnboardingDecadeWelcomeView: View {
         }
         // the results, under the chip, heading and time
         keepInView(Self.inResults(271 + Self.resultsHeadingHeight + 29))
-        try? await Task.sleep(for: .seconds(0.35))
+        await pause(0.35)
         for _ in 0..<4 {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.86)) { resultsShown += 1 }
             Haptics.revealGrain(intensity: 0.45)
-            try? await Task.sleep(for: .seconds(resultsShown == 3 ? 0.3 : 0.12))
+            await pause(resultsShown == 3 ? 0.3 : 0.12)
         }
         // and the agent goes straight on to the analysis, without asking
-        try? await Task.sleep(for: .seconds(1.2))
+        await pause(1.2)
         startInsights()
     }
 
@@ -692,10 +738,10 @@ struct OnboardingDecadeWelcomeView: View {
     private func startInsights() {
         withAnimation(.spring(response: 0.62, dampingFraction: 0.86)) { insightsSent = true }
         Task {
-            try? await Task.sleep(for: .seconds(0.2))
+            await pause(0.2)
             keepInView(Self.inAnalysis(384 + 40))
             withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { analysisTyping = true }
-            try? await Task.sleep(for: .seconds(0.9))
+            await pause(0.9)
             withAnimation(.spring(response: 0.5, dampingFraction: 0.82)) {
                 analysisChipShown = true
                 analysisTyping = false
@@ -722,7 +768,7 @@ struct OnboardingDecadeWelcomeView: View {
         analysisStarted = .now
         guard !analysisDone else { return }
         Task {
-            try? await Task.sleep(for: .seconds(ResearchSheet.analysisDuration))
+            await pause(ResearchSheet.analysisDuration)
             Haptics.thresholdCrossed()
             withAnimation(.spring(response: 0.7, dampingFraction: 0.88)) {
                 analysisDone = true
@@ -730,6 +776,7 @@ struct OnboardingDecadeWelcomeView: View {
             }
             // Shown whether or not it was folded away; Understood, or its close, keeps it in the chat
             if !sheetUp { openAnalysis() }
+            embedded?.onReport()
         }
     }
 
@@ -863,7 +910,9 @@ struct OnboardingDecadeWelcomeView: View {
             Group {
                 switch activeSheet {
                 case .research:
-                    ResearchSheet(style: .welcome, researchStarted: researchStarted, heading: topic?.plan, animatesIn: !researchSeen,
+                    ResearchSheet(style: .welcome, researchStarted: researchStarted,
+                                  duration: ResearchSheet.researchDuration / (embedded?.pace ?? 1),
+                                  heading: topic?.plan, animatesIn: !researchSeen,
                                   researching: researchStarted != nil && !researchDone, onClose: closeSheet)
                 case .analysis:
                     AnalysisSheet(started: analysisStarted ?? .now, done: analysisDone, answer: $mythAnswer, animatesIn: !analysisSeen,
@@ -984,8 +1033,8 @@ struct OnboardingDecadeWelcomeView: View {
         .ignoresSafeArea()
     }
 
-    /// surface/base, as in the frames (679:24216, 699:24516)
-    private var background: some View { ColorScale.surfaceBase }
+    /// surface/base, as in the frames (679:24216, 699:24516); in the phone, the phone's own screen
+    private var background: some View { embedded == nil ? ColorScale.surfaceBase : Color.clear }
 
     /// "Flight card background" (952:11578), 364 × 622; the chat's card (699:24519) once chatting
     private var card: some View {
@@ -1148,7 +1197,8 @@ struct OnboardingDecadeWelcomeView: View {
             topics
             // While the research runs, what it's doing, and now and then the data it's going over (270:16266)
             if let researchStarted, !researchDone, planShown {
-                ResearchLive(started: researchStarted, equityYear: topic == Topic.equityYear) { height in
+                ResearchLive(started: researchStarted, equityYear: topic == Topic.equityYear || embedded != nil,
+                             pace: embedded?.pace ?? 1) { height in
                     keepInView(researchFoot(height))
                 }
                 .frame(width: ResearchLive.cardWidth, alignment: .leading)
@@ -1432,7 +1482,7 @@ struct OnboardingDecadeWelcomeView: View {
             // What was asked from the report, and what follows, as the chat's own bubbles and cards
             VStack(alignment: .leading, spacing: 18) {
                 // With the report closed and nothing asked yet, the same suggestion waits here, at the right
-                if analysisDone, !analysisStored, !(sheetUp && activeSheet == .analysis) {
+                if analysisDone, !analysisStored, !(sheetUp && activeSheet == .analysis), embedded == nil {
                     PortfolioAskChip(action: askPortfolio)
                         .frame(width: cardWidth - 11, alignment: .trailing)
                         .transition(.scale(scale: 0.9, anchor: .bottomTrailing).combined(with: .opacity))

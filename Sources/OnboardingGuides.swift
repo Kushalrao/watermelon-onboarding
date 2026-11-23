@@ -93,12 +93,13 @@ private extension View {
 
 /// Continue (973:17053): 344 × 49, the label centred
 struct OnboardingConfirmButton: View {
+    var title = "Continue"
     var enabled = true
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Text("Continue")
+            Text(title)
                 .font(FigmaFont.walsheimMedium(17))
                 .foregroundStyle(Color.white)
                 .offset(x: 0.5)

@@ -586,6 +586,8 @@ private struct ReportResults: View {
     var onClose: () -> Void = {}
     /// Scrolled a little way in: it's being read
     var onRead: () -> Void = {}
+    /// Only what it says, top to bottom, with no sheet about it and no scrolling of its own: for `ReportReel`
+    var document = false
     /// The section at the top of the sheet
     @State private var section = 0
     /// How tall each section has turned out, the opening first and the closing read last
@@ -885,7 +887,41 @@ private extension ReportResults {
         sectionTops.enumerated().map { index, top in top + (heights[index] ?? 700) - slack(index) + 24 }
     }
 
-    var body: some View {
+    @ViewBuilder var body: some View {
+        if document {
+            pages.background(Self.paper)
+        } else {
+            sheet
+        }
+    }
+
+    /// What the report says, top to bottom, 368 across: the opening, each section, and the closing read
+    private var pages: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            opening.measured(0, into: $heights)
+            Group {
+                ForEach(Array(content.sections.enumerated()), id: \.offset) { index, item in
+                    Group {
+                        switch item {
+                        case .bars(let item): bars(item)
+                        case .versus(let item): versus(item)
+                        case .table(let item): table(item)
+                        case .extremes(let item): extremes(item)
+                        case .spreads(let items): spreads(items)
+                        }
+                    }
+                    .measured(index + 1, into: $heights)
+                }
+                if !content.reads.isEmpty { ourRead }
+            }
+            .arrivingUp(shown > 3)
+        }
+        .frame(width: 334, alignment: .leading)
+        .padding(.leading, 17)
+        .frame(width: AnalysisSheet.width, alignment: .leading)
+    }
+
+    private var sheet: some View {
         let tops = sectionTops
         return VStack(spacing: 0) {
             // The header stays where it is while the rest scrolls under it
@@ -894,30 +930,9 @@ private extension ReportResults {
                 .arrivingUp(shown > 0)
             ScrollViewReader { scroll in
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
-                    opening.measured(0, into: $heights)
-                    Group {
-                        ForEach(Array(content.sections.enumerated()), id: \.offset) { index, item in
-                            Group {
-                                switch item {
-                                case .bars(let item): bars(item)
-                                case .versus(let item): versus(item)
-                                case .table(let item): table(item)
-                                case .extremes(let item): extremes(item)
-                                case .spreads(let items): spreads(items)
-                                }
-                            }
-                            .measured(index + 1, into: $heights)
-                        }
-                        if !content.reads.isEmpty { ourRead }
-                    }
-                    .arrivingUp(shown > 3)
-                }
-                .frame(width: 334, alignment: .leading)
-                .padding(.leading, 17)
-                .frame(width: AnalysisSheet.width, alignment: .leading)
-                // what the sheet has given up at its foot, so the last of it can still be brought into view
-                .padding(.bottom, AnalysisSheet.reportHeight - height + covered)
+                pages
+                    // what the sheet has given up at its foot, so the last of it can still be brought into view
+                    .padding(.bottom, AnalysisSheet.reportHeight - height + covered)
             }
             .scrollTargetBehavior(SectionSnap(tops: tops, feet: sectionFeet, sheet: height - 51 - covered))
             .onScrollGeometryChange(for: Bool.self) { $0.contentOffset.y >= 100 } action: { _, reading in
@@ -1599,4 +1614,109 @@ private extension View {
 #Preview {
     AnalysisSheet(started: .now, done: true, answer: .constant(nil))
         .background(Color.black)
+}
+
+// MARK: - The report, reading itself out
+
+/// One copy of the first report as a plain document. It takes nothing in, so it's laid out once and left alone
+/// while the reel moves it.
+private struct ReportPage: View {
+    var body: some View {
+        ReportResults(content: .equityYear, shown: ReportResults.parts, document: true)
+    }
+}
+
+/// The first report as a document that scrolls itself, 368 across (1267:15806's phone, in the second onboarding):
+/// it goes up without stopping, laid out twice over so its end runs straight into its beginning. A finger on it
+/// holds it there, and can drag it as any page; lifted, it carries on from where it was left. Its graphs grow as
+/// they come into view, as they do in the report. With Reduce Motion it stays still, and is scrolled by hand.
+struct ReportReel: View {
+    /// Points a second, in its own measure, once it's up to pace
+    var speed: CGFloat = 250.24
+    /// What it sets off at, each time it starts or is let go
+    var gentle: CGFloat = 64
+    /// Seconds it takes to gather pace
+    var gathering: CGFloat = 6
+    /// Kept at its top, not yet set off: it's laid out, and waiting to be shown
+    var held = false
+
+    @State private var position = ScrollPosition(y: 0)
+    @State private var reel = Reel()
+    /// The scroll isn't being dragged, or running on from a drag
+    @State private var idle = true
+    @GestureState private var pressed = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var running: Bool { idle && !pressed && !reduceMotion && !held }
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 0) {
+                ReportPage()
+                ReportPage()
+            }
+            // A picture of the report: its questions aren't opened from here
+            .overlay { Color.clear.contentShape(Rectangle()) }
+        }
+        .scrollPosition($position)
+        .onScrollGeometryChange(for: [CGFloat].self) { [$0.contentOffset.y, $0.contentSize.height] } action: { _, now in
+            reel.y = now[0]
+            reel.length = now[1] / 2
+        }
+        // its own steps up the page count as rest; only a finger's, and what they leave it doing, don't
+        .onScrollPhaseChange { _, phase in idle = phase == .idle || phase == .animating }
+        // down, before anything's been dragged
+        .simultaneousGesture(DragGesture(minimumDistance: 0).updating($pressed) { _, state, _ in state = true })
+        .onChange(of: running, initial: true) { _, running in
+            guard running else { return reel.stop() }
+            reel.start { elapsed in
+                guard reel.length > 0 else { return }
+                reel.ran += elapsed
+                // eased at both ends, so the pace neither jumps on nor arrives with a jolt
+                let t = min(reel.ran / gathering, 1)
+                let pace = gentle + (speed - gentle) * t * t * (3 - 2 * t)
+                var y = reel.y + pace * elapsed
+                // past the first copy it's a copy back, where the same thing is showing
+                if y >= reel.length { y -= reel.length }
+                reel.y = y
+                position.scrollTo(y: y)
+            }
+        }
+        .onDisappear { reel.stop() }
+    }
+
+    /// Where the reel is, and the screen's own clock to move it by
+    private final class Reel: NSObject {
+        var y: CGFloat = 0
+        /// One copy's height
+        var length: CGFloat = 0
+        /// Seconds it has been going since it last set off
+        var ran: CGFloat = 0
+        private var link: CADisplayLink?
+        private var last: CFTimeInterval = 0
+        private var step: (CGFloat) -> Void = { _ in }
+
+        /// Calls `step` each frame with the seconds since the one before
+        func start(_ step: @escaping (CGFloat) -> Void) {
+            self.step = step
+            guard link == nil else { return }
+            last = 0
+            ran = 0
+            let link = CADisplayLink(target: self, selector: #selector(tick))
+            link.add(to: .main, forMode: .common)
+            self.link = link
+        }
+
+        func stop() {
+            link?.invalidate()
+            link = nil
+        }
+
+        @objc private func tick(_ link: CADisplayLink) {
+            let elapsed = last == 0 ? 0 : link.timestamp - last
+            last = link.timestamp
+            // a long gap (the app was away) isn't jumped over
+            step(CGFloat(min(elapsed, 0.1)))
+        }
+    }
 }
