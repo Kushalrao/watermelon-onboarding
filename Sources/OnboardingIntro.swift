@@ -1019,7 +1019,7 @@ struct LoopingVideo: UIViewRepresentable {
 
 /// The swell that travels down the identity card with the reveal (`RevealBump.metal`). Drawn with room around the
 /// card so its sides can bow out past their edges.
-private struct RevealBump: ViewModifier {
+struct RevealBump: ViewModifier {
     let start: Date
     let active: Bool
     private static let room: CGFloat = 12

@@ -10,11 +10,12 @@ import SwiftUI
 /// - "Enter one time password" (1362:6984): the same, the card with the number it was sent to (and a way back to
 ///   change it) over the code being typed.
 /// - "Verify your KYC details" (1362:7246): once the code's been confirmed this comes up over that, ground and
-///   all, with what was found for the number: the name, the PAN, the date of birth and the gender, and Continue.
-///   Continue confirms them: a green tick stands where the heading was (1362:7450), and after a moment it goes on.
+///   all. In its card the PAN card is looked up with the first onboarding's reveal, made of lines: lines run
+///   down the box, slowing and spreading, then unfurl into a ruled field and resolve top to bottom into the card
+///   (in place of the frame's name, PAN and date of birth fields); Gender comes in under it and Continue wakes. Continue confirms them: a green tick stands where the
+///   heading was (1362:7450), and after a moment it goes on.
 ///
-/// Nothing is looked up on the way: the first onboarding's sphere that turns into the PAN card as it's found
-/// (`OnboardingIntroView`) isn't part of this. It's kept where it was, and `-onboardingIntroV1` puts it back here.
+/// The first onboarding's own intro is kept where it was, and `-onboardingIntroV1` puts it back here.
 struct OnboardingIntroV2View: View {
     let onContinue: () -> Void
 
@@ -40,7 +41,13 @@ struct OnboardingIntroV2View: View {
     @State private var showsTerms = false
     /// The details have been confirmed: a tick stands where their heading was, and it goes on
     @State private var verified = false
+    /// The PAN card has been found: it's there in full, Gender is under it and Continue wakes. `-onboardingPAN` opens
+    /// on it; `-onboardingIdentity` opens on the KYC card while it's still being looked up.
+    @State private var found = ProcessInfo.processInfo.arguments.contains("-onboardingPAN")
+    /// When the KYC card came up; the lookup's reveal runs from here
+    @State private var lookupStart = Date.now
     @Environment(\.onboardingTop) private var top
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// `-onboardingPhone`, `-onboardingOTP` and `-onboardingPAN` (or `-onboardingIdentity`) open on the frames
     /// after the first, as they do in the first onboarding
@@ -137,6 +144,7 @@ struct OnboardingIntroV2View: View {
         case .otp:
             // The pad goes down as the details come up over it
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            lookupStart = .now
             withAnimation(Self.move) { stage = .kyc }
         case .kyc:
             // 1362:7450: confirmed. The tick, a moment to see it, and on
@@ -485,48 +493,319 @@ struct OnboardingIntroV2View: View {
                 heading("Verify your KYC details", side: side)
             }
 
-            // 1362:7379: 356 × 514
+            // The frame's card (1362:7379), with the PAN card being looked up where its name, PAN and date of birth
+            // were; once it's found, Gender comes in under it and the card grows to hold it
             ZStack(alignment: .topLeading) {
-                // 1362:7435
-                field("Full name", height: 108) {
-                    value("Venkata")
-                    Self.line.frame(width: 329, height: 1).at(1, 55)
-                    // Gap: Rg 13/17 in #212121 at 47%
-                    GapText("Make sure it matches the name on your government ID", family: .walsheim, medium: false, size: 13, lineHeight: 17, color: Self.ink.opacity(0.47))
-                        .frame(width: 241, alignment: .leading)
-                        .at(15, 63)
-                }
-                .at(13, 17)
-                // 1362:7441
-                field("PAN", height: 55) { value("ABCDE8283D") }
-                    .at(13, 182)
-                // 1362:7445 (the frame has the PAN again here; the date is the first onboarding's)
-                field("Date of birth", height: 55) { value("15/08/1999") }
-                    .at(13, 294)
-                // 1362:7429: outlined in border/default, and it opens
-                Menu {
-                    ForEach(["Female", "Male", "Other"], id: \.self) { option in
-                        Button(option) { gender = option }
+                // Gap: GT Walsheim Medium 17/23 on content/primary, as the frame's field names
+                GapText("Your PAN card", family: .walsheim, medium: true, size: 17, lineHeight: 23, color: ColorScale.contentPrimary)
+                    .fixedSize()
+                    .at(13, 17)
+                    .accessibilityHidden(true)
+                panLookup
+                    .at(13, Self.panTop)
+                if found {
+                    // 1362:7429: outlined in border/default, and it opens
+                    Menu {
+                        ForEach(["Female", "Male", "Other"], id: \.self) { option in
+                            Button(option) { gender = option }
+                        }
+                    } label: {
+                        field("Gender", height: 55, border: ColorScale.borderDefault) {
+                            value(gender)
+                            Image("GenderChevron").frame(width: 25, height: 25).at(292, 15)
+                        }
+                        .contentShape(Rectangle())
                     }
-                } label: {
-                    field("Gender", height: 55, border: ColorScale.borderDefault) {
-                        value(gender)
-                        Image("GenderChevron").frame(width: 25, height: 25).at(292, 15)
-                    }
-                    .contentShape(Rectangle())
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Gender")
+                    .accessibilityValue(gender)
+                    .at(13, Self.genderTop)
+                    .transition(.offset(y: 14).combined(with: .opacity).animation(Self.move.delay(0.15)))
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Gender")
-                .accessibilityValue(gender)
-                .at(13, 406)
             }
-            .frame(width: 356, height: 514, alignment: .topLeading)
+            .frame(width: 356, height: found ? Self.genderTop + 91 + 17 : Self.panTop + Self.panHeight + 17, alignment: .topLeading)
             .modifier(Carded())
             .at(side + 17, 189 - 44 + top)
 
-            // 1362:7256
-            OnboardingConfirmButton(action: next)
+            // 1362:7256: wakes once the card's been found
+            OnboardingConfirmButton(enabled: found, action: next)
                 .at(side + 23, 730 - 44 + top)
+        }
+    }
+
+    // MARK: - PAN lookup (the first onboarding's, 44:3351 and 930:10749, in this card)
+
+    /// Where the PAN card's box sits in the KYC card, and how tall it is at the card's 330 across
+    private static let panTop: CGFloat = 53
+    private static let panHeight: CGFloat = 255 * 330 / 364
+    private static let genderTop: CGFloat = panTop + panHeight + 22
+
+    /// The box the PAN card is looked up in: lines running down it, which unfurl into a ruled field over the box and
+    /// resolve, top to bottom, into the card that was found (`LinesToCardReveal`), then the card itself. Drawn at
+    /// the card's own 364 × 255 and set into the KYC card at 330 across, in the box its fields have.
+    private var panLookup: some View {
+        let scale: CGFloat = 364 / 330
+        let shape = RoundedRectangle(cornerRadius: 15 * scale, style: .continuous)
+        return ZStack(alignment: .topLeading) {
+            // Swapped outright: the reveal's last frame is already the finished card
+            if found {
+                FoundPanCard()
+                    .transition(.identity)
+            } else {
+                LinesToCardReveal(start: lookupStart) { FoundPanCard() }
+                    .transition(.identity)
+            }
+        }
+        .frame(width: 364, height: 255, alignment: .topLeading)
+        .clipShape(shape)
+        .modifier(RevealBump(start: lookupStart, active: !found))
+        .overlay(shape.strokeBorder(Self.line, lineWidth: scale))
+        .scaleEffect(1 / scale, anchor: .topLeading)
+        .frame(width: 330, height: Self.panHeight, alignment: .topLeading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(found ? "PAN card. VANGIPURAPPU VENKATA, ABCDE8283D, born 15/08/1999" : "Finding your PAN card")
+        .task {
+            guard !found else { return }
+            if !reduceMotion {
+                let left = LinesToCardReveal.endsAt - Date().timeIntervalSince(lookupStart)
+                try? await Task.sleep(for: .seconds(max(0, left)))
+                guard !Task.isCancelled else { return }
+            }
+            withAnimation(.easeInOut(duration: 0.45)) { found = true }
+        }
+    }
+
+    /// The PAN card's lookup, with the first onboarding's reveal (`SphereToCardReveal`) and its timings, made of
+    /// lines in place of the sphere's particles. Lines run down the box from its top, one after another: the first
+    /// come quickly and close together, and as it goes on they slow and come further and further apart. 1.9 seconds
+    /// in they unfurl: each line opens out into several, which go to their own rows of an even field of ruled lines
+    /// covering the card, top rows first. Right behind that a front runs down the card: where it passes each line
+    /// settles into the surface and the card shows through in the strips between them, until the whole card is
+    /// there. The same ticks as it sweeps, and the same swell under it.
+    /// Times are seconds after `start`, when the KYC card came up; drawn in the card's 364 × 255.
+    private struct LinesToCardReveal: View {
+        let start: Date
+        private let card: AnyView
+
+        init<Card: View>(start: Date, @ViewBuilder card: () -> Card) {
+            self.start = start
+            self.card = AnyView(card())
+        }
+
+        // The sphere's own times
+        private static var growAt: Double { SphereToCardReveal.growAt }
+        private static let growFor = 1.0
+        private static let flattenAt = growAt + 0.2
+        private static let flattenFor = 1.0
+        private static let flattenStagger = 0.55
+        private static let revealAt = growAt + 1.05
+        private static let revealFor = 2.4 / 1.7
+        static var endsAt: Double { SphereToCardReveal.endsAt }
+        private static let frontScatter = 30.0
+        private static let frontSoftness = 18.0
+
+        private static let size = CGSize(width: 364, height: 255)
+        /// The rows of the field the lines unfurl into
+        private static let count = 46
+        /// How fast the lines run down, in points a second: at first, and by the time they unfurl
+        private static let fastest = 430.0, slowest = 45.0
+        /// How far behind the first line each one comes: 8 pt at first, and 0.42 more with each line
+        private static let gap = 8.0, widening = 0.21
+        /// How ragged the front is from one row to the next, 0 to 1 each
+        private static let lag: [Double] = {
+            var random = SeededRandom(state: 0x11E5_C0DE)
+            return (0..<count).map { _ in random.next() }
+        }()
+
+        var body: some View {
+            TimelineView(.animation) { context in
+                let e = context.date.timeIntervalSince(start)
+                let front = Self.front(e)
+                ZStack(alignment: .topLeading) {
+                    // The light ground behind it (930:10749)
+                    SphereToCardReveal.backdrop
+                    if e > Self.revealAt {
+                        card
+                            .mask(Canvas { ctx, _ in Self.drawMask(in: &ctx, front: front) })
+                    }
+                    Canvas(rendersAsynchronously: true) { ctx, _ in
+                        Self.drawLines(in: &ctx, e: e, front: front)
+                    }
+                }
+                .frame(width: Self.size.width, height: Self.size.height, alignment: .topLeading)
+            }
+            .task { await playSweepHaptics() }
+        }
+
+        /// As the sphere's: a fine run of soft ticks while the front sweeps down, one for each band of the card it
+        /// crosses, then one firmer tap once the card is all there
+        private func playSweepHaptics() async {
+            let band = 9.0
+            var lastBand = -1
+            var random = SeededRandom(state: 0xB0B)
+            Haptics.prepare()
+            while !Task.isCancelled {
+                let e = Date().timeIntervalSince(start)
+                if e >= Self.endsAt - 0.1 {
+                    if lastBand >= 0 { Haptics.revealSettled() }
+                    return
+                }
+                let front = Self.front(e)
+                if front >= 0, front <= Self.size.height {
+                    let current = Int(front / band)
+                    if current > lastBand {
+                        lastBand = current
+                        let fade = 1 - 0.4 * front / Self.size.height
+                        Haptics.revealGrain(intensity: (0.32 + 0.18 * random.next()) * fade)
+                    }
+                }
+                try? await Task.sleep(for: .milliseconds(8))
+            }
+        }
+
+        /// The reveal front's height on the card: from above the top edge to past the bottom
+        private static func front(_ e: Double) -> Double {
+            let p = max(0, min(1, (e - revealAt) / revealFor))
+            let eased = 1 - (1 - p) * (1 - p)
+            return -frontScatter - frontSoftness + eased * (size.height + 2 * (frontScatter + frontSoftness))
+        }
+
+        /// How far past a point the front has gone, 0…1
+        private static func passed(_ y: Double, lag: Double, front: Double) -> Double {
+            max(0, min(1, (front - y - lag * frontScatter) / frontSoftness))
+        }
+
+        private static func ease(_ x: Double) -> Double {
+            let p = max(0, min(1, x))
+            return p * p * (3 - 2 * p)
+        }
+
+        /// How far the first line has run by `e`: quickly at first, slowing all the way to when they unfurl, and
+        /// drifting on at that after
+        private static func run(_ e: Double) -> Double {
+            let t = max(0, min(e, flattenAt))
+            let left = 1 - t / flattenAt
+            // v = slowest + (fastest - slowest) × left², summed
+            return slowest * max(0, e) + (fastest - slowest) * flattenAt / 3 * (1 - left * left * left)
+        }
+
+        /// How far behind the first line the `k`th comes
+        private static func behind(_ k: Int) -> Double {
+            gap * Double(k) + widening * Double(k * k)
+        }
+
+        /// The lines in the box when they unfurl, from the top one down
+        private static let unfurling: [Int] = {
+            let ran = run(flattenAt)
+            return (0..<400).filter { behind($0) <= ran && ran - behind($0) <= Double(size.height) }.reversed()
+        }()
+
+        /// The card in the strips between the rows, each showing as the front passes it
+        private static func drawMask(in ctx: inout GraphicsContext, front: Double) {
+            let strip = Double(size.height) / Double(count)
+            for i in 0..<count {
+                let y = Double(i) * strip
+                let amount = passed(y + strip / 2, lag: lag[i] * 0.5, front: front)
+                guard amount > 0 else { break }
+                ctx.fill(Path(CGRect(x: 0, y: y, width: size.width, height: strip + 0.5)), with: .color(Color.black.opacity(amount)))
+            }
+        }
+
+        private static func drawLines(in ctx: inout GraphicsContext, e: Double, front: Double) {
+            let ran = run(e)
+            let height = Double(size.height)
+            let line = StrokeStyle(lineWidth: 1, lineCap: .butt)
+            /// A line's ink where it is in the box: coming in at the top, going out at the bottom
+            func ink(_ y: Double) -> Double { 0.86 * ease(y / 14) * ease((height - y) / 22) }
+            func stroke(_ y: Double, _ opacity: Double) {
+                guard opacity > 0.01 else { return }
+                var path = Path()
+                path.move(to: CGPoint(x: 0, y: y))
+                path.addLine(to: CGPoint(x: size.width, y: y))
+                ctx.stroke(path, with: .color(Color.black.opacity(opacity)), style: line)
+            }
+
+            // Running down: every line there's been, wherever it's in the box. Those in it when they unfurl are
+            // drawn below, as the rows they open into
+            if e < flattenAt {
+                var k = 0
+                while behind(k) <= ran {
+                    let y = ran - behind(k)
+                    if y <= height { stroke(y, ink(y)) }
+                    k += 1
+                }
+                return
+            }
+
+            // Unfurled: each row comes out of the line it's shared out to, in order down the box, top rows first
+            let lines = unfurling
+            guard !lines.isEmpty else { return }
+            var drawn = -1
+            for row in 0..<count {
+                let home = (Double(row) + 0.5) * height / Double(count)
+                let gone = passed(home, lag: lag[row] * 0.5, front: front)
+                guard gone < 1 else { continue }
+                let share = min(lines.count - 1, row * lines.count / count)
+                let from = ran - behind(lines[share])
+                let flat = ease((e - flattenAt - flattenStagger * home / height) / flattenFor)
+                // Until a line opens out it's one line, not as many as its rows
+                if flat <= 0 {
+                    guard share != drawn else { continue }
+                    drawn = share
+                }
+                let y = from + (home - from) * flat
+                let still = from <= height ? ink(from) : 0
+                // As it opens its rows lie on one another: each is as much lighter as together they're the one line
+                let each = flat > 0 ? 1 - pow(1 - still, Double(lines.count) / Double(count)) : still
+                stroke(y, (each + (0.62 - each) * flat) * (1 - gone))
+            }
+        }
+    }
+
+    /// The PAN card that was found (44:3351), as the first onboarding draws it, with this onboarding's details:
+    /// department header, ruled panel with name, PAN and date of birth, and the live hologram, on its faint cool tint
+    private struct FoundPanCard: View {
+        var body: some View {
+            let rule = Color(hex: 0x615E5C).opacity(0.22)
+            return ZStack(alignment: .topLeading) {
+                // Gap: the card's faint cool tint over white (802:5673), 13%; the frame's gradient has no token
+                Color.white
+                LinearGradient(colors: [Color(red: 182 / 255, green: 183 / 255, blue: 205 / 255).opacity(0.13),
+                                        Color(red: 173 / 255, green: 202 / 255, blue: 225 / 255).opacity(0.13)],
+                               startPoint: .leading, endPoint: .trailing)
+
+                Image("PanHeader")
+                    .resizable()
+                    .frame(width: 354, height: 118)
+                    .offset(y: -30.9)
+                    .frame(width: 354, height: 56, alignment: .top)
+                    .clipped()
+                    .at(5, 5)
+
+                rule.frame(width: 364, height: 1).at(0, 65.5)
+                rule.frame(width: 364, height: 1).at(0, 210.5)
+                rule.frame(width: 1, height: 144).at(7.5, 66)
+                rule.frame(width: 1, height: 144).at(12.5, 66)
+
+                line("Name", "VANGIPURAPPU VENKATA").at(26, 77)
+                line("Pan Account Number", "ABCDE8283D").at(26, 122)
+                line("Date of Birth", "15/08/1999").at(26, 167)
+
+                HologramSticker()
+                    .frame(width: 80, height: 78)
+                    .at(270, 118)
+            }
+            .frame(width: 364, height: 255, alignment: .topLeading)
+        }
+
+        private func line(_ label: String, _ value: String) -> some View {
+            VStack(alignment: .leading, spacing: 0) {
+                // Gap: Rg 12/15 in #212121 at 67%, and Rg 14/23 at 5% tracking in black 95%, as on the first onboarding's
+                GapText(label, family: .walsheim, medium: false, size: 12, lineHeight: 15, color: Color(hex: 0x212121).opacity(0.67))
+                    .fixedSize()
+                GapText(value, family: .walsheim, medium: false, size: 14, lineHeight: 23, trackingPercent: 5, color: Color.black.opacity(0.95))
+                    .fixedSize()
+            }
         }
     }
 
