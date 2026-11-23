@@ -11,14 +11,8 @@ this file does not repeat it.
 
 - SwiftUI iOS prototype, iOS 18, generated with XcodeGen from `project.yml`. Bundle id
   `com.kushal.prototype.MutualFundsPrototype`.
-- Git: branch `demo`, remote `origin`. The last commit is `2db23c3`, pushed, with PR #1 open.
-- **Everything since `2db23c3` is uncommitted.** That is the whole second onboarding as it is now. Commit and
-  push only when the owner asks.
-- **Four source files are untracked** and exist nowhere else: `Sources/OnboardingV2.swift`,
-  `Sources/OnboardingV2Welcome.swift`, `Sources/OnboardingV2Intro.swift`, `Sources/OnboardingV2Guides.swift`.
-  Never run `git clean`, `git checkout .`, `git stash -u` or anything else that could drop them.
-- About 145 files under `Resources/Assets.xcassets` are **staged**, and the previous agent did not stage them.
-  Leave the index as it is; ask before unstaging or committing.
+- Git: branch `demo`, remote `origin`, with PR #1 open. As of 2026-11-23 everything is committed and pushed:
+  `59a5a67` is the second onboarding, `61ac286` the mutual funds work. Commit and push only when the owner asks.
 - A plain launch (no flags) opens the mutual funds homepage (`Sources/MutualFundsHome.swift`, added 2026-11-22
   from Figma `sub7vIn6sMBlHb4SIWHyek` node 10:4545, with sections 15:6246, 15:6247 and 15:6248 added under its
   runs, and the fund houses' map 15:6337 (`Sources/MutualFundsHouseMap.swift`, with its own appear transition)
