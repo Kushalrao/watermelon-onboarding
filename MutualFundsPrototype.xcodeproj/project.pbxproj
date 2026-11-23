@@ -14,6 +14,7 @@
 		0761955C32984B6273243408 /* BandWarp.metal in Sources */ = {isa = PBXBuildFile; fileRef = 35C1E9C9C6D5640F6AD337DF /* BandWarp.metal */; };
 		0B60BAA22CEFB46FE29C7EAA /* OnboardingAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60CB34EED9EDF90E33340FC /* OnboardingAnalysis.swift */; };
 		0F0A6EDFA08CE3CC604E504D /* TokenContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0FC638931B4840CAE7F7E5F /* TokenContractTests.swift */; };
+		11335B2C27989ABBC44F9E4B /* MutualFundCatalogue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E122CA667613C699253F83C /* MutualFundCatalogue.swift */; };
 		13585C4FE2CC307CB8A79968 /* OnboardingComplexity.swift in Sources */ = {isa = PBXBuildFile; fileRef = C25DAB2D73D46956C45AADA0 /* OnboardingComplexity.swift */; };
 		137F8386215FBECBA4FD80AC /* FixedDepositHeld.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18DBABB52400FFD9F25F599 /* FixedDepositHeld.swift */; };
 		15F47C199FCC9A3C37A4D894 /* OnboardingV2Intro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A15D391BD2522379368082A /* OnboardingV2Intro.swift */; };
@@ -27,6 +28,7 @@
 		21D8DC1BD2C169921C8D028E /* ParticleSphere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5B773165C094CD9AC46CE1 /* ParticleSphere.swift */; };
 		233A203931C53AAB49BE992B /* hsbc_midcap_nav.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F5D23A8585AEC04626177E9 /* hsbc_midcap_nav.json */; };
 		2613832F3D88E67E9F6A0415 /* RecklessStandardS-TRIAL-RegularItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0B4E0B8365D3CAD219CE01E5 /* RecklessStandardS-TRIAL-RegularItalic.otf */; };
+		27113C8AFE892BE892DECA7C /* MutualFundCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE039C16F4D58EAD22FF1FB /* MutualFundCategory.swift */; };
 		28C758469B8769420BCCC60C /* MutualFundScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDEF03A6301197E88CE72D8 /* MutualFundScreen.swift */; };
 		2A1295A8D6FDCC5B4B6AEE83 /* HomeV4View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7357B2BFCB5B2CFB4E7D5CC9 /* HomeV4View.swift */; };
 		3035B2D08D918D105B2ACEB0 /* Composer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342921007836A09A10668B81 /* Composer.swift */; };
@@ -50,6 +52,7 @@
 		6ED19616B7ED08DD45C31D96 /* ShadowScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3429AD9ABD543181AD0D54 /* ShadowScale.swift */; };
 		6F9AF9A4C96F7BBAA8F2ECA9 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9D0BE599C1B23DD4DB8891 /* Theme.swift */; };
 		6FEBC983E67539A51C964E41 /* RecklessStandardS-TRIAL-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = A66EEA31E663B7F2F6057A4A /* RecklessStandardS-TRIAL-Medium.otf */; };
+		718A353599D75B6D3201CDA7 /* mutual_funds.json in Resources */ = {isa = PBXBuildFile; fileRef = 0F16B7BE68684DCF2F1296CA /* mutual_funds.json */; };
 		75097D7657A8006150C0E8D9 /* OnboardingImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6184CF36E5BC95CEC2CB3D /* OnboardingImport.swift */; };
 		767A5DC5730C18A40E47F52A /* ChatExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A0FD62A9BEC1C173AEBBD2 /* ChatExperience.swift */; };
 		77CD1AD2C20145FE33DA032C /* TypographyScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3BDC74C8CD1B45996CBBB8 /* TypographyScale.swift */; };
@@ -60,6 +63,7 @@
 		8AE51B31DB18770E2D63C933 /* OnboardingGuides.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33FC65FBD7A1293060752AB3 /* OnboardingGuides.swift */; };
 		8B84CE549A5FAA926B28711A /* FixedDepositBank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9184857403AD230A8264C4 /* FixedDepositBank.swift */; };
 		8E019234DBB23D1A47D07A1C /* OnboardingV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAB9D379C9FD12EB077501A /* OnboardingV2.swift */; };
+		953A2216C5E2B01EBDE72ED9 /* MutualFundCatalogueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F01C58ABC571FB212043F3F /* MutualFundCatalogueTests.swift */; };
 		9615534BA7A87F48BF346A80 /* MutualFundsHouseMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20784FC33806B130EF74331 /* MutualFundsHouseMap.swift */; };
 		989A6D2A0862DB64254B22CE /* OnboardingAdvisory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695C74C0E2633C118F2462BC /* OnboardingAdvisory.swift */; };
 		9E8E0050E1F98A32783C1E71 /* fund_curves.json in Resources */ = {isa = PBXBuildFile; fileRef = FD6C2832BEDA5FAACE813174 /* fund_curves.json */; };
@@ -85,6 +89,7 @@
 		C78261403520EA753F182F79 /* OnboardingTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A530D6C57A47D34A5C92B /* OnboardingTerms.swift */; };
 		C919A142A64A317BB9F32D48 /* OnboardingHold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 286B272FFC314EE872A4963D /* OnboardingHold.swift */; };
 		CB3679778A869BD6C6D42CD6 /* OnboardingV2Guides.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A74471C70A06D10EF1AD69 /* OnboardingV2Guides.swift */; };
+		CDDFA189D26B24CB0DBEBC12 /* MutualFundSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D69CBC476868D8E12DA35F /* MutualFundSearch.swift */; };
 		CF444B9D737DA514A53C484C /* GearWormPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3017FF5D1A7EEC715D3ECA /* GearWormPattern.swift */; };
 		CFF305172B5A29502695708B /* ChatZoomTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827BCB10B8CE20D351194C62 /* ChatZoomTransition.swift */; };
 		D2CB72A07F7A1943E87731F5 /* MoodDial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74CB77CD82F51F0153726B70 /* MoodDial.swift */; };
@@ -95,6 +100,7 @@
 		E3B81DA46551334A1D03658C /* HomeV5View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D39E0469B178A31E7D290B7 /* HomeV5View.swift */; };
 		E4AF3D0384BDC398B1CA9183 /* FixedDepositBankV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3860D4ED1FD3AE699E8C581D /* FixedDepositBankV2.swift */; };
 		E8DC5B6FFE213FF13A8E4669 /* FixedDepositsHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4ABD2919B9F933EFB1EDA87 /* FixedDepositsHome.swift */; };
+		ECC48DBA8194F0EEEC2AF226 /* MutualFundGrowthChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77958EAAE56351C68C73917E /* MutualFundGrowthChart.swift */; };
 		F0A219A5E099223BFCF17E88 /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2360A34DCA70C56EF5B0C6C3 /* Stack.swift */; };
 		F4AB2ABA529DF1B81E8B051D /* MutualFundDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = F400A7CE193375E7DCA4DF0B /* MutualFundDetail.swift */; };
 		F5F088C7B73225144BC99576 /* OnboardingIntro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6391215D0C659F193FBABF7D /* OnboardingIntro.swift */; };
@@ -130,6 +136,7 @@
 		0C3429AD9ABD543181AD0D54 /* ShadowScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowScale.swift; sourceTree = "<group>"; };
 		0C570918A6C39BC217169D4B /* MutualFundsPrototypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundsPrototypeApp.swift; sourceTree = "<group>"; };
 		0E5B773165C094CD9AC46CE1 /* ParticleSphere.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleSphere.swift; sourceTree = "<group>"; };
+		0F16B7BE68684DCF2F1296CA /* mutual_funds.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = mutual_funds.json; sourceTree = "<group>"; };
 		13611B3A2B8C0EC5588245FF /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
 		1782E778D8036E4106D116A1 /* DsText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsText.swift; sourceTree = "<group>"; };
 		17B19625AA88AADF91AC70DF /* HomeV3View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeV3View.swift; sourceTree = "<group>"; };
@@ -140,6 +147,7 @@
 		23F99BC946D8856AE3120B9A /* FixedDepositPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositPlan.swift; sourceTree = "<group>"; };
 		278FEBA3945BB8CC06C218C9 /* ForYouScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForYouScreen.swift; sourceTree = "<group>"; };
 		286B272FFC314EE872A4963D /* OnboardingHold.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingHold.swift; sourceTree = "<group>"; };
+		2F01C58ABC571FB212043F3F /* MutualFundCatalogueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundCatalogueTests.swift; sourceTree = "<group>"; };
 		2F5D23A8585AEC04626177E9 /* hsbc_midcap_nav.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = hsbc_midcap_nav.json; sourceTree = "<group>"; };
 		3259D7C083D4614EF0322C9C /* OnboardingResearchIntro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingResearchIntro.swift; sourceTree = "<group>"; };
 		336D74AB1533798904BF4EBD /* Surface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Surface.swift; sourceTree = "<group>"; };
@@ -154,7 +162,9 @@
 		451B861C43AC353D133C5649 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4A912E78837659BDA956E9EA /* ColorPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPrimitives.swift; sourceTree = "<group>"; };
 		4BAB9D379C9FD12EB077501A /* OnboardingV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingV2.swift; sourceTree = "<group>"; };
+		4BE039C16F4D58EAD22FF1FB /* MutualFundCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundCategory.swift; sourceTree = "<group>"; };
 		4D6184CF36E5BC95CEC2CB3D /* OnboardingImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingImport.swift; sourceTree = "<group>"; };
+		4E122CA667613C699253F83C /* MutualFundCatalogue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundCatalogue.swift; sourceTree = "<group>"; };
 		4EC9109F06A2C38E1DCBA7F6 /* MovementWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementWatch.swift; sourceTree = "<group>"; };
 		5022775BEE4179BDD6E6DC5A /* HeldWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeldWidget.swift; sourceTree = "<group>"; };
 		56F2EA3C4A8F2D0B586F26B7 /* BorderLightSweep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderLightSweep.swift; sourceTree = "<group>"; };
@@ -173,6 +183,7 @@
 		74CB77CD82F51F0153726B70 /* MoodDial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodDial.swift; sourceTree = "<group>"; };
 		757D37E4B04D269C7ADA2C8E /* MutualFundsPrototype.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MutualFundsPrototype.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		75A0FD62A9BEC1C173AEBBD2 /* ChatExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExperience.swift; sourceTree = "<group>"; };
+		77958EAAE56351C68C73917E /* MutualFundGrowthChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundGrowthChart.swift; sourceTree = "<group>"; };
 		7A1821E9B8DB68FB3FE760E2 /* DecadeBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecadeBackdrop.swift; sourceTree = "<group>"; };
 		7C9D0BE599C1B23DD4DB8891 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		7CD3C67AE116B393EF7A5C5B /* OnboardingDecadeWelcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingDecadeWelcome.swift; sourceTree = "<group>"; };
@@ -180,6 +191,7 @@
 		827BCB10B8CE20D351194C62 /* ChatZoomTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatZoomTransition.swift; sourceTree = "<group>"; };
 		84C51897D87B5AFF7254EBB6 /* ContainerTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerTokens.swift; sourceTree = "<group>"; };
 		8666537369AF62AE0D950F74 /* QuickSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSearch.swift; sourceTree = "<group>"; };
+		87D69CBC476868D8E12DA35F /* MutualFundSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutualFundSearch.swift; sourceTree = "<group>"; };
 		8A9184857403AD230A8264C4 /* FixedDepositBank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDepositBank.swift; sourceTree = "<group>"; };
 		92FFCE4B65EFCAF5355288FB /* FixedDeposits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedDeposits.swift; sourceTree = "<group>"; };
 		94A70B1766BB61E60DC60590 /* OnboardingResearchLive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingResearchLive.swift; sourceTree = "<group>"; };
@@ -240,6 +252,7 @@
 				451B861C43AC353D133C5649 /* Assets.xcassets */,
 				FD6C2832BEDA5FAACE813174 /* fund_curves.json */,
 				2F5D23A8585AEC04626177E9 /* hsbc_midcap_nav.json */,
+				0F16B7BE68684DCF2F1296CA /* mutual_funds.json */,
 				FFCD3FFD872432085BAE8160 /* watch_movement_black.mp4 */,
 				E89842D9244C8CA992DEC32A /* watch_movement.mp4 */,
 				615B3061721E4861E1FD7AED /* Fonts */,
@@ -258,6 +271,7 @@
 		2E2BAAE680A90C3F35F88D75 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				2F01C58ABC571FB212043F3F /* MutualFundCatalogueTests.swift */,
 				F0FC638931B4840CAE7F7E5F /* TokenContractTests.swift */,
 			);
 			path = Tests;
@@ -370,9 +384,13 @@
 				AA40A550DD4B3704C9ABA6A6 /* HomeView.swift */,
 				74CB77CD82F51F0153726B70 /* MoodDial.swift */,
 				4EC9109F06A2C38E1DCBA7F6 /* MovementWatch.swift */,
+				4E122CA667613C699253F83C /* MutualFundCatalogue.swift */,
+				4BE039C16F4D58EAD22FF1FB /* MutualFundCategory.swift */,
 				1DA3E8F92FD189EB650E00F0 /* MutualFundData.swift */,
 				F400A7CE193375E7DCA4DF0B /* MutualFundDetail.swift */,
+				77958EAAE56351C68C73917E /* MutualFundGrowthChart.swift */,
 				CCDEF03A6301197E88CE72D8 /* MutualFundScreen.swift */,
+				87D69CBC476868D8E12DA35F /* MutualFundSearch.swift */,
 				A6D8646799F69FDF30CCCE06 /* MutualFundsHome.swift */,
 				37279BAB7D52F48B8AFFF3A6 /* MutualFundsHomeV2.swift */,
 				C20784FC33806B130EF74331 /* MutualFundsHouseMap.swift */,
@@ -520,6 +538,7 @@
 				629871A6C1835376BC3A1F98 /* RecklessStandardS-TRIAL-SemiBold.otf in Resources */,
 				9E8E0050E1F98A32783C1E71 /* fund_curves.json in Resources */,
 				233A203931C53AAB49BE992B /* hsbc_midcap_nav.json in Resources */,
+				718A353599D75B6D3201CDA7 /* mutual_funds.json in Resources */,
 				4553DFBF935AAE413920476D /* watch_movement.mp4 in Resources */,
 				A3C9EEF4B26F48F395B941EA /* watch_movement_black.mp4 in Resources */,
 			);
@@ -600,9 +619,13 @@
 				F9DEF30470F7779A087DAEC5 /* HomeView.swift in Sources */,
 				D2CB72A07F7A1943E87731F5 /* MoodDial.swift in Sources */,
 				5041CFC6DCA14B87673848A4 /* MovementWatch.swift in Sources */,
+				11335B2C27989ABBC44F9E4B /* MutualFundCatalogue.swift in Sources */,
+				27113C8AFE892BE892DECA7C /* MutualFundCategory.swift in Sources */,
 				583115748F7BB579CFE4194D /* MutualFundData.swift in Sources */,
 				F4AB2ABA529DF1B81E8B051D /* MutualFundDetail.swift in Sources */,
+				ECC48DBA8194F0EEEC2AF226 /* MutualFundGrowthChart.swift in Sources */,
 				28C758469B8769420BCCC60C /* MutualFundScreen.swift in Sources */,
+				CDDFA189D26B24CB0DBEBC12 /* MutualFundSearch.swift in Sources */,
 				C3D6C17D87E8649A8569819B /* MutualFundsHome.swift in Sources */,
 				20F97C5B0CEB86D830F5CF8A /* MutualFundsHomeV2.swift in Sources */,
 				9615534BA7A87F48BF346A80 /* MutualFundsHouseMap.swift in Sources */,
@@ -649,6 +672,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				953A2216C5E2B01EBDE72ED9 /* MutualFundCatalogueTests.swift in Sources */,
 				0F0A6EDFA08CE3CC604E504D /* TokenContractTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

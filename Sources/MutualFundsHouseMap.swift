@@ -465,13 +465,27 @@ struct FundHouseLogo: View {
     let side: CGFloat
     /// Draws the tile's outline, as in the rows and cards
     var bordered = true
+    /// The fund house's name, whose first letter stands in where the app has no logo for it
+    var house = ""
 
     var body: some View {
         let scale = side / 41
         let tile = RoundedRectangle(cornerRadius: 8.843 * scale, style: .continuous) // Gap: 8.843 at 41, the tile's radius, has no token
-        Image(name)
-            .resizable()
-            .scaledToFit()
+        Group {
+            if UIImage(named: name) != nil {
+                Image(name)
+                    .resizable()
+                    .scaledToFit()
+            } else {
+                // No frame draws a house without its logo: its first letter on the sunken surface
+                ColorScale.surfaceSunken1
+                    .overlay {
+                        // Gap: Md at 44% of the tile has no text style
+                        GapText(String(house.prefix(1)).uppercased(), family: .walsheim, medium: true, size: side * 0.44, lineHeight: side * 0.56, color: ColorScale.contentSecondary)
+                            .fixedSize()
+                    }
+            }
+        }
             .frame(width: 32.961 * scale, height: 32.961 * scale)
             .clipShape(RoundedRectangle(cornerRadius: 5.627 * scale, style: .continuous)) // Gap: 5.627 at 41, the logo's radius, has no token
             .frame(width: side, height: side)

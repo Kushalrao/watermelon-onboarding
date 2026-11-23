@@ -105,8 +105,7 @@ struct MutualFundsHomeView: View {
     private static let footWash = Color(hex: 0xF3F6F3) // Gap: #F3F6F3, the wash under the pill, is unbound
 
     /// The fund whose page is pushed over this one; `-mfFund` opens with the drawn fund's already up
-    @State private var openedFund: MutualFund? = ProcessInfo.processInfo.arguments.contains("-mfFund") ? .hsbc : nil
-    private static let push = Animation.spring(response: 0.45, dampingFraction: 0.92)
+    @State private var openedFund: MutualFund? = ProcessInfo.processInfo.arguments.contains("-mfFund") ? .kotak : nil
 
     /// Opens a fund's page with the return that was tapped: the homepage writes two for one of its funds
     private func open(_ fund: Fund) {
@@ -114,7 +113,7 @@ struct MutualFundsHomeView: View {
         Haptics.tap()
         let figure = Double(fund.returned.replacingOccurrences(of: "%", with: ""))
         let found = MutualFund.named(fund.name)
-        withAnimation(Self.push) { openedFund = figure.map(found.returning) ?? found }
+        openedFund = figure.map(found.returning) ?? found
     }
 
     var body: some View {
@@ -168,18 +167,8 @@ struct MutualFundsHomeView: View {
             .ignoresSafeArea(edges: .bottom)
             .allowsHitTesting(false)
         }
-        .accessibilityHidden(openedFund != nil)
-        // The advisor stays at the foot of the page, as on the fund page
-        .advisorBar()
-        .overlay {
-            // iOS push: the fund's page comes in from the trailing edge, over this one and its advisor
-            ZStack {
-                if let openedFund {
-                    MutualFundDetailView(fund: openedFund) { withAnimation(Self.push) { self.openedFund = nil } }
-                        .transition(.move(edge: .trailing))
-                }
-            }
-        }
+        // The advisor stays at the foot of the page; a fund's page is pushed over it, and the bar is carried across
+        .modifier(FundPush(fund: $openedFund))
         .preferredColorScheme(.light)
     }
 

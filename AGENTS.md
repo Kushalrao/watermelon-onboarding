@@ -14,15 +14,31 @@ this file does not repeat it.
 - Git: branch `demo`, remote `origin`, with PR #1 open. As of 2026-11-23 everything is committed and pushed:
   `59a5a67` is the second onboarding, `61ac286` the mutual funds work. Commit and push only when the owner asks.
 - A plain launch (no flags) opens the mutual funds homepage, second version (`Sources/MutualFundsHomeV2.swift`,
-  Figma `sub7vIn6sMBlHb4SIWHyek` node 47:6749). The first version (`Sources/MutualFundsHome.swift`, node 10:4545
+  Figma `sub7vIn6sMBlHb4SIWHyek` node 101:17619, which took the place of 47:6749: a back button and search field at the top, three tabs, "FUND / 3Y RETURNS" over each list, and a card for each kind of fund at the end, which opens the kind's page). Search is built in place (`Sources/MutualFundSearch.swift`): the explore page's field searches all 1,150 funds over the page, and a category page's field narrows its own list; no frame draws search in use. The first version (`Sources/MutualFundsHome.swift`, node 10:4545
   with sections 15:6246, 15:6247 and 15:6248 and the fund houses' map 15:6337 in
-  `Sources/MutualFundsHouseMap.swift`) is behind `-mfHomeV1`. A fund opens `Sources/MutualFundDetail.swift`
-  (node 37:3821), with its content from `Sources/MutualFundData.swift`. The second onboarding needs `-onboarding`.
+  `Sources/MutualFundsHouseMap.swift`) is behind `-mfHomeV1`. A fund opens `Sources/MutualFundDetail.swift`,
+  which has two layouts: the card one (node 101:15915) is what opens, and the sheet one (node 101:15002) is behind
+  `-mfFundV2`. The first version (node 37:3821) was replaced and is only in git. Its cards are widgets:
+  a tap on the chart, Fund holdings or Sectors exposure opens the card out into a pop-up (only the holdings' is
+  drawn, node 101:17152; the other two are made in its manner), a hold lifts any card with questions, and a
+  swipe right sends it to the advisor's composer, which comes out of the page's own "Ask advisor" pill
+  (`advisorComposer`, `askable(.fundCard(…))`). Once the name has scrolled away the bar at the top carries it in a pill
+  beside a larger back button (node 105:19390). The chart is `Sources/MutualFundGrowthChart.swift`. Its content is from
+  `Sources/MutualFundData.swift`. The second onboarding needs `-onboarding`.
 - The mutual funds screens were checked on the simulator and on a device; they have no UI tests yet.
-- Last verified: `testOnboardingV2ReportCompare` passed after the most recent change (the side blur on the
-  compare frame), and the lint is clean. The full walk-through, `testOnboardingV2Welcome`, has **not** been
-  re-run since two later changes (the default report version flipping back, and the side blur). Run it before
-  relying on it.
+- `Resources/mutual_funds.json` is the owner's list of 1,150 active mutual funds (a copy of the owner's Claude sheet
+  "Active mutual funds in India — metadata and returns", read 2026-11-23; its link is not kept in this public repo), with `Sources/MutualFundCatalogue.swift`
+  to filter, rank and search it and `Tests/MutualFundCatalogueTests.swift`. The category pages read it
+  (`Sources/MutualFundCategory.swift`, Figma 79:12035, which took the place of 13:5191: a line about the kind, a
+  "What are …?" pill, a row of kinds that swaps the page, "FUND / 3Y RETURNS", and "Highest 3Y return" on the
+  first fund; opened from the homepage's kinds, its category cards and
+  the ranked card's expand button), and so do the second homepage's own lists: each is the top three of its
+  category by three-year return (small cap, mid cap, infrastructure), and the cube list is small caps four to
+  six. Its two small charts are as drawn, with the frame's one-month figures, and open their real funds. The
+  first homepage (`-mfHomeV1`) still has the frames' placeholder funds. The list has
+  no sector column, so Banking, Infrastructure,
+  Technology and Real estate are told by fund names, and no ratings, so a row's figure and dots are a score made
+  from the fund's return within its category.
 
 ## 2. How the owner works
 
@@ -90,9 +106,10 @@ python3 tools/lint/check_ds_rules.py             # must stay clean
 
 | Flag | Opens |
 |---|---|
-| none, or `-mf` | the mutual funds homepage, second version (`MutualFundsHomeV2View`, Figma 47:6749) |
+| none, or `-mf` | the mutual funds homepage, second version (`MutualFundsHomeV2View`, Figma 101:17619) |
 | `-mfHomeV1` | the first mutual funds homepage (`MutualFundsHomeView`), with the fund houses' map |
-| `-mfFund` | the homepage with the drawn fund's page (`MutualFundDetailView`, Figma 37:3821) already pushed over it. Each fund's content is in `Sources/MutualFundData.swift`; all but HSBC's is sample data |
+| `-mfFund` | the homepage with the drawn fund's page (`MutualFundDetailView`, Figma 101:15915) already pushed over it. Each fund's content is in `Sources/MutualFundData.swift`; a listed fund's name, house, NAV and return are real and the rest is sample data |
+| `-mfFundV2` | fund pages in the sheet layout (Figma 101:15002) instead of the card one; add it to `-mfFund` or to a plain launch |
 | `-onboarding` | second onboarding from its first screen |
 | `-onboardingV1` | the first onboarding, whole |
 | `-onboardingStep N` | second onboarding at step `0` (intro) or `20` (opening) |

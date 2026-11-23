@@ -6,6 +6,13 @@ import SwiftUI
 /// It also carries the fund page's two ways of asking about a widget, for any view marked `askable(_:)` inside
 /// the page: hold it to lift it out with questions, or swipe it right to send it to the composer as context.
 private struct AdvisorBar: ViewModifier {
+    /// The pill is drawn at rest. A mutual fund's page has a bar of its own ("Ask advisor" and "Start SIP") and
+    /// borrows only the composer, which then comes out of that bar's pill, and the hold.
+    var restingPill = true
+    /// How far above the foot of the screen the pill's top is: the pill is 53 tall and sits 13 above the home
+    /// indicator's 34
+    var pillRise: CGFloat = 100
+
     @State private var isComposing = false
     @State private var composeProgress: CGFloat = 0
     @State private var text = ""
@@ -26,12 +33,12 @@ private struct AdvisorBar: ViewModifier {
     @State private var appeared = Date()
 
     private static let transition = Animation.spring(response: 0.5, dampingFraction: 0.86)
-    /// The pill is 53 tall and sits 13 above the home indicator's 34
-    private static let pillRise: CGFloat = 100
 
     func body(content: Content) -> some View {
         content
-            .environment(\.askAbout, AskAbout(held: heldWidget?.context, hold: hold, send: { open(with: $0) }))
+            .environment(\.askAbout, AskAbout(held: heldWidget?.context, hold: hold, send: { open(with: $0) }, open: { open(with: nil) }))
+            // A fund's page takes its own bar out of the way while the composer is up
+            .transformPreference(FundFootCoveredKey.self) { $0 = $0 || (!restingPill && isComposing) }
             .environment(\.advisorBarActionTaps, actionTaps)
             .overlay {
                 GeometryReader { geo in
@@ -43,12 +50,14 @@ private struct AdvisorBar: ViewModifier {
                             keyboardHeight: keyboard.height,
                             isComposing: isComposing,
                             context: composerContext,
-                            pillTop: geo.size.height - Self.pillRise,
+                            pillTop: geo.size.height - pillRise,
                             action: actionTitle.map { title in (title, { Haptics.tap(); actionTaps += 1 }) },
                             stacked: stacked,
                             onOpen: { open(with: nil) },
                             onClose: close
                         )
+                        .opacity(restingPill ? 1 : min(1, composeProgress * 5))
+                        .allowsHitTesting(restingPill || isComposing)
                         // Above everything: while a widget is held, a tap anywhere else puts it back
                         HeldWidgetLayer(
                             frame: heldWidget?.frame,
@@ -136,6 +145,8 @@ struct AskAbout {
     var held: FundContext?
     var hold: (FundContext, CGRect) -> Void = { _, _ in }
     var send: (FundContext) -> Void = { _ in }
+    /// Opens the composer with nothing attached
+    var open: () -> Void = {}
 }
 
 /// Set by a page that wants its own button beside the advisor pill: the button's title
@@ -199,6 +210,10 @@ struct AdvisorBarActionListener: View {
 extension View {
     /// Pins the "Ask your advisor" pill to the foot of the page
     func advisorBar() -> some View { modifier(AdvisorBar()) }
+
+    /// The advisor's composer and the hold for a page that draws its own bar: nothing is drawn at rest, and the
+    /// composer comes out of where that bar's pill is, `pillRise` above the foot of the screen
+    func advisorComposer(pillRise: CGFloat) -> some View { modifier(AdvisorBar(restingPill: false, pillRise: pillRise)) }
 
     /// Hold to lift this widget out with questions; swipe it right to ask about it. Needs `advisorBar()` above it.
     func askable(_ context: FundContext) -> some View { modifier(Askable(context: context)) }
