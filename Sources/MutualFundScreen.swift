@@ -96,6 +96,40 @@ enum FundContext: Equatable {
     case bank(String, BankSection, v2: Bool)
     /// A deposit's card on the fixed deposits page, by issuer and which of the page's two runs it is in
     case fdCard(String, Int)
+    /// A card on a mutual fund's page (`MutualFundDetailView`): the fund, by name, and which card
+    case fundCard(String, FundSection)
+
+    /// The cards on a mutual fund's page
+    enum FundSection: Equatable {
+        case growth, basics, holdings, sectors, charges, managers
+
+        var title: String {
+            switch self {
+            case .growth: "Fund performance"
+            case .basics: "Fund basics"
+            case .holdings: "Fund holdings"
+            case .sectors: "Sectors exposure"
+            case .charges: "Fund charges"
+            case .managers: "Fund managers"
+            }
+        }
+
+        var questions: [String] {
+            switch self {
+            case .growth: ["Why did it dip here?", "Is this return steady?"]
+            case .basics: ["Explain me the terms", "Is the expense ratio high?"]
+            case .holdings: ["Why these companies?", "Is it too concentrated?"]
+            case .sectors: ["Why so much in one sector?", "Which sector is risky?"]
+            case .charges: ["What will I pay in a year?", "What is exit load?"]
+            case .managers: ["How long have they run it?", "What else do they manage?"]
+            }
+        }
+    }
+
+    /// The mutual fund it is, for a card on a fund's page
+    var fund: MutualFund? {
+        if case .fundCard(let name, _) = self { MutualFund.page(named: name) } else { nil }
+    }
 
     /// The cards on a bank's page (`offers` is one of the second version's tenure groups)
     enum BankSection: Equatable {
@@ -130,7 +164,15 @@ enum FundContext: Equatable {
     }
 
     /// The chip's icon in the composer
-    var icon: String { deposit?.logo ?? "MetaIcon" }
+    var icon: String {
+        if let logo = fund?.logo, !logo.isEmpty { return logo }
+        return deposit?.logo ?? "MetaIcon"
+    }
+
+    /// The icon is a square logo, which the chip fits to its slot; the fund page's own icon is drawn at its size
+    var hasLogo: Bool {
+        deposit != nil || fund?.logo?.isEmpty == false
+    }
 
     var title: String {
         switch self {
@@ -143,6 +185,7 @@ enum FundContext: Equatable {
         case .msftChart: "Parag Parikh price chart"
         case .deposit(let name), .fdCard(let name, _): "\(name) FD"
         case .bank(_, let section, _): section.title
+        case .fundCard(_, let section): section.title
         }
     }
 
@@ -157,12 +200,14 @@ enum FundContext: Equatable {
         case .msftChart: "Flexi Cap · 3Y"
         case .deposit, .fdCard: deposit.map { "Up to \($0.rate) PA · \($0.ratingShort)" } ?? ""
         case .bank(let name, _, _): name
+        case .fundCard(let name, _): name
         }
     }
 
     /// Suggested questions shown when the widget is held (753:12431 defines these for the stats card)
     var questions: [String] {
         if case .bank(_, let section, _) = self { return section.questions }
+        if case .fundCard(_, let section) = self { return section.questions }
         if let deposit { return ["Is \(deposit.name) safe?", "What if I break it early?"] }
         return ["Explain me the terms", "Why is the ratio so high?"]
     }
@@ -179,6 +224,7 @@ enum FundContext: Equatable {
         case .msftChart: MSFTChartCard()
         case .deposit: if let deposit { DepositCard(deposit: deposit) }
         case .fdCard: if let deposit { FDHomeCard(deposit: deposit) }
+        case .fundCard(_, let section): if let fund { MutualFundDetailView(fund: fund).section(section) }
         case .bank(_, let section, let v2):
             if let deposit {
                 if v2 {
@@ -284,7 +330,7 @@ struct LongPressAttach: UIViewRepresentable {
         }
 
         func gestureRecognizerShouldBegin(_ gesture: UIGestureRecognizer) -> Bool {
-            guard let anchor else { return false }
+            guard let anchor, !WidgetGestures.suspended else { return false }
             let point = gesture.location(in: anchor)
             // A long press on text is the text's, to select it; the widget lifts from anywhere else on it
             return anchor.bounds.contains(point) && !SelectableTextView.isText(at: point, in: anchor)
@@ -412,8 +458,8 @@ struct RightSwipeAttach: UIViewRepresentable {
         }
 
         func gestureRecognizerShouldBegin(_ gesture: UIGestureRecognizer) -> Bool {
-            guard let pan = gesture as? UIPanGestureRecognizer, let anchor else { return false }
-            guard anchor.bounds.contains(pan.location(in: anchor)) else { return false }
+            guard let pan = gesture as? UIPanGestureRecognizer, let anchor, !WidgetGestures.suspended else { return false }
+            guard anchor.bounds.contains(pan.location(in: anchor)), !SwipeShield.covers(pan) else { return false }
             let t = pan.translation(in: pan.view)
             return t.x > 0 && t.x > abs(t.y) * 1.5
         }
@@ -421,6 +467,33 @@ struct RightSwipeAttach: UIViewRepresentable {
         func gestureRecognizer(_ g: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
             false
         }
+    }
+}
+
+/// A page puts its widgets' hold and swipe aside while something of its own covers it (a pop-up): their
+/// recognizers are on the page's scroll view, which a touch on what covers the page still reaches
+enum WidgetGestures {
+    static var suspended = false
+}
+
+/// Marks ground inside a swipeable widget that keeps sideways drags for itself: a chart that is read by dragging
+/// across it, or a row that scrolls sideways. A swipe that starts on it does not send the widget.
+struct SwipeShield: UIViewRepresentable {
+    private static let shields = NSHashTable<UIView>.weakObjects()
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.isUserInteractionEnabled = false
+        view.backgroundColor = .clear
+        Self.shields.add(view)
+        return view
+    }
+
+    func updateUIView(_ view: UIView, context: Context) {}
+
+    /// The gesture is over shielded ground
+    static func covers(_ gesture: UIGestureRecognizer) -> Bool {
+        shields.allObjects.contains { $0.window != nil && $0.bounds.contains(gesture.location(in: $0)) }
     }
 }
 

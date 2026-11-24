@@ -269,7 +269,7 @@ struct ComposerLayer: View {
             Color.white
 
             Group {
-                if context.deposit != nil {
+                if context.hasLogo {
                     Image(context.icon).resizable().aspectRatio(contentMode: .fill)
                 } else {
                     Image(context.icon).resizable().frame(width: 36, height: 39)
@@ -287,6 +287,9 @@ struct ComposerLayer: View {
             Text(context.subtitle)
                 .font(FigmaFont.walsheim(14))
                 .foregroundStyle(Color.black.opacity(0.56))
+                // A long line (a fund's name) stops short of the sparkline
+                .lineLimit(1)
+                .frame(maxWidth: 190, alignment: .leading)
                 .at(61, 39)
 
             if let deposit = context.deposit {
