@@ -8,8 +8,9 @@ import SwiftUI
 /// filled. In the pop-up the card opens out into it is the card's chart, taller.
 ///
 /// It can be read with a finger: a drag across it puts a line through the curve where the finger is, with a dot
-/// on the curve and, in a pill over the line, the fund's NAV on that day and the day. The pill rides along with
-/// the line and goes when the finger lifts. A drag up or down is left to the page. In the pop-up a touch held on
+/// on the curve and, in a pill over the line, the fund's NAV on that day and the day. The wash under the curve
+/// then reaches only as far as the finger, and the curve runs on from there without it. The pill rides along
+/// with the line and goes when the finger lifts, and the wash comes back under the whole curve. A drag up or down is left to the page. In the pop-up a touch held on
 /// it reads it too; on the page a hold lifts the whole widget out instead.
 ///
 /// A tap on a period moves the ring to it, and the curve and its prices change over to it
@@ -198,6 +199,12 @@ struct FundGrowthChart: View {
                     startPoint: .top, endPoint: .bottom
                 ))
                 .frame(width: plot.width, height: plot.height)
+                // While the chart is being read the wash stops at the finger: the NAV in the pill is that day's,
+                // so what is filled is the time up to that day, and after it the curve goes on alone
+                .mask(alignment: .leading) {
+                    Rectangle()
+                        .frame(width: read.map { plot.width * CGFloat($0) / CGFloat(max(reading.prices.count - 1, 1)) } ?? plot.width)
+                }
                 .at(plot.minX, plot.minY)
             GrowthCurve(heights: AnimatableSeries(rise), closed: false)
                 .stroke(Self.chartLine, style: StrokeStyle(lineWidth: 2.5, lineJoin: .round)) // Gap: the curve is 2.5 pt, not the hairline
