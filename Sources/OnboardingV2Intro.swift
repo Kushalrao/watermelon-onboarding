@@ -245,7 +245,7 @@ struct OnboardingIntroV2View: View {
     }
 
     /// 1341:1672, 302 × 529.399: the phone the opening draws, a little smaller: its outline, its screen 10.786 in,
-    /// its island, and her picture under that
+    /// and her picture at its head
     private var phone: some View {
         ZStack(alignment: .topLeading) {
             OpenFrame(radius: 53.03, line: 1.798).fill(Self.outline, style: FillStyle(eoFill: true))
@@ -271,10 +271,7 @@ struct OnboardingIntroV2View: View {
                 .scaleEffect(53.34 / 186)
                 .frame(width: 53.34, height: 55.061)
                 .at(13.482 + 110.554, 13.482 + 42.244)
-            // 1341:1759
-            Capsule().fill(Color.black)
-                .frame(width: 79.994, height: 23.369)
-                .at(111.452, 22.47)
+            // (1341:1759, its island, is no longer drawn: the phone has none anywhere in the onboarding)
         }
         .frame(width: 302, height: 529.399, alignment: .topLeading)
     }

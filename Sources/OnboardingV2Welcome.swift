@@ -34,13 +34,15 @@ import SwiftUI
 ///   one clear and the rest lost in a blur that deepens down the screen. All of it goes up a part at a time, with
 ///   a rest after each. Under it the first onboarding's chat itself, already asked that, has run to its report at
 ///   many times its pace, unseen.
-/// - When that has had its time, "Wealth simplified for you" (1249:4944): the phone
-///   rises, and as it does the report is there out of focus and comes clear from the top down, as what she went
-///   through did and much faster. Then a line comes in
-///   across its screen from the right to the middle (1249:5255), the report to its left and the same thing put
-///   simply to its right (1277:18139). It goes across and back twice to show it moves, and comes to rest with
-///   three quarters of the screen simple. The line is dragged either way; dragged all the way left, the heading
-///   becomes "Decades of research, simplified for you".
+/// - When that has had its time, "We do the work so you don’t have to" (1519:10715; before it, "Wealth simplified
+///   for you", 1249:4944): two tabs come in under the heading, "Research" and "What you read", and the phone
+///   settles under them; as it does the report is there out of focus and comes clear from the top down, as what
+///   she went through did and much faster. It's left like that, all of it, "Research" the chosen tab. Then the
+///   tabs change over, and a line comes in across its screen from the right by its handle (1519:11049), the
+///   report to its left and the same thing put simply to its right (1277:18139), and comes to rest with three
+///   quarters of the screen simple, what's left of the report out of focus. The line is dragged either way by
+///   its handle, and the tab that's chosen is whichever side has more of the screen; a tab tapped takes the line
+///   to its place. Dragged all the way left, the heading becomes "Decades of research, simplified for you".
 /// - "Lets see how to use the app" (1362:7957): those words alone in the middle of the page, with no phone, for a
 ///   couple of seconds, and on by itself.
 /// - "Hold any widget to get curious" (1249:2716) and "Swipe and get specific" (1251:6920): a widget on the
@@ -134,7 +136,8 @@ struct OnboardingWelcomeV2View: View {
             case .typing: nil
             case .topics: "Tell your advisor to research on a topic"
             case .chat: nil
-            case .simple: "Wealth simplified for you"
+            // 1519:11056 beside the report; "Wealth simplified for you" where the simple report is alone (`-reportSimple`)
+            case .simple: OnboardingWelcomeV2View.compares ? "We do the work so you don’t have to" : "Wealth simplified for you"
             case .usage: "Lets see how to use the app"
             case .hold: "Hold any widget to get curious"
             case .swipe: "Swipe and get specific"
@@ -149,7 +152,7 @@ struct OnboardingWelcomeV2View: View {
             case .access: "Access your advisor\nanytime"
             case .hold: "Hold any widget\nto get curious"
             case .levels: "Adjust to what\nfeels comfortable"
-            case .simple: "Wealth simplified\nfor you"
+            case .simple: OnboardingWelcomeV2View.compares ? "We do the work so\nyou don’t have to" : "Wealth simplified\nfor you"
             case .simplest: "Proactive, so you\ndon’t miss"
             case .research: "Analysis backed\nby research"
             case .usage: "Lets see how to use\nthe app"
@@ -165,6 +168,7 @@ struct OnboardingWelcomeV2View: View {
             // 1362:8052: in the middle of the page
             case .usage: 381
             case .meet: 106
+            case .simple where OnboardingWelcomeV2View.compares: 100
             case .access, .typing, .chat, .simple, .hold, .swipe, .levels: 104
             case .connect: 274
             case .topics: 109
@@ -177,6 +181,8 @@ struct OnboardingWelcomeV2View: View {
             case .typing: 189
             case .topics: 239
             case .chat: 269
+            // 1519:10721: under the two tabs
+            case .simple where OnboardingWelcomeV2View.compares: 279
             // (and where it's left from, on the last frame)
             case .simple, .usage, .hold, .swipe, .levels, .connect: 217
             default: 30
@@ -249,9 +255,11 @@ struct OnboardingWelcomeV2View: View {
     /// Beside its simple version the report is a little larger: 294.4 across (1249:5010), its top 47.2 down the phone
     private static let reportScale: CGFloat = 0.8
     /// Where the line comes to rest: a quarter of the way across, three quarters of the screen simple
-    private static let splitRest: CGFloat = 0.25
-    /// How it gets there: in from the right, and across and back twice, each for this long
-    private static let splitSway: [(to: CGFloat, time: TimeInterval)] = [(0.25, 0.7), (0.72, 0.6), (0.18, 0.6), (0.6, 0.55)]
+    fileprivate static let splitRest: CGFloat = 0.25
+    /// How long the report is left on the phone, all of it, once it has landed, before the tabs change over
+    private static let researchRest: TimeInterval = 0.9
+    /// How the line gets from one tab's place to the other's: in from the right by its handle, to its rest
+    fileprivate static let reveal = Animation.spring(response: 0.7, dampingFraction: 0.86)
     /// The heading once the line's been dragged all the way left
     private static let simplifiedHeading = "Decades of research, simplified for you"
     /// Beside each other, how far out of focus the side with less of the screen is, and how slowly the two change over
@@ -483,6 +491,16 @@ struct OnboardingWelcomeV2View: View {
                     .id(simplified ? -1 : stage.rawValue)
                     .transition(Self.words)
                 }
+
+                if stage == .simple, Self.compares {
+                    // 1519:11060: over the phone, which of the two it has more of
+                    CompareTabs(compare: compare)
+                        .at(side + 32, 207 - 44 + top)
+                        .transition(.asymmetric(
+                            insertion: .offset(y: 12).combined(with: .opacity).animation(Self.move.delay(0.15)),
+                            removal: .opacity.animation(.easeIn(duration: 0.25))
+                        ))
+                }
             }
             .scaleEffect(shown ? 1 : 1.1)
             .opacity(shown ? 1 : 0)
@@ -624,28 +642,24 @@ struct OnboardingWelcomeV2View: View {
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.82)) { reportShown = true }
                 next()
             case .simple:
-                // Once the phone has risen, the line comes in from the right, the simple version following it in. It
-                // goes across and back twice, to show that it moves, and comes to rest with three quarters of the
-                // screen simple; a finger on it at any point and it's the finger's. Then Continue
+                // The report lands with the phone, under the tabs: all of it and clear, "Research" the tab that's
+                // chosen, and no line. It's left to be seen like that. Then the tabs change over to "What you
+                // read" and the line comes in from the right by its handle, the simple version following it in, to
+                // rest with three quarters of the screen simple; what's left of the report goes out of focus as it
+                // does. A finger on a tab or the line before then and it's the finger's. Then Continue
                 try? await Task.sleep(for: .seconds(0.9))
                 guard !Task.isCancelled else { return }
-                withAnimation(.easeOut(duration: 0.2)) { compare.shown = true }
-                try? await Task.sleep(for: .seconds(0.15))
-                Haptics.settle()
-                if !reduceMotion {
-                    for sway in Self.splitSway {
-                        guard !Task.isCancelled, !compare.touched else { break }
-                        withAnimation(.easeInOut(duration: sway.time)) { compare.split = sway.to }
-                        try? await Task.sleep(for: .seconds(sway.time))
-                    }
-                }
+                try? await Task.sleep(for: .seconds(Self.researchRest))
                 guard !Task.isCancelled else { return }
                 if !compare.touched {
-                    withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { compare.split = Self.splitRest }
-                    try? await Task.sleep(for: .seconds(0.5))
+                    Haptics.settle()
+                    withAnimation(.easeOut(duration: 0.2)) { compare.shown = true }
+                    withAnimation(Self.reveal) { compare.split = Self.splitRest }
+                    // (once the simple version leads: it's the report that goes out of focus, never the other first)
+                    compare.focusing = true
+                    try? await Task.sleep(for: .seconds(0.6))
                     guard !Task.isCancelled else { return }
                 }
-                // at rest: the side with less of the screen goes out of focus
                 compare.focusing = true
                 withAnimation(Self.move) { controlsShown = true }
             case .chat:
@@ -1745,11 +1759,6 @@ struct OnboardingWelcomeV2View: View {
                 .clipShape(RoundedRectangle(cornerRadius: 46, style: .continuous))
                 .at(15, 15)
             }
-            if stage < .topics {
-                island
-                    .opacity(lone ? 0 : 1)
-                    .transition(.opacity.animation(.easeIn(duration: 0.3)))
-            }
             if stage <= .topics {
                 // 1277:16379: her picture, small, at the head of the phone (the page's colour lies over it). It's
                 // the pill's own, which leaves the pill as that goes down, and grows on its way up
@@ -1765,7 +1774,6 @@ struct OnboardingWelcomeV2View: View {
                 Group {
                     screen
                     shelf
-                    island
                 }
                 .transition(.opacity.animation(.easeOut(duration: 0.35)))
             }
@@ -1821,8 +1829,6 @@ struct OnboardingWelcomeV2View: View {
                         SimpleMaking(formed: reportShown)
                             .at(12, 12)
                     }
-                    island
-                        .zIndex(3)
                 }
                 .transition(.asymmetric(insertion: .opacity.animation(.easeOut(duration: 0.4).delay(0.2)),
                                         removal: .opacity.animation(.easeIn(duration: 0.3))))
@@ -1919,6 +1925,66 @@ struct OnboardingWelcomeV2View: View {
         .accessibilityHidden(true)
     }
 
+    /// The two tabs over the phone (1519:11060), 327 × 47 on white: "Research", the report, and "What you read",
+    /// the same put simply. The one whose side has more of the phone's screen is the chosen one, white on a black
+    /// pill that slides between them. Tapped, a tab takes the line to its place: off to the right for all of the
+    /// report, or to where it rests for the simple version. Of `Compare` it reads only which side leads, so a
+    /// drag redraws it only as the line crosses the middle.
+    private struct CompareTabs: View {
+        let compare: Compare
+        @Namespace private var pill
+
+        var body: some View {
+            HStack(spacing: 7) {
+                tab("Research", report: true)
+                tab("What you read", report: false)
+            }
+            // 7 in from either end; the tabs, 39 tall, have 4 over and under them
+            .padding(.horizontal, 7)
+            .frame(width: 327, height: 47, alignment: .leading)
+            .background(Capsule().fill(ColorScale.surfaceWidget))
+            .animation(.spring(response: 0.35, dampingFraction: 0.86), value: compare.reportLeads)
+        }
+
+        private func tab(_ title: String, report: Bool) -> some View {
+            let chosen = compare.reportLeads == report
+            return HStack(spacing: 9) {
+                Image("OnboardingCompareTab")
+                    .foregroundStyle(chosen ? ColorScale.contentOnColor : ColorScale.contentSecondary)
+                    .frame(width: 18, height: 18)
+                    .accessibilityHidden(true)
+                // H5: GT Walsheim Medium 19/27
+                DsText(title, variant: .h5, color: chosen ? .contentOnColor : .contentSecondary)
+                    .fixedSize()
+            }
+            .padding(.horizontal, 11)
+            .padding(.vertical, 6)
+            .background {
+                if chosen {
+                    Capsule()
+                        .fill(ColorScale.surfaceInverse)
+                        // 0 4 48.5 at 7%
+                        .shadow(color: Color.black.opacity(0.07), radius: 24.25, x: 0, y: 4)
+                        .matchedGeometryEffect(id: "chosen", in: pill)
+                }
+            }
+            // the whole of the pill's height takes the tap
+            .frame(height: 47)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                Haptics.tap()
+                compare.touched = true
+                withAnimation(.easeOut(duration: 0.2)) { compare.shown = true }
+                withAnimation(OnboardingWelcomeV2View.reveal) {
+                    compare.split = report ? 1 : OnboardingWelcomeV2View.splitRest
+                }
+                compare.focusing = true
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(chosen ? [.isButton, .isSelected] : .isButton)
+        }
+    }
+
     /// The report and its simple version, side by side on the phone's screen (in the phone's own measure, 336 × 589):
     /// the simple version from the line to the screen's right edge, and the line. It draws itself from `Compare`,
     /// so it is all that's redrawn as the line moves.
@@ -1931,19 +1997,32 @@ struct OnboardingWelcomeV2View: View {
             ZStack(alignment: .topLeading) {
                 simple
                 divider
+                handle
             }
             .frame(width: 336, height: 589, alignment: .topLeading)
         }
 
-        /// How far across the screen's 312 the middle of the line is: its 13 stay within it
-        private var lineX: CGFloat { 6.5 + compare.split * 299 }
+        /// How far across the screen's 312 the middle of the line is: its 11 stay within it
+        private var lineX: CGFloat { 5.5 + compare.split * 301 }
 
-        /// The line between the two (1249:5255): 13 across on white, from the screen's top to the phone's foot, cut to
-        /// the screen's corners at either end of its run; the island lies over it. It's dragged across; let go near
-        /// the left edge, it goes all the way, and the heading changes for it.
+        /// The line's handle (1519:11051): a white round, 34 across, with an arrow each way, on the middle of the
+        /// line 292 down the screen. It isn't cut to the screen as the line is, so at either end of the line's run
+        /// it lies over the phone's edge, all of it there to take hold of. The line under it takes the drag.
+        private var handle: some View {
+            Image("OnboardingCompareHandle")
+                .frame(width: 34, height: 34)
+                .at(12 + lineX - 17, 12 + 292 - 17)
+                .opacity(compare.shown ? 1 : 0)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
+
+        /// The line between the two (1519:11050; before it, 1249:5255, 13 across): 11 across on white, from the
+        /// screen's top to the phone's foot, cut to the screen's corners at either end of its run. It's dragged across; let go near the left edge, it goes all the way, and the heading changes
+        /// for it.
         private var divider: some View {
             Color.white
-                .frame(width: 13, height: 577)
+                .frame(width: 11, height: 577)
                 // 0 2 34 +6 at 9%; SwiftUI can't draw the spread
                 .shadow(color: Color.black.opacity(0.09), radius: 17, x: 0, y: 2)
                 .frame(width: 56, height: 577)
@@ -1962,7 +2041,7 @@ struct OnboardingWelcomeV2View: View {
                             var direct = Transaction()
                             direct.disablesAnimations = true
                             withTransaction(direct) {
-                                compare.split = min(1, max(0, (dragFrom ?? compare.split) + value.translation.width / 299))
+                                compare.split = min(1, max(0, (dragFrom ?? compare.split) + value.translation.width / 301))
                             }
                         }
                         .onEnded { _ in
@@ -2007,13 +2086,19 @@ struct OnboardingWelcomeV2View: View {
                 .contentShape(Rectangle())
                 .clipped()
                 .at(12 + lineX, 12)
+                // cut to the screen's corners after the blur, which fills in what's outside its own
+                .mask(alignment: .topLeading) {
+                    UnevenRoundedRectangle(topLeadingRadius: 49, topTrailingRadius: 49, style: .continuous)
+                        .frame(width: 312, height: 577)
+                        .at(12, 12)
+                }
                 .opacity(compare.shown ? 1 : 0)
         }
     }
 
     /// The report put simply (1277:18163), on the phone's screen: 312 across and `height` of it showing. The frame's
-    /// card is 327 across; it's drawn at the screen's 312, on the yellow-to-peach wash, and it starts under the
-    /// phone's island and scrolls, since what's under the phone covers its foot.
+    /// card is 327 across; it's drawn at the screen's 312, on the yellow-to-peach wash, and it starts 48 down
+    /// (where the phone's island, since taken off the phone, ended) and scrolls, since what's under the phone covers its foot.
     private struct SimpleReport: View {
         var height: CGFloat = 577
 
@@ -2070,7 +2155,7 @@ struct OnboardingWelcomeV2View: View {
                     simpleNote("Equity funds did well as war fears eased and oil got cheaper, so foreign investors started buying again.", height: 122.625)
                     simpleNote("Small-cap funds did better because they had fallen much more earlier, so they had more room to bounce back", height: 146.617)
                 }
-                // under the island, and its last card clear of what's under the phone
+                // where the island it used to start under ended, and its last card clear of what's under the phone
                 .padding(.top, 48)
                 .padding(.bottom, 190)
                 .frame(width: 327)
@@ -2113,14 +2198,6 @@ struct OnboardingWelcomeV2View: View {
         .frame(width: 312, height: 641)
         .at(12, 12)
         .accessibilityHidden(true)
-    }
-
-    /// 1249:6257
-    private var island: some View {
-        Capsule().fill(Color.black)
-            .frame(width: 89, height: 26)
-            .at(124, 25)
-            .accessibilityHidden(true)
     }
 
     /// The first onboarding's chat, run on the phone's screen (1251:12227): laid out in its own points, in the
