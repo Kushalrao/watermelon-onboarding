@@ -16,7 +16,7 @@ this file does not repeat it.
   branch was called `demo` until 2026-11-23; PR #1, the onboarding's, was closed when it was renamed, with its
   commits already on `main`. Commit and push only when the owner asks.
 - A plain launch (no flags) opens the mutual funds homepage, second version (`Sources/MutualFundsHomeV2.swift`,
-  Figma `sub7vIn6sMBlHb4SIWHyek` node 101:17619, which took the place of 47:6749: a back button and search field at the top, three tabs, "FUND / 3Y RETURNS" over each list, and a card for each kind of fund at the end, which opens the kind's page). Search is built in place (`Sources/MutualFundSearch.swift`): the explore page's field searches all 1,150 funds over the page, and a category page's field narrows its own list; no frame draws search in use. The first version (`Sources/MutualFundsHome.swift`, node 10:4545
+  Figma `sub7vIn6sMBlHb4SIWHyek` node 118:26118, which took the place of 101:17619 and 47:6749: a back button and search field at the top, three tabs, "Mutual funds" over the category cards, the ranked card and lists with "FUND / 3Y RETURNS" over each, and "All mutual funds" at the end: kind chips that open the kind's page, over a card of the top eight small cap funds). A tap on "3Y RETURNS" brings up the stretch picker (node 118:26105, `FundPeriodPicker`); the pick applies to every list on the page. The catalogue has no 1M or 6M returns: those two are sample figures (`ListedFund.returned(over:)`). Search is built in place (`Sources/MutualFundSearch.swift`): the explore page's field searches all 1,150 funds over the page, and a category page's field narrows its own list; no frame draws search in use. The first version (`Sources/MutualFundsHome.swift`, node 10:4545
   with sections 15:6246, 15:6247 and 15:6248 and the fund houses' map 15:6337 in
   `Sources/MutualFundsHouseMap.swift`) is behind `-mfHomeV1`. A fund opens `Sources/MutualFundDetail.swift`,
   which has two layouts: the card one (node 101:15915) is what opens, and the sheet one (node 101:15002) is behind
@@ -163,7 +163,7 @@ Stages `welcome, mobile, otp, kyc`. Figma: 1341:1275, 1362:6812, 1362:6984, 1362
 | 5 | `typing` | none | 1362:6195 | tick, pill rides up over a keyboard. Moves on by itself after 1.9 s |
 | 6 | `topics` | Tell your advisor to research on a topic | 1251:7096 | prompts in two columns on the phone. Tap one |
 | 7 | `chat` | none | 1354:3723 | tick at once. `ResearchRun` scrolls what the advisor goes through, in steps, for 4.75 s, then the report comes clear from the top down |
-| 8 | `simple` | Wealth simplified for you | 1249:4944, 1249:5255, 1277:18139 | the compare line: report on the left, simple version on the right. Continue |
+| 8 | `simple` | We do the work so you don’t have to | 1519:10715, 1277:18139 (before: 1249:4944, 1249:5255) | the compare line: report on the left, simple version on the right. Continue |
 | 9 | `usage` | Lets see how to use the app | 1362:7957 | words alone, no phone. Moves on after 1.9 s |
 | 10 | `hold` | Hold any widget to get curious | 1249:2716 | hold the widget. Tick, then on by itself 0.6 s after the questions show. No Continue |
 | 11 | `swipe` | Swipe and get specific | 1251:6920 | swipe the widget. Tick, then on by itself. No Continue |
@@ -178,10 +178,14 @@ a haptic); `advance()` is the plain one.
 - `Compare` is an `@Observable` class holding `split` (0 is all simple, 1 is all report), `reportLeads`
   (derived in `split`'s `didSet`, true above 0.5), `focusing`, `shown`, `touched` and `simplified`. It is kept
   apart from the view's `@State` so dragging the line redraws only `CompareLayer`.
-- The line comes in, sways across and back twice, and rests at `splitRest = 0.25` (three quarters simple).
+- Two tabs sit over the phone (1519:11060): "Research" and "What you read". The chosen one is the side with more of
+  the screen; tapping one takes the line to its place (off to the right, or to `splitRest`).
+- The report lands in full under "Research" and is left for 0.9 s (`researchRest`). Then the tabs change over and the
+  line comes in from the right by its handle (1519:11049) to rest at `splitRest = 0.25` (three quarters simple).
 - The side with less of the screen is blurred (`unfocused = 7`), and the two sides swap over
   `refocusing = .easeInOut(duration: 0.9)` when the line crosses the middle. The blur starts only once
-  `focusing` is true: when the sway comes to rest, when a drag starts, or on the accessibility adjust action.
+  `focusing` is true: as the line comes in, when a tab is tapped, when a drag starts, or on the accessibility adjust
+  action.
 - Dragged all the way left, the heading becomes "Decades of research, simplified for you".
 
 ### How the opening is built
@@ -205,7 +209,7 @@ a haptic); `advance()` is the plain one.
 ### Things that have gone wrong before
 
 - A view removed from a `ZStack` drops behind its siblings and vanishes at once unless it has an explicit
-  `.zIndex`. On the phone: `ResearchRun` 1, `CompareLayer` 2, the island 3.
+  `.zIndex`. On the phone: `ResearchRun` 1, `CompareLayer` 2. (The phone no longer draws an island.)
 - `.animation(nil, value:)` on a moving view also kills its position animation. Scope it:
   `.animation(nil) { $0.opacity(...) }`.
 - The report under `ResearchRun` is the real v1 chat run unseen at `chatPace = 40`; `reportUp()` waits 0.5 s

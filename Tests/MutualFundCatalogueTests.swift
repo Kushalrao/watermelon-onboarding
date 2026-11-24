@@ -81,15 +81,13 @@ final class MutualFundCatalogueTests: XCTestCase {
             XCTAssertEqual(list.count, 3)
             XCTAssertTrue(list.allSatisfy { MutualFundCatalogue.fund(code: $0.id) != nil })
         }
-        XCTAssertEqual(Set(lists.joined().map(\.id)).count, 12, "no fund is on the homepage twice")
+        XCTAssertEqual(Set(lists.joined().map(\.id)).count, 12, "no fund is in two of the homepage's short lists")
+        // "All mutual funds" is the top of the small caps' page
+        XCTAssertEqual(MutualFundsHomeV2View.all, Array(FundCategory.smallCap.funds.prefix(8)))
         XCTAssertEqual(MutualFundsHomeV2View.ranked, Array(FundCategory.smallCap.funds.prefix(3)), "the ranked card is the top of the page it opens")
         XCTAssertTrue(MutualFundsHomeV2View.midCaps.allSatisfy { $0.category == "Mid Cap Fund" })
         XCTAssertTrue(MutualFundsHomeV2View.infrastructure.allSatisfy { $0.name.localizedCaseInsensitiveContains("infra") })
         XCTAssertEqual(FundCategory.infrastructure.funds.count, 19)
-        // Each small chart opens the fund it names
-        for riser in MutualFundsHomeV2View.risers {
-            XCTAssertEqual(MutualFundCatalogue.fund(code: riser.code)?.name, riser.fund)
-        }
     }
 
     func testAFundsPage() {
@@ -153,13 +151,7 @@ final class MutualFundCatalogueTests: XCTestCase {
     }
 
     func testTheExplorePagesKindsAndSearch() {
-        // Every kind's card has its drawing and opens a page with funds on it
-        XCTAssertEqual(MutualFundsHomeV2View.kindCards.count, 12)
-        for kind in MutualFundsHomeV2View.kindCards {
-            XCTAssertNotNil(UIImage(named: kind.art), "\(kind.art) is not an image set")
-            XCTAssertFalse(FundCategory.named(kind.title)?.funds.isEmpty ?? true, "\(kind.title) opens no funds")
-        }
-        // The kinds search offers open pages too
+        // The kinds the page's chips and search offer open pages with funds on them
         for kind in MutualFundsHomeV2View.kinds {
             XCTAssertNotNil(FundCategory.named(kind.title), "\(kind.title) opens no category")
             XCTAssertNotNil(UIImage(named: kind.orb))
@@ -184,5 +176,20 @@ final class MutualFundCatalogueTests: XCTestCase {
         for extra in ["MFHomeAngelOne", "MFHomeILFS"] {
             XCTAssertNotNil(UIImage(named: extra), "\(extra) is not an image set")
         }
+    }
+
+    /// A list's returns over the stretch picked: the catalogue's own where it has them, the headline at three
+    /// years, and the same sample figure every time for the two stretches it has none for
+    func testReturnsOverAPeriod() throws {
+        let fund = try XCTUnwrap(MutualFundCatalogue.funds.first { $0.threeYear != nil && $0.fiveYear != nil && $0.oneYear != nil })
+        XCTAssertEqual(fund.returned(over: .threeYears), fund.headline)
+        XCTAssertEqual(fund.returned(over: .oneYear), fund.oneYear)
+        XCTAssertEqual(fund.returned(over: .fiveYears), fund.fiveYear)
+        XCTAssertEqual(fund.returned(over: .all), fund.sinceInception)
+        XCTAssertEqual(fund.returned(over: .oneMonth), fund.returned(over: .oneMonth))
+        XCTAssertNotNil(fund.returned(over: .sixMonths))
+        let young = try XCTUnwrap(MutualFundCatalogue.funds.first { $0.fiveYear == nil })
+        XCTAssertNil(young.returned(over: .fiveYears))
+        XCTAssertEqual(FundPeriod.allCases.map(\.rawValue), ["1M", "6M", "1Y", "3Y", "5Y", "ALL"])
     }
 }

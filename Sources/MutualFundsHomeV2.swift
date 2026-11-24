@@ -1,19 +1,24 @@
 import SwiftUI
 
-/// Figma "iPhone 14 Plus - 555" (101:17619, file `sub7vIn6sMBlHb4SIWHyek`): the mutual funds explore page, the
-/// homepage's second version as it now stands. A back button and a search field stay at the top; under them a
-/// row of three tabs ("All", chosen, "For you" and "Portfolio"), a tinted card of funds ranked by performance,
-/// two plain lists, a row of fund categories, the month's risers as small charts, a list under the cube
-/// heading, the categories again, and then a card for each kind of fund, one under the other. Each list has
-/// "FUND" and "3Y RETURNS" over its funds. The advisor's pill stays at the foot.
+/// Figma "iPhone 14 Plus - 559" (118:26118, file `sub7vIn6sMBlHb4SIWHyek`, which took the place of 101:17619):
+/// the mutual funds explore page, the homepage's second version as it now stands. A back button and a search
+/// field stay at the top; under them a row of three tabs ("All", chosen, "For you" and "Portfolio"), "Mutual
+/// funds" over a row of fund categories, a tinted card of funds ranked by performance, two plain lists, a list
+/// under the cube heading, the categories again, and then "All mutual funds": the kinds of fund as chips over a
+/// card of funds. Each list has "FUND" and "3Y RETURNS" over its funds; a tap on the returns brings up the
+/// choices of stretch (118:26105), and the one picked is the stretch every list's returns are over. The
+/// advisor's pill stays at the foot.
+///
+/// The frame before it had the month's risers as small charts ("Rising in november") after the lists, and a
+/// card for each kind of fund, one under the other, where "All mutual funds" is; this frame took both away.
 ///
 /// It was drawn first as 47:6749, with "Explore Mutual Funds" as a title over the search field and a row of
 /// nine kinds of fund where the tabs are; the frame took those away.
 ///
 /// It is what a plain launch opens, and `-mf` opens it too; the first version (`MutualFundsHomeView`, with the
-/// fund houses' map) is kept behind `-mfHomeV1`. A tap on a fund, in a row or on a small chart, pushes that
+/// fund houses' map) is kept behind `-mfHomeV1`. A tap on a fund in a row pushes that
 /// fund's page (`MutualFundDetailView`); `-mfFund` opens with the drawn fund's already up. The frame draws one
-/// state only: the tabs and the lists' "3Y RETURNS" do not respond yet. A category card, a kind's card or the
+/// state only: the tabs do not respond yet. A category card, a kind's chip or the
 /// ranked card's expand button pushes that category's page (`MutualFundCategoryView`), which lists the real funds
 /// of the kind.
 ///
@@ -58,26 +63,6 @@ struct MutualFundsHomeV2View: View {
         }
     }
 
-    /// A riser of the month, with its small chart as drawn (57:8554)
-    struct Riser: Identifiable {
-        let id: Int
-        /// The name over two lines, broken where the frame breaks it
-        let name: String
-        let fund: String
-        /// Its scheme code in the list of active funds, whose page a tap opens
-        let code: Int
-        let logo: String
-        /// What it has returned in the month, as the frame writes it
-        let returned: String
-        /// The drawn area and line, image sets' names, and where each sits in the chart's 202 × 153.72 panel
-        let area: String
-        let areaTop: CGFloat
-        let line: String
-        let lineAt: CGPoint
-        /// The prices at the trailing edge that can be seen, with how far down each is
-        let prices: [(String, CGFloat)]
-    }
-
     /// The kinds of fund search offers to browse (47:7331, the row the page's first drawing had), each with its orb
     static let kinds: [(title: String, orb: String)] = [
         ("Equity", "MFHome2ChipEquity"), ("Banking", "MFHome2ChipBanking"), ("Small cap", "MFHome2ChipSmallCap"),
@@ -85,33 +70,8 @@ struct MutualFundsHomeV2View: View {
         ("Liquid", "MFHome2ChipLiquid"), ("Large cap", "MFHome2ChipLargeCap"), ("Technology", "MFHome2ChipTechnology"),
     ]
 
-    /// A kind of fund's card (111:21216 …): its title, its drawing, and where the drawing is in the card's 364 × 203
-    struct Kind: Identifiable {
-        let title: String
-        let art: String
-        /// The drawing's size, how far it is from the card's trailing edge, and how far down it starts
-        let size: CGSize
-        let trailing: CGFloat
-        let top: CGFloat
-        var id: String { title }
-    }
-
-    /// 111:21215: the kinds' cards, in the frame's order. The frame has "Energy/ Power" and "Commodities" twice
-    /// each; they are here once.
-    static let kindCards: [Kind] = [
-        Kind(title: "Hybrid fund", art: "MFKindArtHybrid", size: CGSize(width: 112.79, height: 107.31), trailing: 43, top: 48),
-        Kind(title: "Equity fund", art: "MFKindArtEquity", size: CGSize(width: 117.56, height: 154.85), trailing: 53, top: 23.95),
-        Kind(title: "Debt fund", art: "MFKindArtDebt", size: CGSize(width: 124.09, height: 126.73), trailing: 38.9, top: 37.96),
-        Kind(title: "Banking", art: "MFKindArtBanking", size: CGSize(width: 108.41, height: 128.11), trailing: 50.59, top: 37),
-        Kind(title: "Technology", art: "MFKindArtTechnology", size: CGSize(width: 96.42, height: 116.29), trailing: 50, top: 43),
-        Kind(title: "Pharma", art: "MFKindArtPharma", size: CGSize(width: 121.43, height: 128.95), trailing: 41, top: 37),
-        Kind(title: "FMCG", art: "MFKindArtFMCG", size: CGSize(width: 118.08, height: 130.15), trailing: 52.92, top: 36),
-        Kind(title: "Infrastructure", art: "MFKindArtInfrastructure", size: CGSize(width: 125.56, height: 140.84), trailing: 36.44, top: 30.87),
-        Kind(title: "Energy/ Power", art: "MFKindArtEnergy", size: CGSize(width: 121.08, height: 124.13), trailing: 40.92, top: 39),
-        Kind(title: "Automobile", art: "MFKindArtAutomobile", size: CGSize(width: 134.44, height: 122), trailing: 35.56, top: 41),
-        Kind(title: "Commodities", art: "MFKindArtCommodities", size: CGSize(width: 143.03, height: 118.57), trailing: 34.97, top: 42),
-        Kind(title: "Real estate", art: "MFKindArtRealEstate", size: CGSize(width: 105.87, height: 131.3), trailing: 42.13, top: 35.42),
-    ]
+    /// 118:26439: "All mutual funds", as the frame lists them: the eight small cap funds that have returned most
+    static let all: [ListedFund] = Array(FundCategory.smallCap.funds.prefix(8))
 
     /// 57:8327: the ranked card's three funds: the small cap funds that have returned most a year over three
     /// years, which are the first three of the page its expand button opens
@@ -132,17 +92,6 @@ struct MutualFundsHomeV2View: View {
         ("Equity funds", "MFHome2CatEquity", 70), ("Hybrid funds", "MFHome2CatHybrid", 79), nil, nil,
     ]
 
-    /// 47:7141: "Rising in november"
-    static let risers: [Riser] = [
-        Riser(id: 0, name: "Axis Midcap Fund", fund: "Axis Midcap Fund", code: 120505, logo: "MFHomeAxis", returned: "6.7%",
-              area: "MFHome2ChartAxisArea", areaTop: 18.08, line: "MFHome2ChartAxisLine", lineAt: CGPoint(x: 7.19, y: 17.63),
-              prices: [("¢107", 13.08), ("¢102", 65.5), ("¢96", 133)]),
-        Riser(id: 1, name: "SBI Contra\nFund", fund: "SBI Contra Fund", code: 119835, logo: "MFHomeSBI", returned: "7.8%",
-              area: "MFHome2ChartSBIArea", areaTop: 5.04, line: "MFHome2ChartSBILine", lineAt: CGPoint(x: 7.41, y: 4.72),
-              prices: [("¢108", 0.05), ("¢102", 65.5), ("¢96", 133)]),
-    ]
-
-    private static let titleInk = Color(hex: 0x212121) // Gap: #212121, a card's question, is unbound
     private static let barShadow = Color.black.opacity(0.08) // Gap: black 8%, the top bar's shadow, is Shadow/1 at a stronger tint
     private static let tabShadow = Color.black.opacity(0.07) // Gap: black 7%, the chosen tab's shadow, is unbound
     private static let rankedInk = Color(hex: 0xA872B3) // Gap: accent-lavender/500 has no semantic token
@@ -150,9 +99,6 @@ struct MutualFundsHomeV2View: View {
     private static let rankedFoot = Color(hex: 0xE7FCE4, opacity: 0.44) // Gap: #E7FCE4 44%, the foot of the ranked card, is unbound
     private static let rankedShadow = Color.black.opacity(0.08) // Gap: black 8%, the ranked card's shadow, is Shadow/1 at a stronger tint
     private static let footWash = Color(hex: 0xF3F6F3) // Gap: #F3F6F3, the wash under the pill, is unbound
-    private static let axisInk = Color.black.opacity(0.4) // Gap: black 40%, a small chart's prices, is unbound
-    private static let gridInk = Color.black.opacity(0.13) // Gap: black 13%, a small chart's middle line, is unbound
-    private static let baseInk = Color.black.opacity(0.33) // Gap: black 33%, a small chart's base line, is unbound
 
     /// The fund whose page is pushed over this one; `-mfFund` opens with the drawn fund's already up
     @State private var openedFund: MutualFund? = ProcessInfo.processInfo.arguments.contains("-mfFund") ? .kotak : nil
@@ -167,6 +113,99 @@ struct MutualFundsHomeV2View: View {
     private static let searchSpring = Animation.spring(response: 0.35, dampingFraction: 0.85)
     /// What is typed into the search field
     @State private var query = ""
+
+    /// The stretch every list's returns are over (118:26105), and where on the screen the column's words that were
+    /// tapped are while its choices are up
+    @State private var period = FundPeriod.threeYears
+    @State private var pickingAt: CGRect?
+    /// The list whose column brought them up: they stay with its words if the page moves under them
+    @State private var pickingIn: String?
+    /// How far the choices have come out from under the column's words (0 to 1), and how far they've grown from
+    /// the words' size to their own: each on its own spring, as a fund's card opens out
+    @State private var pillMove: CGFloat = 0
+    @State private var pillGrow: CGFloat = 0
+    /// The pill sliding to the stretch picked
+    private static let pickSpring = Animation.spring(response: 0.32, dampingFraction: 0.8)
+    // The springs a fund's card opens out and goes back on (`MutualFundDetailView`)
+    private static let openMove = Animation.spring(response: 0.5, dampingFraction: 0.78)
+    private static let openGrow = Animation.spring(response: 0.58, dampingFraction: 0.7)
+    private static let closeMove = Animation.spring(response: 0.42, dampingFraction: 0.84)
+    private static let closeGrow = Animation.spring(response: 0.46, dampingFraction: 0.76)
+
+    /// Brings the choices up from the column's words at `place`; they come out once they're there (`periodLayer`)
+    private func openPeriods(in list: String, at place: CGRect) {
+        guard pickingAt == nil else { return }
+        Haptics.tap()
+        pillMove = 0
+        pillGrow = 0
+        pickingIn = list
+        pickingAt = place
+    }
+
+    /// Sends the choices back under the column's words, and takes them away once they're there
+    private func closePeriods() {
+        guard pickingAt != nil, pillGrow > 0 else { return }
+        withAnimation(Self.closeGrow) { pillGrow = 0 }
+        withAnimation(Self.closeMove, completionCriteria: .removed) {
+            pillMove = 0
+        } completion: {
+            if pillMove == 0 { pickingAt = nil }
+        }
+    }
+
+    private func pick(_ picked: FundPeriod) {
+        Haptics.tap()
+        withAnimation(Self.pickSpring) { period = picked }
+        // A moment to see the pill land on it, and the choices go back
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { closePeriods() }
+    }
+
+    /// A list's funds, the better return over the chosen stretch first; a fund that hasn't run that long is last
+    private func ordered(_ funds: [ListedFund]) -> [ListedFund] {
+        guard period != .threeYears else { return funds }
+        return funds.enumerated().sorted {
+            let first = $0.element.returned(over: period), second = $1.element.returned(over: period)
+            return (first == nil ? 1 : 0, -(first ?? 0), $0.offset) < (second == nil ? 1 : 0, -(second ?? 0), $1.offset)
+        }.map(\.element)
+    }
+
+    /// 118:26105: the choices of stretch, under the column's words that brought them up (over them where there's
+    /// no room under), their trailing end 10 from the screen's as the frame has it. They come out from under those
+    /// words: starting behind them at their size, moving out to their place and growing to their own size, and go
+    /// back the same way once one's picked. A tap anywhere else puts them away too.
+    private var periodLayer: some View {
+        GeometryReader { screen in
+            if let at = pickingAt {
+                let top = screen.frame(in: .global).minY
+                let under = at.maxY - top + 6
+                // Clear of the advisor's pill at the foot
+                let fits = under + 57 < screen.size.height - 120
+                let rest = fits ? under : at.minY - top - 6 - 57
+                // Behind the words: as wide as they are, its trailing end at theirs, its middle on theirs
+                let small = min(1, at.width / 352)
+                let grown = min(max(pillGrow, 0), 1)
+                let scale = small + (1 - small) * pillGrow
+                let behind = at.midY - top - 57 / 2
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture { closePeriods() }
+                    .accessibilityLabel("Close")
+                    .accessibilityAddTraits(.isButton)
+                FundPeriodPicker(chosen: period, onPick: pick)
+                    .fixedSize()
+                    .scaleEffect(scale, anchor: .trailing)
+                    .opacity(min(1, grown / 0.3))
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.trailing, 10 + (screen.size.width - at.maxX + screen.frame(in: .global).minX - 10) * (1 - pillMove)) // Gap: 10 from the screen's trailing edge, no spacing token
+                    .offset(y: behind + (rest - behind) * pillMove)
+                    .onAppear {
+                        withAnimation(Self.openMove) { pillMove = 1 }
+                        withAnimation(Self.openGrow) { pillGrow = 1 }
+                    }
+            }
+        }
+    }
+
     @FocusState private var searchFocused: Bool
 
     private func open(_ category: FundCategory?) {
@@ -201,22 +240,21 @@ struct MutualFundsHomeV2View: View {
                     tabs
                         .padding(.leading, 17) // Gap: 17 from the screen's edge, no spacing token
                         .padding(.top, 88) // Gap: the tabs start 89 under the status bar, 19 under the top bar; no spacing token
+                    // 118:26173
+                    categories("Mutual funds", across: 168)
+                        .padding(.top, 37) // Gap: 37 under the tabs, no spacing token
                     // The sections are 47 apart
-                    rankedCard
-                        .padding(.horizontal, SpacingScale.spaceMdLg)
-                        .padding(.top, 27) // Gap: 27 under the tabs, no spacing token
                     Group {
+                        rankedCard
+                            .padding(.horizontal, SpacingScale.spaceMdLg)
                         list("Upcoming mid caps", Self.midCaps)
                             .padding(.horizontal, 17) // Gap: 17 from the screen's edges, no spacing token
                         list("New infrastructure funds", Self.infrastructure)
                             .padding(.horizontal, 17) // Gap: 17 from the screen's edges, no spacing token
-                        categories
-                        risers
                         cubeList
                             .padding(.horizontal, 17) // Gap: 17 from the screen's edges, no spacing token
-                        categories
-                        kindStack
-                            .padding(.horizontal, SpacingScale.spaceMdLg)
+                        categories("Rising small cap funds", across: 173)
+                        allFunds
                     }
                     .padding(.top, SpacingScale.space6xl)
                 }
@@ -242,6 +280,7 @@ struct MutualFundsHomeV2View: View {
         // The frame has no fill of its own: white
         .background(ColorScale.surfaceWidget.ignoresSafeArea())
         .overlay(alignment: .top) { bar }
+        .overlay { periodLayer }
         .overlay {
             // 47:6970: the page fades into a pale wash behind the pill, 125 up from the foot of the screen
             VStack(spacing: 0) {
@@ -348,36 +387,6 @@ struct MutualFundsHomeV2View: View {
         .accessibilityAddTraits(chosen ? .isSelected : [])
     }
 
-    /// 111:21215: a card for each kind of fund, one under the other. A tap opens the kind's page.
-    private var kindStack: some View {
-        Stack(gap: .spaceXl) {
-            ForEach(Self.kindCards) { kind in
-                // 111:21216: 203 tall, with the kind's drawing toward its trailing edge
-                Surface(surface: .surfaceWidget, radius: .radius27, border: .borderSubtle, shadow: .none) {
-                    ZStack(alignment: .topLeading) {
-                        Image(kind.art)
-                            .resizable()
-                            .frame(width: kind.size.width, height: kind.size.height)
-                            .padding(.trailing, kind.trailing)
-                            .padding(.top, kind.top)
-                            .frame(maxWidth: .infinity, alignment: .topTrailing)
-                            .accessibilityHidden(true)
-                        // Gap: Md 23/31 in the unbound #212121 has no text style (H4 is 23/35)
-                        GapText(kind.title, family: .walsheim, medium: true, size: 23, lineHeight: 31, color: Self.titleInk)
-                            .fixedSize()
-                            .at(17, 17)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
-                    .frame(height: 203, alignment: .topLeading)
-                }
-                .contentShape(Rectangle())
-                .onTapGesture { open(FundCategory.named(kind.title)) }
-                .accessibilityElement(children: .combine)
-                .accessibilityAddTraits(.isButton)
-            }
-        }
-    }
-
     // MARK: Search
 
     /// Search, over the page and under the top bar: the kinds of fund to browse while nothing is typed, then the
@@ -466,7 +475,7 @@ struct MutualFundsHomeV2View: View {
             .padding(.horizontal, 17) // Gap: 17 inside the card, no spacing token
             Surface(surface: .surfaceWidget, radius: .radius15, shadow: .none) {
                 VStack(spacing: 37) { // Gap: 37 between the rows, no spacing token
-                    ForEach(Self.ranked) { row($0) }
+                    ForEach(ordered(Self.ranked)) { row($0) }
                 }
                 .padding(17) // Gap: 17 inside the white card, no spacing token
             }
@@ -488,16 +497,20 @@ struct MutualFundsHomeV2View: View {
     private func list(_ heading: String, _ funds: [ListedFund]) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             title(heading)
-            listed(funds)
+            listed(heading, funds)
                 .padding(.top, 17) // Gap: 17 under the title, no spacing token
         }
     }
 
     /// The column names, then the funds 15 under them
-    private func listed(_ funds: [ListedFund]) -> some View {
+    private func listed(_ heading: String, _ funds: [ListedFund]) -> some View {
         Stack(gap: .spaceLg) {
-            FundColumns()
-            rows(funds)
+            FundColumns(period: period) {
+                openPeriods(in: heading, at: $0)
+            } onMove: { place in
+                if pickingAt != nil, pickingIn == heading { pickingAt = place }
+            }
+            rows(ordered(funds))
         }
     }
 
@@ -509,7 +522,7 @@ struct MutualFundsHomeV2View: View {
 
     /// 57:8328: one of the homepage's funds as a row; a tap opens its page
     private func row(_ fund: ListedFund) -> some View {
-        MutualFundRow(fund) { open(fund) }
+        MutualFundRow(fund, over: period) { open(fund) }
     }
 
     /// 57:8659: the cube, a title and a line about it, then three funds
@@ -535,16 +548,66 @@ struct MutualFundsHomeV2View: View {
             }
             .padding(.trailing, SpacingScale.spaceLg)
             .frame(height: 68, alignment: .top)
-            listed(Self.rising)
+            listed("Rising small cap funds", Self.rising)
+        }
+    }
+
+    // MARK: All mutual funds
+
+    /// 118:26436: "All mutual funds": the kinds of fund as chips, running off the trailing edge (a tap opens that
+    /// kind's page; the last is written as the frame writes it), then "FUND" and the returns' stretch over the
+    /// funds in the widget card, as a category's page lists them: returns to two decimals, and the first marked
+    /// as the highest
+    private var allFunds: some View {
+        let funds = ordered(Self.all)
+        let leader = funds.first.flatMap { $0.returned(over: period) == nil ? nil : $0.id }
+        return VStack(alignment: .leading, spacing: 0) {
+            title("All mutual funds")
+                .padding(.leading, 17) // Gap: 17 from the screen's edge, no spacing token
+            ScrollView(.horizontal, showsIndicators: false) {
+                Stack(direction: .horizontal, gap: .spaceMd) {
+                    ForEach(Self.kinds, id: \.title) { kind in
+                        FundKindChip(title: kind.title == "Technology" ? "Technologi" : kind.title, orb: kind.orb)
+                            .onTapGesture { open(FundCategory.named(kind.title)) }
+                            .accessibilityLabel(kind.title)
+                    }
+                }
+                .padding(.horizontal, SpacingScale.spaceMdLg)
+            }
+            .scrollClipDisabled()
+            .padding(.top, SpacingScale.spaceMdLg)
+            FundColumns(period: period) {
+                openPeriods(in: "All mutual funds", at: $0)
+            } onMove: { place in
+                if pickingAt != nil, pickingIn == "All mutual funds" { pickingAt = place }
+            }
+            .padding(.horizontal, 17) // Gap: 17 from the screen's edges, no spacing token
+            .padding(.top, SpacingScale.spaceLg)
+            // 118:26439: the funds, in the widget card with its designed shadow
+            Surface(surface: .surfaceWidget, radius: .radius23) {
+                VStack(spacing: 41) { // Gap: 41 between the rows, no spacing token
+                    ForEach(funds) { fund in
+                        MutualFundRow(fund, over: period, decimals: 2, badge: fund.id == leader ? "Highest \(period.rawValue) return" : nil) {
+                            open(fund)
+                        }
+                    }
+                }
+                .padding(.horizontal, 17) // Gap: 17 inside the card, no spacing token
+                .padding(.top, 24) // Gap: 24 over the first fund, no spacing token
+                .padding(.bottom, 28) // Gap: 28 under the last, no spacing token
+            }
+            .padding(.horizontal, SpacingScale.spaceMdLg)
+            .padding(.top, SpacingScale.spaceLg)
         }
     }
 
     // MARK: Categories
 
-    /// 57:8505: "Rising small cap funds" over a row of square cards, running off the trailing edge
-    private var categories: some View {
+    /// 118:26173, 118:26210: a title over a row of cards, running off the trailing edge: "Mutual funds" at the top
+    /// of the page, its cards 168 across, and "Rising small cap funds" further down, its cards 173
+    private func categories(_ heading: String, across: CGFloat) -> some View {
         Stack(gap: .space2xl) {
-            DsText("Rising small cap funds", variant: .h3)
+            DsText(heading, variant: .h3)
                 .fixedSize()
                 // H3 on the 35 pt line the frame gives it (the token's line is 39)
                 .frame(height: 35)
@@ -566,7 +629,7 @@ struct MutualFundsHomeV2View: View {
                                         .accessibilityHidden(true)
                                 }
                             }
-                            .frame(width: 173, height: 173, alignment: .topLeading)
+                            .frame(width: across, height: 173, alignment: .topLeading)
                         }
                         .contentShape(Rectangle())
                         .onTapGesture { open(category.flatMap { FundCategory.named($0.title) }) }
@@ -578,93 +641,6 @@ struct MutualFundsHomeV2View: View {
                 .padding(.horizontal, 17) // Gap: 17 from the screen's edges, no spacing token
             }
         }
-    }
-
-    // MARK: Risers
-
-    /// 57:8904: "Rising in november", each riser's name over its month as a small chart
-    private var risers: some View {
-        VStack(alignment: .leading, spacing: 27) { // Gap: 27 under the title, no spacing token
-            title("Rising in november")
-                .padding(.leading, 17) // Gap: 17 from the screen's edge, no spacing token
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 10) { // Gap: 10 between the risers, no spacing token
-                    ForEach(Self.risers) { riser($0) }
-                }
-                .padding(.horizontal, 17) // Gap: 17 from the screen's edges, no spacing token
-            }
-            // The cards' shadows reach past the row
-            .scrollClipDisabled()
-        }
-    }
-
-    /// 57:8554: the fund over its card, 206.5 across
-    private func riser(_ riser: Riser) -> some View {
-        Stack(gap: .spaceMdLg) {
-            // 57:8576: the logo, the name over two lines, and a chevron
-            ZStack(alignment: .topLeading) {
-                FundHouseLogo(name: riser.logo, side: 41)
-                    .at(0, 1)
-                DsText(riser.name, variant: .p3)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(width: 125, alignment: .leading)
-                    .at(50, 0)
-                Image("MFHome2Chevron")
-                    .at(186.02, 5.47)
-                    .accessibilityHidden(true)
-            }
-            .frame(width: 193.8, height: 46, alignment: .topLeading)
-            // 57:8555. Gap: #FEFEFE in the frame; here the white widget surface
-            Surface(surface: .surfaceWidget, radius: .radius23) {
-                ZStack(alignment: .topLeading) {
-                    chart(riser)
-                        .at(4, 21.14)
-                    // Gap: GT Walsheim Bold 20.5/25.2 has no text style, and the app has no Bold face: Medium here
-                    GapText(riser.returned, family: .walsheim, medium: true, size: 20.517, lineHeight: 25.207, color: ColorScale.contentPrimary)
-                        .fixedSize()
-                        .at(13, 11)
-                    // Gap: Rg 8.8/12.3 has no text style
-                    GapText("1M returns", family: .walsheim, medium: false, size: 8.793, lineHeight: 12.31, color: ColorScale.contentTertiary)
-                        .fixedSize()
-                        .at(13, 36.21)
-                }
-                .frame(width: 202, height: 173, alignment: .topLeading)
-            }
-            .padding(.leading, 1) // Gap: the card sits 1 in from the name, no spacing token
-        }
-        .frame(width: 206.5, alignment: .leading)
-        .contentShape(Rectangle())
-        .onTapGesture { open(MutualFundCatalogue.fund(code: riser.code)) }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(riser.fund), \(riser.returned) in a month")
-        .accessibilityAddTraits(.isButton)
-    }
-
-    /// 57:8556: the month as drawn, on its 202 × 153.72 panel: two lines across, the area and its line, and the
-    /// prices at the trailing edge
-    private func chart(_ riser: Riser) -> some View {
-        ZStack(alignment: .topLeading) {
-            ColorScale.surfaceBase
-            Self.gridInk
-                .frame(width: 187.57, height: 0.55)
-                .at(7.77, 69.95)
-            Self.baseInk
-                .frame(width: 187.57, height: 0.55)
-                .at(7.77, 137.45)
-            Image(riser.area)
-                .at(7.8, riser.areaTop)
-            Image(riser.line)
-                .at(riser.lineAt.x, riser.lineAt.y)
-            ForEach(riser.prices, id: \.0) { price, top in
-                // Gap: Rg 6.7/9.4 at 7% tracking has no text style
-                GapText(price, family: .walsheim, medium: false, size: 6.659, lineHeight: 9.434, trackingPercent: 7, color: Self.axisInk)
-                    .fixedSize()
-                    .frame(width: 194.7, alignment: .trailing)
-                    .at(0, top)
-            }
-        }
-        .frame(width: 202, height: 153.72, alignment: .topLeading)
-        .clipShape(RoundedRectangle(cornerRadius: 8.324, style: .continuous)) // Gap: 8.324, the panel's radius, has no token
     }
 }
 
@@ -709,13 +685,15 @@ extension MutualFundRow {
     /// A fund from the list of active funds: its name in full, its house's logo, the return it is ranked by, and
     /// its score among its category's funds as the figure and dots
     /// The return is written to one decimal, as the explore page has it, or to two, as a category's page does
-    init(_ fund: ListedFund, decimals: Int = 1, badge: String? = nil, onTap: @escaping () -> Void) {
+    /// over the stretch asked for; a fund that hasn't run that long has a dash
+    init(_ fund: ListedFund, over period: FundPeriod = .threeYears, decimals: Int = 1, badge: String? = nil, onTap: @escaping () -> Void) {
+        let returned = fund.returned(over: period)
         self.init(
             name: fund.name, logo: fund.logo ?? "", house: fund.house,
-            returned: String(format: "%.\(decimals)f%%", fund.headline), up: fund.headline >= 0,
+            returned: returned.map { String(format: "%.\(decimals)f%%", $0) } ?? "–", up: (returned ?? 0) >= 0,
             rating: String(format: "%.1f", fund.score), filled: Int(fund.score.rounded()),
             tone: MutualFundsHomeV2View.Tone(score: fund.score),
-            kind: fund.kindLine, badge: badge, onTap: onTap
+            kind: fund.kindLine, badge: badge, widest: decimals > 1 ? "49." + String(repeating: "5", count: decimals) + "%" : "49.5%", onTap: onTap
         )
     }
 }
@@ -741,6 +719,8 @@ struct MutualFundRow: View {
     let kind: String
     /// What the fund is first at, written over its name where its rating would be (79:12044): "Highest 3Y return"
     var badge: String? = nil
+    /// The widest return the row keeps room for: "49.5%" to one decimal, "49.55%" to two
+    var widest = "49.5%"
     let onTap: () -> Void
 
     private static let upInk = Color(hex: 0x3FD519) // Gap: utility-green/400 has no semantic token
@@ -766,9 +746,16 @@ struct MutualFundRow: View {
                     DsText(name, variant: .p3)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 0)
+                    // The return's room is always that of the widest it's set for ("49.5%"), so the name beside it
+                    // breaks the same way whatever the return is
                     // Gap: H6 (Md 17/23) in a utility colour with no content token
-                    GapText(returned, family: .walsheim, medium: true, size: 17, lineHeight: 23, color: up ? Self.upInk : Self.downInk)
+                    GapText(widest, family: .walsheim, medium: true, size: 17, lineHeight: 23, color: Self.upInk)
                         .fixedSize()
+                        .hidden()
+                        .overlay(alignment: .trailing) {
+                            GapText(returned, family: .walsheim, medium: true, size: 17, lineHeight: 23, color: up ? Self.upInk : Self.downInk)
+                                .fixedSize()
+                        }
                 }
                 if badge == nil {
                     FundRatingMark(rating: rating, filled: filled, tone: tone)
